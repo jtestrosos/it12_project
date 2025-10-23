@@ -177,7 +177,7 @@
                                             <div class="d-flex align-items-center">
                                                 <i class="fas fa-clock text-primary me-2"></i>
                                                 <span class="text-muted">Last Visit:</span>
-                                                <span class="ms-2">{{ $patient->appointments->latest()->first()->appointment_date->format('M d, Y') }}</span>
+                                                <span class="ms-2">{{ $patient->appointments->sortByDesc('appointment_date')->first()->appointment_date->format('M d, Y') }}</span>
                                             </div>
                                             @endif
                                         </div>

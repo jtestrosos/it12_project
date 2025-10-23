@@ -68,12 +68,14 @@ Route::post('/register', function (Request $request) {
     $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email',
+        'barangay' => 'required|string|max:255',
         'password' => 'required|min:6|confirmed',
     ]);
 
     $user = \App\Models\User::create([
         'name' => $request->name,
         'email' => $request->email,
+        'barangay' => $request->barangay,
         'password' => bcrypt($request->password),
         'role' => 'user' // Default role for new registrations
     ]);
@@ -86,6 +88,7 @@ Route::post('/register', function (Request $request) {
 Route::middleware(['auth'])->group(function () {
     Route::prefix('patient')->name('patient.')->group(function () {
         Route::get('/dashboard', [PatientController::class, 'dashboard'])->name('dashboard');
+        Route::get('/appointments', [PatientController::class, 'appointments'])->name('appointments');
         Route::get('/book-appointment', [PatientController::class, 'bookAppointment'])->name('book-appointment');
         Route::post('/appointment', [PatientController::class, 'storeAppointment'])->name('appointment.store');
         Route::get('/appointment/{appointment}', [PatientController::class, 'showAppointment'])->name('appointment.show');

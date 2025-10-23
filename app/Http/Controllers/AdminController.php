@@ -22,13 +22,35 @@ class AdminController extends Controller
         $recentAppointments = Appointment::with('user')->latest()->limit(5)->get();
         $lowStockInventory = Inventory::whereColumn('current_stock', '<=', 'minimum_stock')->limit(5)->get();
 
+        // Patients by Barangay data for the doughnut chart
+        $patientsByBarangay = User::where('role', 'user')
+            ->whereNotNull('barangay')
+            ->selectRaw('barangay, count(*) as count')
+            ->groupBy('barangay')
+            ->get();
+
+        // Service types data for the bar chart
+        $serviceTypes = Appointment::selectRaw('service_type, count(*) as count')
+            ->whereMonth('created_at', now()->month)
+            ->groupBy('service_type')
+            ->get();
+
+        // Weekly appointments data for the line chart
+        $weeklyAppointments = Appointment::selectRaw('DAYOFWEEK(appointment_date) as day_of_week, count(*) as count')
+            ->whereBetween('appointment_date', [now()->startOfWeek(), now()->endOfWeek()])
+            ->groupBy('day_of_week')
+            ->get();
+
         return view('admin.dashboard', compact(
             'totalPatients',
             'todayAppointments',
             'lowStockItems',
             'monthlyServices',
             'recentAppointments',
-            'lowStockInventory'
+            'lowStockInventory',
+            'patientsByBarangay',
+            'serviceTypes',
+            'weeklyAppointments'
         ));
     }
 
@@ -168,19 +190,32 @@ class AdminController extends Controller
     {
         $appointmentStats = [
             'total' => Appointment::count(),
-            'pending' => Appointment::pending()->count(),
-            'approved' => Appointment::approved()->count(),
+            'pending' => Appointment::where('status', 'pending')->count(),
+            'approved' => Appointment::where('status', 'approved')->count(),
             'completed' => Appointment::where('status', 'completed')->count(),
             'cancelled' => Appointment::where('status', 'cancelled')->count()
         ];
 
         $inventoryStats = [
             'total_items' => Inventory::count(),
-            'low_stock' => Inventory::lowStock()->count(),
-            'out_of_stock' => Inventory::outOfStock()->count(),
-            'expired' => Inventory::expired()->count()
+            'low_stock' => Inventory::whereColumn('current_stock', '<=', 'minimum_stock')->count(),
+            'out_of_stock' => Inventory::where('current_stock', 0)->count(),
+            'expired' => Inventory::where('expiry_date', '<', now())->count()
         ];
 
-        return view('admin.reports', compact('appointmentStats', 'inventoryStats'));
+        // Service types data for the doughnut chart
+        $serviceTypes = Appointment::selectRaw('service_type, count(*) as count')
+            ->groupBy('service_type')
+            ->get();
+
+        // Monthly appointments trend for the last 6 months
+        $monthlyTrend = Appointment::selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, count(*) as count')
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->groupBy('year', 'month')
+            ->orderBy('year', 'asc')
+            ->orderBy('month', 'asc')
+            ->get();
+
+        return view('admin.reports', compact('appointmentStats', 'inventoryStats', 'serviceTypes', 'monthlyTrend'));
     }
 }

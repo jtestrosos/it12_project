@@ -240,15 +240,22 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Get data from Laravel
+        const serviceData = @json($serviceTypes);
+        const monthlyData = @json($monthlyTrend);
+
         // Service Chart
         const serviceCtx = document.getElementById('serviceChart').getContext('2d');
+        const serviceLabels = serviceData.map(item => item.service_type);
+        const serviceCounts = serviceData.map(item => item.count);
+        
         new Chart(serviceCtx, {
             type: 'doughnut',
             data: {
-                labels: ['General Checkup', 'Prenatal', 'Medical Check-up', 'Immunization', 'Family Planning'],
+                labels: serviceLabels,
                 datasets: [{
-                    data: [45, 20, 30, 15, 10],
-                    backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1']
+                    data: serviceCounts,
+                    backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#17a2b8', '#6f42c1']
                 }]
             },
             options: {
@@ -269,15 +276,34 @@
             }
         });
 
-        // Trend Chart
+        // Trend Chart - Monthly Appointments
         const trendCtx = document.getElementById('trendChart').getContext('2d');
+        
+        // Prepare monthly data
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const trendLabels = [];
+        const trendCounts = [];
+        
+        // Get last 6 months
+        for (let i = 5; i >= 0; i--) {
+            const date = new Date();
+            date.setMonth(date.getMonth() - i);
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
+            
+            trendLabels.push(monthNames[date.getMonth()]);
+            
+            const monthData = monthlyData.find(item => item.month == month && item.year == year);
+            trendCounts.push(monthData ? monthData.count : 0);
+        }
+        
         new Chart(trendCtx, {
             type: 'line',
             data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                labels: trendLabels,
                 datasets: [{
                     label: 'Appointments',
-                    data: [65, 59, 80, 81, 56, 55],
+                    data: trendCounts,
                     borderColor: '#007bff',
                     backgroundColor: 'rgba(0, 123, 255, 0.1)',
                     tension: 0.4,

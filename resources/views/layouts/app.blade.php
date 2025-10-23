@@ -184,6 +184,24 @@
                             <input type="email" name="email" class="form-control" required>
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Barangay</label>
+                            <select name="barangay" class="form-control" required>
+                                <option value="">Select Barangay</option>
+                                <option value="Barangay 1">Barangay 1</option>
+                                <option value="Barangay 2">Barangay 2</option>
+                                <option value="Barangay 3">Barangay 3</option>
+                                <option value="Barangay 4">Barangay 4</option>
+                                <option value="Barangay 5">Barangay 5</option>
+                                <option value="Barangay 6">Barangay 6</option>
+                                <option value="Barangay 7">Barangay 7</option>
+                                <option value="Barangay 8">Barangay 8</option>
+                                <option value="Barangay 9">Barangay 9</option>
+                                <option value="Barangay 10">Barangay 10</option>
+                                <option value="Barangay 11">Barangay 11</option>
+                                <option value="Barangay 12">Barangay 12</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Password</label>
                             <input type="password" name="password" class="form-control" required>
                         </div>

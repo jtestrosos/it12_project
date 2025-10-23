@@ -1,13 +1,52 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-info text-white">
-                    <h4 class="mb-0">Book an Appointment</h4>
-                </div>
+<style>
+    .booking-container {
+        background-color: #f0f0f0;
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+    .booking-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border: none;
+    }
+    .booking-header {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        border-radius: 12px 12px 0 0;
+        padding: 1.5rem;
+    }
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        padding: 0.75rem;
+    }
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+    }
+    .btn-secondary {
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+    }
+</style>
+
+<div class="booking-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card booking-card">
+                    <div class="booking-header text-white">
+                        <h4 class="mb-0"><i class="fas fa-calendar-plus me-2"></i>Book an Appointment</h4>
+                    </div>
                 <div class="card-body">
                     <form method="POST" action="{{ route('patient.appointment.store') }}">
                         @csrf
@@ -110,13 +149,18 @@
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{{ route('patient.dashboard') }}" class="btn btn-secondary me-md-2">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Book Appointment</button>
+                            <a href="{{ route('patient.dashboard') }}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-calendar-check me-2"></i>Book Appointment
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 @endsection

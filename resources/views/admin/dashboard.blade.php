@@ -263,39 +263,49 @@
                             <div class="col-md-6">
                                 <div class="chart-container">
                                     <h6 class="mb-3">Recent Activity</h6>
-                                    <div class="activity-item">
-                                        <div class="activity-icon status-completed">
-                                            <i class="fas fa-check"></i>
+                                    @if($recentAppointments->count() > 0)
+                                        @foreach($recentAppointments as $appointment)
+                                        <div class="activity-item">
+                                            <div class="activity-icon 
+                                                @if($appointment->status == 'completed') status-completed
+                                                @elseif($appointment->status == 'approved') status-approved
+                                                @elseif($appointment->status == 'pending') status-pending
+                                                @elseif($appointment->status == 'cancelled') status-cancelled
+                                                @else status-progress
+                                                @endif">
+                                                @if($appointment->status == 'completed')
+                                                    <i class="fas fa-check"></i>
+                                                @elseif($appointment->status == 'approved')
+                                                    <i class="fas fa-thumbs-up"></i>
+                                                @elseif($appointment->status == 'pending')
+                                                    <i class="fas fa-clock"></i>
+                                                @elseif($appointment->status == 'cancelled')
+                                                    <i class="fas fa-times"></i>
+                                                @else
+                                                    <i class="fas fa-heartbeat"></i>
+                                                @endif
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="fw-bold">{{ $appointment->patient_name ?? ($appointment->user->name ?? 'Walk-in Patient') }}</div>
+                                                <div class="text-muted">{{ $appointment->service_type }}</div>
+                                                <small class="text-muted">{{ \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A') }}</small>
+                                            </div>
+                                            <span class="badge 
+                                                @if($appointment->status == 'completed') bg-success
+                                                @elseif($appointment->status == 'approved') bg-info
+                                                @elseif($appointment->status == 'pending') bg-warning
+                                                @elseif($appointment->status == 'cancelled') bg-danger
+                                                @else bg-primary
+                                                @endif">
+                                                {{ ucfirst($appointment->status) }}
+                                            </span>
                                         </div>
-                                        <div class="flex-grow-1">
-                                            <div class="fw-bold">Albert Melendres</div>
-                                            <div class="text-muted">General Check-up</div>
-                                            <small class="text-muted">10:30 AM</small>
+                                        @endforeach
+                                    @else
+                                        <div class="text-center py-3">
+                                            <p class="text-muted mb-0">No recent activity</p>
                                         </div>
-                                        <span class="badge bg-success">Completed</span>
-                                    </div>
-                                    <div class="activity-item">
-                                        <div class="activity-icon status-completed">
-                                            <i class="fas fa-check"></i>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <div class="fw-bold">Lebronnie James Pathay Estrosos The 7th</div>
-                                            <div class="text-muted">Family Planning</div>
-                                            <small class="text-muted">11:30 AM</small>
-                                        </div>
-                                        <span class="badge bg-success">Completed</span>
-                                    </div>
-                                    <div class="activity-item">
-                                        <div class="activity-icon status-progress">
-                                            <i class="fas fa-heartbeat"></i>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <div class="fw-bold">Huey Hibaler</div>
-                                            <div class="text-muted">Medical Checkup</div>
-                                            <small class="text-muted">2:00 PM</small>
-                                        </div>
-                                        <span class="badge bg-info">In Progress</span>
-                                    </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -359,15 +369,32 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Overview Chart
+        // Get data from Laravel
+        const weeklyData = @json($weeklyAppointments);
+        const serviceData = @json($serviceTypes);
+        const barangayData = @json($patientsByBarangay);
+
+        // Prepare weekly appointments data
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const weeklyLabels = [];
+        const weeklyCounts = [];
+        
+        // Initialize with zeros for all days
+        for (let i = 1; i <= 7; i++) {
+            weeklyLabels.push(dayNames[i]);
+            const dayData = weeklyData.find(item => item.day_of_week == i);
+            weeklyCounts.push(dayData ? dayData.count : 0);
+        }
+
+        // Overview Chart (Weekly Appointments)
         const overviewCtx = document.getElementById('overviewChart').getContext('2d');
         new Chart(overviewCtx, {
             type: 'line',
             data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+                labels: weeklyLabels,
                 datasets: [{
                     label: 'Appointments',
-                    data: [30, 60, 45, 10, 35],
+                    data: weeklyCounts,
                     borderColor: '#007bff',
                     backgroundColor: 'rgba(0, 123, 255, 0.1)',
                     tension: 0.4
@@ -379,23 +406,25 @@
                 aspectRatio: 1.8,
                 scales: {
                     y: {
-                        beginAtZero: true,
-                        max: 80
+                        beginAtZero: true
                     }
                 }
             }
         });
 
-        // Service Chart
+        // Service Chart (Monthly Services)
         const serviceCtx = document.getElementById('serviceChart').getContext('2d');
+        const serviceLabels = serviceData.map(item => item.service_type);
+        const serviceCounts = serviceData.map(item => item.count);
+        
         new Chart(serviceCtx, {
             type: 'bar',
             data: {
-                labels: ['General Checkup', 'Immunization', 'Medical Checkup', 'Prenatal', 'Family Planning'],
+                labels: serviceLabels,
                 datasets: [{
-                    label: 'Services',
-                    data: [150, 100, 140, 20, 30],
-                    backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1']
+                    label: 'Services This Month',
+                    data: serviceCounts,
+                    backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#17a2b8', '#6f42c1']
                 }]
             },
             options: {
@@ -404,8 +433,7 @@
                 aspectRatio: 1.8,
                 scales: {
                     y: {
-                        beginAtZero: true,
-                        max: 160
+                        beginAtZero: true
                     }
                 }
             }
@@ -413,19 +441,27 @@
 
         // Barangay Chart
         const barangayCtx = document.getElementById('barangayChart').getContext('2d');
+        const barangayLabels = barangayData.map(item => item.barangay);
+        const barangayCounts = barangayData.map(item => item.count);
+        
         new Chart(barangayCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Barangay 12', 'Barangay 11'],
+                labels: barangayLabels,
                 datasets: [{
-                    data: [70, 30],
-                    backgroundColor: ['#007bff', '#dc3545']
+                    data: barangayCounts,
+                    backgroundColor: ['#007bff', '#dc3545', '#28a745', '#ffc107', '#17a2b8', '#6f42c1']
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
-                aspectRatio: 1.0
+                aspectRatio: 1.0,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
             }
         });
     </script>

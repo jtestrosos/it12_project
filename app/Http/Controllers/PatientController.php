@@ -16,6 +16,14 @@ class PatientController extends Controller
         return view('patient.dashboard', compact('appointments'));
     }
 
+    public function appointments()
+    {
+        $user = Auth::user();
+        $appointments = $user->appointments()->latest()->paginate(20);
+        
+        return view('patient.appointments', compact('appointments'));
+    }
+
     public function bookAppointment()
     {
         return view('patient.book-appointment');
