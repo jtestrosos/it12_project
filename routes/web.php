@@ -95,16 +95,17 @@ Route::middleware(['auth'])->group(function () {
 
 // Admin Routes
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-        Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
-        Route::post('/appointment/{appointment}/update', [AdminController::class, 'updateAppointmentStatus'])->name('appointment.update');
-        Route::get('/inventory', [AdminController::class, 'inventory'])->name('inventory');
-        Route::post('/inventory/add', [AdminController::class, 'addInventory'])->name('inventory.add');
-        Route::post('/inventory/{inventory}/update', [AdminController::class, 'updateInventory'])->name('inventory.update');
-        Route::post('/walk-in', [AdminController::class, 'addWalkIn'])->name('walk-in');
-        Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
-    });
+        Route::prefix('admin')->name('admin.')->group(function () {
+            Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+            Route::get('/patients', [AdminController::class, 'patients'])->name('patients');
+            Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
+            Route::post('/appointment/{appointment}/update', [AdminController::class, 'updateAppointmentStatus'])->name('appointment.update');
+            Route::get('/inventory', [AdminController::class, 'inventory'])->name('inventory');
+            Route::post('/inventory/add', [AdminController::class, 'addInventory'])->name('inventory.add');
+            Route::post('/inventory/{inventory}/update', [AdminController::class, 'updateInventory'])->name('inventory.update');
+            Route::post('/walk-in', [AdminController::class, 'addWalkIn'])->name('walk-in');
+            Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
+        });
 });
 
 // Super Admin Routes

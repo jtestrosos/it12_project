@@ -14,22 +14,32 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        $todayAppointments = Appointment::today()->count();
-        $pendingAppointments = Appointment::pending()->count();
-        $lowStockItems = Inventory::lowStock()->count();
-        $outOfStockItems = Inventory::outOfStock()->count();
+        $totalPatients = User::where('role', 'user')->count();
+        $todayAppointments = Appointment::whereDate('appointment_date', today())->count();
+        $lowStockItems = Inventory::whereColumn('current_stock', '<=', 'minimum_stock')->count();
+        $monthlyServices = Appointment::whereMonth('created_at', now()->month)->count();
 
         $recentAppointments = Appointment::with('user')->latest()->limit(5)->get();
-        $lowStockInventory = Inventory::lowStock()->limit(5)->get();
+        $lowStockInventory = Inventory::whereColumn('current_stock', '<=', 'minimum_stock')->limit(5)->get();
 
         return view('admin.dashboard', compact(
+            'totalPatients',
             'todayAppointments',
-            'pendingAppointments', 
             'lowStockItems',
-            'outOfStockItems',
+            'monthlyServices',
             'recentAppointments',
             'lowStockInventory'
         ));
+    }
+
+    public function patients()
+    {
+        $patients = User::where('role', 'user')
+            ->with('appointments')
+            ->latest()
+            ->paginate(20);
+
+        return view('admin.patients', compact('patients'));
     }
 
     public function appointments()
