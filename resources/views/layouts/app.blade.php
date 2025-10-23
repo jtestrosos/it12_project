@@ -91,6 +91,19 @@
                             <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a>
                         </li>
                         @else
+                        @if(Auth::user()->isSuperAdmin())
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('superadmin.dashboard') }}">Super Admin</a>
+                        </li>
+                        @elseif(Auth::user()->isAdmin())
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.dashboard') }}">Admin</a>
+                        </li>
+                        @else
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('patient.dashboard') }}">Dashboard</a>
+                        </li>
+                        @endif
                         <li class="nav-item">
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                 @csrf
@@ -190,7 +203,11 @@
     <script>
         function requireLogin() {
             @if(Auth::check())
-                window.location.href = "{{ route('appointments.create') }}";
+                @if(Auth::user()->isPatient())
+                    window.location.href = "{{ route('patient.book-appointment') }}";
+                @else
+                    window.location.href = "{{ Auth::user()->isSuperAdmin() ? route('superadmin.dashboard') : route('admin.dashboard') }}";
+                @endif
             @else
                 var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
                 loginModal.show();

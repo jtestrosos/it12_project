@@ -18,7 +18,11 @@
 
                 <!-- ✅ Button triggers login modal if not logged in -->
                 @auth
-                    <a href="{{ route('booking') }}" class="btn btn-primary btn-lg me-2 mb-2">Book Appointment Now</a>
+                    @if(Auth::user()->isPatient())
+                        <a href="{{ route('patient.book-appointment') }}" class="btn btn-primary btn-lg me-2 mb-2">Book Appointment Now</a>
+                    @else
+                        <a href="{{ Auth::user()->isSuperAdmin() ? route('superadmin.dashboard') : route('admin.dashboard') }}" class="btn btn-primary btn-lg me-2 mb-2">Go to Dashboard</a>
+                    @endif
                 @else
                     <button class="btn btn-primary btn-lg me-2 mb-2" data-bs-toggle="modal" data-bs-target="#loginModal">
                         Book Appointment Now
