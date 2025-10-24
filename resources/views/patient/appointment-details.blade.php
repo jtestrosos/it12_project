@@ -6,9 +6,11 @@
 @endphp
 <style>
     .appointment-details-container {
-        background-color: #f8f9fa;
+        background-color: #f0f0f0;
         min-height: 100vh;
-        padding: 2rem 0;
+        padding: 2rem;
+        width: 100%;
+        margin: 0;
     }
     .appointment-details-card {
         background: white;
@@ -63,7 +65,6 @@
 </style>
 
 <div class="appointment-details-container">
-    <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-10">
                 <div class="card appointment-details-card">
@@ -183,7 +184,6 @@
                     </div>
                 </div>
             </div>
-        </div>
     </div>
 </div>
 @endsection

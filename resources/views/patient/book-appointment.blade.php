@@ -6,9 +6,11 @@
 @endphp
 <style>
     .booking-container {
-        background-color: #f8f9fa;
+        background-color: #f0f0f0;
         min-height: 100vh;
-        padding: 2rem 0;
+        padding: 2rem;
+        width: 100%;
+        margin: 0;
     }
     .booking-card {
         background: white;
@@ -75,7 +77,6 @@
 </style>
 
 <div class="booking-container">
-    <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-10">
                 <div class="card booking-card">
@@ -209,7 +210,6 @@
                     </div>
                 </div>
             </div>
-        </div>
     </div>
 </div>
 @endsection

@@ -6,9 +6,13 @@
 @endphp
 <style>
     .appointments-container {
-        background-color: #f8f9fa;
+        background-color: #f0f0f0;
         min-height: 100vh;
-        padding: 2rem 0;
+        padding: 0;
+        width: 100%;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
     }
     .appointments-card {
         background: white;
@@ -67,46 +71,46 @@
         font-size: 0.9rem;
         font-weight: 500;
     }
+    .dashboard-header {
+        background: white;
+        border-bottom: 1px solid #e9ecef;
+        padding: 1rem 2rem;
+        margin-bottom: 0;
+    }
+    .main-content {
+        background-color: #f0f0f0;
+        min-height: 100vh;
+        padding-bottom: 2rem;
+        width: 100%;
+        margin: 0;
+        flex: 1;
+    }
 </style>
 
 <div class="appointments-container">
-    <div class="container-fluid">
-        <!-- Header -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h2 class="fw-bold mb-1 text-dark">My Appointments</h2>
-                        <p class="text-muted mb-0">Manage your healthcare appointments.</p>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <div class="me-3">
-                            <i class="fas fa-bell text-muted fs-5"></i>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <div class="appointment-avatar me-2">P</div>
-                            <div>
-                                <div class="fw-bold text-dark">Patient</div>
-                                <small class="text-muted">User</small>
-                            </div>
-                        </div>
-                    </div>
+    <!-- Header -->
+    <div class="dashboard-header d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="mb-0">My Appointments</h4>
+            <p class="text-muted mb-0">Manage your healthcare appointments.</p>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="main-content">
+        <div class="p-4">
+            <!-- Book Appointment Button -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <a href="{{ route('patient.book-appointment') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i> Book New Appointment
+                    </a>
                 </div>
             </div>
-        </div>
 
-        <!-- Book Appointment Button -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <a href="{{ route('patient.book-appointment') }}" class="btn btn-primary btn-modern">
-                    <i class="fas fa-plus me-2"></i> Book New Appointment
-                </a>
-            </div>
-        </div>
-
-        <!-- Appointments Table -->
-        <div class="row">
-            <div class="col-12">
+            <!-- Appointments Table -->
+            <div class="row">
+                <div class="col-12">
                 <div class="card appointments-card">
                     <div class="appointments-header">
                         <h5 class="mb-0 text-dark">All Appointments</h5>
