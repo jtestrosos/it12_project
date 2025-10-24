@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
@@ -59,18 +60,68 @@ class AdminController extends Controller
         $patients = User::where('role', 'user')
             ->with('appointments')
             ->latest()
-            ->paginate(20);
+            ->paginate(10);
 
         return view('admin.patients', compact('patients'));
+    }
+
+    public function createPatient(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'barangay' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'password' => 'required|string|min:6|confirmed'
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'barangay' => $request->barangay,
+            'phone' => $request->phone,
+            'password' => Hash::make($request->password),
+            'role' => 'user'
+        ]);
+
+        return redirect()->back()->with('success', 'Patient created successfully.');
     }
 
     public function appointments()
     {
         $appointments = Appointment::with(['user', 'approvedBy'])
             ->latest()
-            ->paginate(15);
+            ->paginate(10);
             
         return view('admin.appointments', compact('appointments'));
+    }
+
+    public function createAppointment(Request $request)
+    {
+        $request->validate([
+            'patient_name' => 'required|string|max:255',
+            'patient_phone' => 'required|string|max:20',
+            'patient_address' => 'required|string|max:500',
+            'service_type' => 'required|string',
+            'appointment_date' => 'required|date|after_or_equal:today',
+            'appointment_time' => 'required',
+            'notes' => 'nullable|string|max:1000'
+        ]);
+
+        Appointment::create([
+            'user_id' => null, // Walk-in appointments don't have user accounts
+            'patient_name' => $request->patient_name,
+            'patient_phone' => $request->patient_phone,
+            'patient_address' => $request->patient_address,
+            'appointment_date' => $request->appointment_date,
+            'appointment_time' => $request->appointment_time,
+            'service_type' => $request->service_type,
+            'notes' => $request->notes,
+            'is_walk_in' => true,
+            'status' => 'pending'
+        ]);
+
+        return redirect()->back()->with('success', 'Appointment created successfully.');
     }
 
     public function updateAppointmentStatus(Request $request, Appointment $appointment)

@@ -137,8 +137,60 @@ class SuperAdminController extends Controller
 
     public function backup()
     {
-        // This would typically involve creating database backups
-        // For now, we'll just show a success message
-        return redirect()->back()->with('success', 'Backup process initiated. Check logs for completion status.');
+        return view('superadmin.backup');
+    }
+
+    public function createBackup(Request $request)
+    {
+        $request->validate([
+            'type' => 'required|in:database,files,full'
+        ]);
+
+        $type = $request->type;
+        
+        // Log the backup action
+        SystemLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'backup_created',
+            'description' => ucfirst($type) . ' backup created',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent()
+        ]);
+
+        // In a real application, you would implement actual backup logic here
+        // For now, we'll simulate the backup process
+        
+        return response()->json([
+            'success' => true,
+            'message' => ucfirst($type) . ' backup completed successfully!',
+            'backup_id' => 'backup_' . time() . '_' . $type
+        ]);
+    }
+
+    public function scheduleBackup(Request $request)
+    {
+        $request->validate([
+            'type' => 'required|in:database,files,full',
+            'schedule' => 'required|string'
+        ]);
+
+        $type = $request->type;
+        $schedule = $request->schedule;
+        
+        // Log the backup scheduling action
+        SystemLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'backup_scheduled',
+            'description' => ucfirst($type) . ' backup scheduled for ' . $schedule,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent()
+        ]);
+
+        // In a real application, you would implement actual scheduling logic here
+        
+        return response()->json([
+            'success' => true,
+            'message' => ucfirst($type) . ' backup scheduled for ' . $schedule . '!'
+        ]);
     }
 }

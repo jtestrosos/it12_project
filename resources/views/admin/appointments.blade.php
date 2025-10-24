@@ -135,83 +135,173 @@
 
                     <!-- Content -->
                     <div class="p-4">
-                        @if($appointments->count() > 0)
-                            <div class="row">
-                                @foreach($appointments as $appointment)
-                                <div class="col-md-6 col-lg-4 mb-3">
-                                    <div class="appointment-card">
-                                        <div class="d-flex justify-content-between align-items-start mb-3">
-                                            <div>
-                                                <h6 class="fw-bold mb-1">{{ $appointment->patient_name }}</h6>
-                                                <small class="text-muted">{{ $appointment->patient_phone }}</small>
-                                            </div>
-                                            <span class="status-badge status-{{ $appointment->status }}">
-                                                {{ ucfirst($appointment->status) }}
-                                            </span>
-                                        </div>
-                                        
-                                        <div class="mb-3">
-                                            <div class="d-flex align-items-center mb-2">
-                                                <i class="fas fa-calendar text-primary me-2"></i>
-                                                <span class="fw-bold">{{ $appointment->appointment_date->format('M d, Y') }}</span>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-2">
-                                                <i class="fas fa-clock text-primary me-2"></i>
-                                                <span>{{ $appointment->appointment_time }}</span>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-2">
-                                                <i class="fas fa-stethoscope text-primary me-2"></i>
-                                                <span>{{ $appointment->service_type }}</span>
-                                            </div>
-                                            @if($appointment->notes)
-                                            <div class="d-flex align-items-start">
-                                                <i class="fas fa-sticky-note text-primary me-2 mt-1"></i>
-                                                <small class="text-muted">{{ $appointment->notes }}</small>
-                                            </div>
-                                            @endif
-                                        </div>
+                        <!-- Add Appointment Button -->
+                        <div class="d-flex justify-content-end mb-4">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">
+                                <i class="fas fa-plus me-2"></i> Add New Appointment
+                            </button>
+                        </div>
 
-                                        @if($appointment->status == 'pending')
-                                        <div class="d-flex gap-2">
-                                            <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
-                                                @csrf
-                                                <input type="hidden" name="status" value="approved">
-                                                <button type="submit" class="btn btn-success btn-sm">
-                                                    <i class="fas fa-check me-1"></i> Approve
-                                                </button>
-                                            </form>
-                                            <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
-                                                @csrf
-                                                <input type="hidden" name="status" value="cancelled">
-                                                <button type="submit" class="btn btn-danger btn-sm">
-                                                    <i class="fas fa-times me-1"></i> Cancel
-                                                </button>
-                                            </form>
-                                        </div>
-                                        @elseif($appointment->status == 'approved')
-                                        <div class="d-flex gap-2">
-                                            <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
-                                                @csrf
-                                                <input type="hidden" name="status" value="completed">
-                                                <button type="submit" class="btn btn-info btn-sm">
-                                                    <i class="fas fa-check-circle me-1"></i> Mark Complete
-                                                </button>
-                                            </form>
-                                        </div>
-                                        @endif
-                                    </div>
+                        <!-- Appointments Table -->
+                        <div class="card">
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Patient</th>
+                                                <th>Phone</th>
+                                                <th>Date & Time</th>
+                                                <th>Service</th>
+                                                <th>Status</th>
+                                                <th>Notes</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($appointments as $appointment)
+                                            <tr>
+                                                <td>
+                                                    <div class="fw-bold">{{ $appointment->patient_name }}</div>
+                                                    @if($appointment->user)
+                                                        <small class="text-muted">{{ $appointment->user->email }}</small>
+                                                    @endif
+                                                </td>
+                                                <td>{{ $appointment->patient_phone }}</td>
+                                                <td>
+                                                    <div class="fw-bold">{{ $appointment->appointment_date->format('M d, Y') }}</div>
+                                                    <small class="text-muted">{{ $appointment->appointment_time }}</small>
+                                                </td>
+                                                <td>{{ $appointment->service_type }}</td>
+                                                <td>
+                                                    <span class="status-badge status-{{ $appointment->status }}">
+                                                        {{ ucfirst($appointment->status) }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    @if($appointment->notes)
+                                                        <small class="text-muted">{{ Str::limit($appointment->notes, 30) }}</small>
+                                                    @else
+                                                        <span class="text-muted">-</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if($appointment->status == 'pending')
+                                                        <div class="btn-group" role="group">
+                                                            <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
+                                                                @csrf
+                                                                <input type="hidden" name="status" value="approved">
+                                                                <button type="submit" class="btn btn-success btn-sm">
+                                                                    <i class="fas fa-check"></i>
+                                                                </button>
+                                                            </form>
+                                                            <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
+                                                                @csrf
+                                                                <input type="hidden" name="status" value="cancelled">
+                                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    @elseif($appointment->status == 'approved')
+                                                        <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
+                                                            @csrf
+                                                            <input type="hidden" name="status" value="completed">
+                                                            <button type="submit" class="btn btn-info btn-sm">
+                                                                <i class="fas fa-check-circle"></i>
+                                                            </button>
+                                                        </form>
+                                                    @else
+                                                        <span class="text-muted">-</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
                                 </div>
-                                @endforeach
                             </div>
-                        @else
-                            <div class="text-center py-5">
-                                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">No appointments found</h5>
-                                <p class="text-muted">There are no appointments to display at the moment.</p>
-                            </div>
-                        @endif
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="d-flex justify-content-center mt-4">
+                            {{ $appointments->links() }}
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Appointment Modal -->
+    <div class="modal fade" id="addAppointmentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Appointment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ route('admin.appointment.create') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="patient_name" class="form-label">Patient Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="patient_name" name="patient_name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="patient_phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                    <input type="tel" class="form-control" id="patient_phone" name="patient_phone" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="patient_address" class="form-label">Address <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="patient_address" name="patient_address" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="service_type" class="form-label">Service Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="service_type" name="service_type" required>
+                                        <option value="">Select Service</option>
+                                        <option value="General Checkup">General Checkup</option>
+                                        <option value="Prenatal">Prenatal</option>
+                                        <option value="Immunization">Immunization</option>
+                                        <option value="Family Planning">Family Planning</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="appointment_date" class="form-label">Appointment Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="appointment_date" name="appointment_date" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="appointment_time" class="form-label">Appointment Time <span class="text-danger">*</span></label>
+                                    <input type="time" class="form-control" id="appointment_time" name="appointment_time" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Appointment</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

@@ -101,7 +101,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
             Route::get('/patients', [AdminController::class, 'patients'])->name('patients');
+            Route::post('/patient/create', [AdminController::class, 'createPatient'])->name('patient.create');
             Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
+            Route::post('/appointment/create', [AdminController::class, 'createAppointment'])->name('appointment.create');
             Route::post('/appointment/{appointment}/update', [AdminController::class, 'updateAppointmentStatus'])->name('appointment.update');
             Route::get('/inventory', [AdminController::class, 'inventory'])->name('inventory');
             Route::post('/inventory/add', [AdminController::class, 'addInventory'])->name('inventory.add');
@@ -122,6 +124,8 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
         Route::get('/system-logs', [SuperAdminController::class, 'systemLogs'])->name('system-logs');
         Route::get('/audit-trail', [SuperAdminController::class, 'auditTrail'])->name('audit-trail');
         Route::get('/analytics', [SuperAdminController::class, 'analytics'])->name('analytics');
-        Route::post('/backup', [SuperAdminController::class, 'backup'])->name('backup');
+        Route::get('/backup', [SuperAdminController::class, 'backup'])->name('backup');
+        Route::post('/backup/create', [SuperAdminController::class, 'createBackup'])->name('backup.create');
+        Route::post('/backup/schedule', [SuperAdminController::class, 'scheduleBackup'])->name('backup.schedule');
     });
 });

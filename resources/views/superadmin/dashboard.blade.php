@@ -1,191 +1,386 @@
-@extends('layouts.app')
-
-@section('content')
-<div class="container my-5">
-    <div class="row">
-        <div class="col-12">
-            <h2 class="fw-bold mb-4">Super Admin Dashboard</h2>
-        </div>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="row mb-4">
-        <div class="col-md-2">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Total Users</h5>
-                    <h3>{{ $totalUsers }}</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Admins</h5>
-                    <h3>{{ $totalAdmins }}</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Patients</h5>
-                    <h3>{{ $totalPatients }}</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Appointments</h5>
-                    <h3>{{ $totalAppointments }}</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card bg-dark text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Inventory</h5>
-                    <h3>{{ $totalInventory }}</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card bg-secondary text-white">
-                <div class="card-body">
-                    <h5 class="card-title">System Logs</h5>
-                    <h3>{{ $recentLogs->count() }}</h3>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Quick Actions</h5>
-                </div>
-                <div class="card-body">
-                    <a href="{{ route('superadmin.users') }}" class="btn btn-primary me-2">
-                        <i class="fas fa-users"></i> Manage Users
-                    </a>
-                    <a href="{{ route('superadmin.system-logs') }}" class="btn btn-info me-2">
-                        <i class="fas fa-list"></i> System Logs
-                    </a>
-                    <a href="{{ route('superadmin.analytics') }}" class="btn btn-success me-2">
-                        <i class="fas fa-chart-bar"></i> Analytics
-                    </a>
-                    <button class="btn btn-warning" onclick="backup()">
-                        <i class="fas fa-download"></i> Backup System
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <!-- Recent System Logs -->
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Recent System Logs</h5>
-                </div>
-                <div class="card-body">
-                    @if($recentLogs->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>User</th>
-                                        <th>Action</th>
-                                        <th>Time</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($recentLogs as $log)
-                                    <tr>
-                                        <td>{{ $log->user ? $log->user->name : 'System' }}</td>
-                                        <td>{{ $log->action }}</td>
-                                        <td>{{ $log->created_at->format('M d, H:i') }}</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barangay Health Center - Staff Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .sidebar {
+            background: #f8f9fa;
+            min-height: 100vh;
+            border-right: 1px solid #e9ecef;
+        }
+        .sidebar .nav-link {
+            color: #495057;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 4px 8px;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        .sidebar .nav-link.active {
+            background-color: #007bff;
+            color: white;
+        }
+        .main-content {
+            background-color: #f0f0f0;
+            min-height: 100vh;
+        }
+        .header {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 1rem 2rem;
+        }
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: none;
+            transition: transform 0.2s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+        }
+        .metric-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        .metric-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .metric-change {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            height: 450px;
+            position: relative;
+        }
+        .chart-container canvas {
+            max-height: 350px !important;
+            max-width: 100% !important;
+            width: auto !important;
+            height: auto !important;
+        }
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-progress {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 p-0">
+                <div class="sidebar">
+                    <div class="p-3">
+                        <div class="d-flex align-items-center mb-4">
+                            <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 40px; height: 40px;">
+                            <div>
+                                <h6 class="mb-0 fw-bold">Barangay Health Center</h6>
+                                <small class="text-muted">Staff Management System</small>
+                            </div>
                         </div>
-                    @else
-                        <p class="text-muted">No recent logs.</p>
-                    @endif
+                        <nav class="nav flex-column">
+                            <a class="nav-link active" href="#">
+                                <i class="fas fa-th-large me-2"></i> Dashboard
+                            </a>
+                            <a class="nav-link" href="{{ route('superadmin.users') }}">
+                                <i class="fas fa-user me-2"></i> User Management
+                            </a>
+                            <a class="nav-link" href="{{ route('superadmin.system-logs') }}">
+                                <i class="fas fa-list me-2"></i> System Logs
+                            </a>
+                            <a class="nav-link" href="{{ route('superadmin.analytics') }}">
+                                <i class="fas fa-chart-bar me-2"></i> Analytics
+                            </a>
+                            <a class="nav-link" href="{{ route('superadmin.backup') }}">
+                                <i class="fas fa-download me-2"></i> Backup
+                            </a>
+                        </nav>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Recent Users -->
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Recent Users</h5>
-                </div>
-                <div class="card-body">
-                    @if($recentUsers->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Joined</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($recentUsers as $user)
-                                    <tr>
-                                        <td>{{ $user->name }}</td>
-                                        <td>{{ $user->email }}</td>
-                                        <td>
-                                            <span class="badge 
-                                                @if($user->role == 'superadmin') bg-danger
-                                                @elseif($user->role == 'admin') bg-warning
-                                                @else bg-primary
+            <!-- Main Content -->
+            <div class="col-md-10 p-0">
+                <div class="main-content">
+                    <!-- Header -->
+                    <div class="header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">Dashboard Overview</h4>
+                            <p class="text-muted mb-0">Welcome back! Here's what's happening today.</p>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-bell text-muted me-3"></i>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    SA
+                                </div>
+                                <div>
+                                    <div class="fw-bold">Super Admin</div>
+                                    <small class="text-muted">Administrator</small>
+                                </div>
+                            </div>
+                            <a href="{{ route('logout') }}" class="btn btn-outline-secondary ms-3" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="p-4">
+                        <!-- Metrics Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-3 mb-3">
+                                <div class="metric-card">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="metric-label">Total Patients</div>
+                                            <div class="metric-number">{{ $totalUsers ?? 0 }}</div>
+                                            <div class="metric-change text-success">+12% from last month</div>
+                                        </div>
+                                        <div class="text-primary">
+                                            <i class="fas fa-users fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="metric-card">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="metric-label">Today's Appointments</div>
+                                            <div class="metric-number">{{ $totalAppointments ?? 0 }}</div>
+                                            <div class="metric-change text-info">8 completed, 16 pending</div>
+                                        </div>
+                                        <div class="text-warning">
+                                            <i class="fas fa-calendar-check fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="metric-card">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="metric-label">Low Stock Items</div>
+                                            <div class="metric-number">{{ $totalInventory ?? 0 }}</div>
+                                            <div class="metric-change text-warning">Needs restocking</div>
+                                        </div>
+                                        <div class="text-danger">
+                                            <i class="fas fa-boxes fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="metric-card">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="metric-label">Services This Month</div>
+                                            <div class="metric-number">{{ $totalPatients ?? 0 }}</div>
+                                            <div class="metric-change text-success">+8% from last month</div>
+                                        </div>
+                                        <div class="text-success">
+                                            <i class="fas fa-heartbeat fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h6 class="mb-3">Dashboard Overview</h6>
+                                    <canvas id="overviewChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h6 class="mb-3">Service this Month</h6>
+                                    <canvas id="serviceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Section -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h6 class="mb-3">Patients by Barangay</h6>
+                                    <canvas id="barangayChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="chart-container">
+                                    <h6 class="mb-3">Recent Activity</h6>
+                                    @if(isset($recentLogs) && $recentLogs->count() > 0)
+                                        @foreach($recentLogs->take(5) as $log)
+                                        <div class="activity-item">
+                                            <div class="activity-icon 
+                                                @if($log->action == 'created') status-completed
+                                                @elseif($log->action == 'updated') status-progress
+                                                @elseif($log->action == 'deleted') status-pending
+                                                @else status-progress
                                                 @endif">
-                                                {{ ucfirst($user->role) }}
-                                            </span>
-                                        </td>
-                                        <td>{{ $user->created_at->format('M d') }}</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                                @if($log->action == 'created')
+                                                    <i class="fas fa-plus"></i>
+                                                @elseif($log->action == 'updated')
+                                                    <i class="fas fa-edit"></i>
+                                                @elseif($log->action == 'deleted')
+                                                    <i class="fas fa-trash"></i>
+                                                @else
+                                                    <i class="fas fa-info"></i>
+                                                @endif
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="fw-bold">{{ $log->user ? $log->user->name : 'System' }}</div>
+                                                <div class="text-muted">{{ $log->action }}</div>
+                                                <small class="text-muted">{{ $log->created_at->format('h:i A') }}</small>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    @else
+                                        <div class="text-center py-3">
+                                            <p class="text-muted mb-0">No recent activity</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
-                    @else
-                        <p class="text-muted">No recent users.</p>
-                    @endif
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-function backup() {
-    if (confirm('Are you sure you want to initiate a system backup?')) {
-        fetch('{{ route("superadmin.backup") }}', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Content-Type': 'application/json'
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+        @csrf
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Overview Chart (Weekly Appointments)
+        const overviewCtx = document.getElementById('overviewChart').getContext('2d');
+        new Chart(overviewCtx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Appointments',
+                    data: [12, 19, 3, 5, 2, 3, 8],
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 1.8,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
             }
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert('Backup process initiated successfully!');
-        })
-        .catch(error => {
-            alert('Error initiating backup: ' + error);
         });
-    }
-}
-</script>
-@endsection
+
+        // Service Chart (Monthly Services)
+        const serviceCtx = document.getElementById('serviceChart').getContext('2d');
+        new Chart(serviceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['General Checkup', 'Prenatal'],
+                datasets: [{
+                    label: 'Services This Month',
+                    data: [2, 1],
+                    backgroundColor: ['#007bff', '#28a745']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 1.8,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Barangay Chart
+        const barangayCtx = document.getElementById('barangayChart').getContext('2d');
+        new Chart(barangayCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Barangay 12', 'Others'],
+                datasets: [{
+                    data: [85, 15],
+                    backgroundColor: ['#007bff', '#e9ecef']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 1.0,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
