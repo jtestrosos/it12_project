@@ -18,6 +18,14 @@
                     <input type="email" name="email" class="form-control" required>
                 </div>
                 <div class="mb-3">
+                    <label for="phone" class="form-label">Phone Number <small class="text-muted">(Optional - can be filled when booking appointments)</small></label>
+                    <input type="tel" name="phone" class="form-control" placeholder="Enter your phone number (optional)">
+                </div>
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address <small class="text-muted">(Optional - can be filled when booking appointments)</small></label>
+                    <textarea name="address" class="form-control" rows="2" placeholder="Enter your complete address (optional)"></textarea>
+                </div>
+                <div class="mb-3">
                     <label for="barangay" class="form-label">Barangay</label>
                     <select name="barangay" class="form-control" required>
                         <option value="">Select Barangay</option>

@@ -68,6 +68,8 @@ Route::post('/register', function (Request $request) {
     $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email',
+        'phone' => 'nullable|string|max:20',
+        'address' => 'nullable|string|max:500',
         'barangay' => 'required|string|max:255',
         'password' => 'required|min:6|confirmed',
     ]);
@@ -75,6 +77,8 @@ Route::post('/register', function (Request $request) {
     $user = \App\Models\User::create([
         'name' => $request->name,
         'email' => $request->email,
+        'phone' => $request->phone,
+        'address' => $request->address,
         'barangay' => $request->barangay,
         'password' => bcrypt($request->password),
         'role' => 'user' // Default role for new registrations

@@ -26,7 +26,8 @@ class PatientController extends Controller
 
     public function bookAppointment()
     {
-        return view('patient.book-appointment');
+        $user = Auth::user();
+        return view('patient.book-appointment', compact('user'));
     }
 
     public function storeAppointment(Request $request)

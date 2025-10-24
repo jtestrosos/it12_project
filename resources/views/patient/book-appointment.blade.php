@@ -98,11 +98,15 @@
                             <!-- Patient Information -->
                             <div class="form-section">
                                 <h6><i class="fas fa-user me-2"></i>Patient Information</h6>
+                                <p class="text-muted small mb-3">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Your information has been pre-filled from your account. You can modify any details as needed.
+                                </p>
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label for="patient_name" class="form-label">Full Name *</label>
                                         <input type="text" class="form-control @error('patient_name') is-invalid @enderror" 
-                                               id="patient_name" name="patient_name" value="{{ old('patient_name') }}" required>
+                                               id="patient_name" name="patient_name" value="{{ old('patient_name', $user->name ?? '') }}" required>
                                         @error('patient_name')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -110,19 +114,11 @@
                                     <div class="col-md-6">
                                         <label for="patient_phone" class="form-label">Phone Number *</label>
                                         <input type="tel" class="form-control @error('patient_phone') is-invalid @enderror" 
-                                               id="patient_phone" name="patient_phone" value="{{ old('patient_phone') }}" required>
+                                               id="patient_phone" name="patient_phone" value="{{ old('patient_phone', $user->phone ?? '') }}" required>
                                         @error('patient_phone')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                </div>
-                                <div class="mt-3">
-                                    <label for="patient_address" class="form-label">Address *</label>
-                                    <textarea class="form-control @error('patient_address') is-invalid @enderror" 
-                                              id="patient_address" name="patient_address" rows="2" required>{{ old('patient_address') }}</textarea>
-                                    @error('patient_address')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
                                 </div>
                             </div>
 

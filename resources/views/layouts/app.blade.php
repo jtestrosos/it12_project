@@ -447,6 +447,10 @@
                             <input type="email" name="email" class="form-control" required>
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" name="phone" class="form-control" placeholder="Enter your phone number">
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Barangay</label>
                             <select name="barangay" class="form-control" required>
                                 <option value="">Select Barangay</option>
