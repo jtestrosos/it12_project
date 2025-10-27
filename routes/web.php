@@ -7,9 +7,6 @@ use App\Http\Controllers\SuperAdminController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-
-
-
 // Homepage
 Route::get('/', function () {
     return view('home');
@@ -131,5 +128,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
         Route::get('/backup', [SuperAdminController::class, 'backup'])->name('backup');
         Route::post('/backup/create', [SuperAdminController::class, 'createBackup'])->name('backup.create');
         Route::post('/backup/schedule', [SuperAdminController::class, 'scheduleBackup'])->name('backup.schedule');
+        Route::get('/backup/{backup}/download', [SuperAdminController::class, 'downloadBackup'])->name('backup.download');
+        Route::delete('/backup/{backup}/delete', [SuperAdminController::class, 'deleteBackup'])->name('backup.delete');
     });
 });
