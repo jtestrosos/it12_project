@@ -16,7 +16,7 @@
                 <h1 class="fw-bold mb-3">Easy Online Booking for Your Healthcare Needs</h1>
                 <p class="lead mb-4">Skip the long queues and book your appointment online. Access quality healthcare services right in your barangay with just a few clicks.</p>
 
-                <!-- ✅ Button triggers login modal if not logged in -->
+                <!--  Button triggers login modal if not logged in -->
                 @auth
                     @if(Auth::user()->isPatient())
                         <a href="{{ route('patient.book-appointment') }}" class="btn btn-primary btn-lg me-2 mb-2">Book Appointment Now</a>
@@ -41,7 +41,7 @@
     </div>
 </div>
 
-<!-- ✅ HOW IT WORKS SECTION -->
+<!--  HOW IT WORKS SECTION -->
 <section class="py-5 bg-light">
     <div class="container text-center">
         <h2 class="fw-bold mb-4">How It Works</h2>
@@ -99,10 +99,10 @@
 }
 </style>
 
-<!-- ✅ Bootstrap Icons CDN -->
+<!--  Bootstrap Icons CDN -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-<!-- ✅ Optional: AOS (Animate On Scroll) for smooth fade-ins -->
+<!--  Optional: AOS (Animate On Scroll) for smooth fade-ins -->
 <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 <script>

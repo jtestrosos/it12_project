@@ -26,13 +26,25 @@ class SystemLogObserver
 
     private function logActivity(string $action, Model $model)
     {
+        // Get changed attributes for updates
+        if ($action === 'updated' && $model->wasChanged()) {
+            $newValues = $model->getDirty();
+            $oldValues = [];
+            foreach ($newValues as $key => $value) {
+                $oldValues[$key] = $model->getOriginal($key);
+            }
+        } else {
+            $newValues = $action === 'deleted' ? null : $model->getAttributes();
+            $oldValues = $action === 'created' ? null : $model->getOriginal();
+        }
+
         SystemLog::create([
             'user_id' => Auth::id(),
             'action' => $action,
             'table_name' => $model->getTable(),
             'record_id' => $model->getKey(),
-            'new_values' => $action === 'deleted' ? null : $model->getAttributes(),
-            'old_values' => $action === 'created' ? null : $model->getOriginal(),
+            'new_values' => $newValues,
+            'old_values' => $oldValues,
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent()
         ]);

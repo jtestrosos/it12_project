@@ -3,6 +3,10 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Models\Appointment;
+use App\Models\User;
+use App\Models\Inventory;
+use App\Observers\SystemLogObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +23,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register SystemLogObserver for tracking all changes
+        Appointment::observe(SystemLogObserver::class);
+        User::observe(SystemLogObserver::class);
+        Inventory::observe(SystemLogObserver::class);
     }
 }
