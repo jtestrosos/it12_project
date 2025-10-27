@@ -1,45 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Backup - Barangay Health Center</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .sidebar {
-            background: #f8f9fa;
-            min-height: 100vh;
-            border-right: 1px solid #e9ecef;
-        }
-        .sidebar .nav-link {
-            color: #495057;
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin: 4px 8px;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover {
-            background-color: #e9ecef;
-            color: #495057;
-        }
-        .sidebar .nav-link.active {
-            background-color: #007bff;
-            color: white;
-        }
-        .main-content {
-            background-color: #f0f0f0;
-            min-height: 100vh;
-        }
-        .header {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-            padding: 1rem 2rem;
-        }
+@extends('superadmin.layout')
+
+@section('title', 'System Backup - Barangay Health Center')
+@section('page-title', 'System Backup')
+@section('page-description', 'Manage system backups and data protection')
+
+@section('page-styles')
+<style>
         .backup-card {
             background: white;
             border-radius: 12px;
@@ -83,69 +49,9 @@
             border-radius: 4px;
         }
     </style>
-</head>
-<body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-2 p-0">
-                <div class="sidebar">
-                    <div class="p-3">
-                        <div class="d-flex align-items-center mb-4">
-                            <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 40px; height: 40px;">
-                            <div>
-                                <h6 class="mb-0 fw-bold">Barangay Health Center</h6>
-                                <small class="text-muted">Staff Management System</small>
-                            </div>
-                        </div>
-                        <nav class="nav flex-column">
-                            <a class="nav-link" href="{{ route('superadmin.dashboard') }}">
-                                <i class="fas fa-th-large me-2"></i> Dashboard
-                            </a>
-                            <a class="nav-link" href="{{ route('superadmin.users') }}">
-                                <i class="fas fa-user me-2"></i> User Management
-                            </a>
-                            <a class="nav-link" href="{{ route('superadmin.system-logs') }}">
-                                <i class="fas fa-list me-2"></i> System Logs
-                            </a>
-                            <a class="nav-link" href="{{ route('superadmin.analytics') }}">
-                                <i class="fas fa-chart-bar me-2"></i> Analytics
-                            </a>
-                            <a class="nav-link active" href="{{ route('superadmin.backup') }}">
-                                <i class="fas fa-download me-2"></i> Backup
-                            </a>
-                        </nav>
-                    </div>
-                </div>
-            </div>
+@endsection
 
-            <!-- Main Content -->
-            <div class="col-md-10 p-0">
-                <div class="main-content">
-                    <!-- Header -->
-                    <div class="header d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="mb-0">System Backup</h4>
-                            <p class="text-muted mb-0">Manage system backups and data protection</p>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                    SA
-                                </div>
-                                <div>
-                                    <div class="fw-bold">Super Admin</div>
-                                    <small class="text-muted">Administrator</small>
-                                </div>
-                            </div>
-                            <a href="{{ route('logout') }}" class="btn btn-outline-secondary ms-3" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Content -->
-                    <div class="p-4">
+@section('content')
                         <!-- Backup Actions -->
                         <div class="row mb-4">
                             <div class="col-md-6">
@@ -160,7 +66,7 @@
                                         </div>
                                     </div>
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-primary" onclick="createBackup('database')">
+                                        <button class="btn btn-primary" onclick="createBackup('database', this)">
                                             <i class="fas fa-download me-2"></i> Backup Database
                                         </button>
                                         <button class="btn btn-outline-info" onclick="scheduleBackup('database')">
@@ -181,7 +87,7 @@
                                         </div>
                                     </div>
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-warning" onclick="createBackup('files')">
+                                        <button class="btn btn-warning" onclick="createBackup('files', this)">
                                             <i class="fas fa-download me-2"></i> Backup Files
                                         </button>
                                         <button class="btn btn-outline-warning" onclick="scheduleBackup('files')">
@@ -206,7 +112,7 @@
                                         </div>
                                     </div>
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-danger" onclick="createBackup('full')">
+                                        <button class="btn btn-danger" onclick="createBackup('full', this)">
                                             <i class="fas fa-download me-2"></i> Full System Backup
                                         </button>
                                         <button class="btn btn-outline-danger" onclick="scheduleBackup('full')">
@@ -227,20 +133,36 @@
                                     <div class="row">
                                         <div class="col-md-3">
                                             <div class="text-center">
+                                                @if($lastDatabase)
                                                 <div class="backup-icon backup-success mx-auto mb-2">
                                                     <i class="fas fa-check"></i>
                                                 </div>
                                                 <h6>Last Database Backup</h6>
-                                                <small class="text-muted">2 hours ago</small>
+                                                <small class="text-muted">{{ $lastDatabase->completed_at->diffForHumans() }}</small>
+                                                @else
+                                                <div class="backup-icon backup-warning mx-auto mb-2">
+                                                    <i class="fas fa-exclamation"></i>
+                                                </div>
+                                                <h6>Last Database Backup</h6>
+                                                <small class="text-muted">Never</small>
+                                                @endif
                                             </div>
                                         </div>
                                         <div class="col-md-3">
                                             <div class="text-center">
+                                                @if($lastFiles)
+                                                <div class="backup-icon backup-success mx-auto mb-2">
+                                                    <i class="fas fa-check"></i>
+                                                </div>
+                                                <h6>Last File Backup</h6>
+                                                <small class="text-muted">{{ $lastFiles->completed_at->diffForHumans() }}</small>
+                                                @else
                                                 <div class="backup-icon backup-warning mx-auto mb-2">
                                                     <i class="fas fa-exclamation"></i>
                                                 </div>
                                                 <h6>Last File Backup</h6>
-                                                <small class="text-muted">1 day ago</small>
+                                                <small class="text-muted">Never</small>
+                                                @endif
                                             </div>
                                         </div>
                                         <div class="col-md-3">
@@ -258,7 +180,7 @@
                                                     <i class="fas fa-hdd"></i>
                                                 </div>
                                                 <h6>Storage Used</h6>
-                                                <small class="text-muted">2.5 GB / 10 GB</small>
+                                                <small class="text-muted">{{ $storageUsed }} / {{ $storageTotal }}</small>
                                             </div>
                                         </div>
                                     </div>
@@ -281,108 +203,109 @@
                                                     <th>Date</th>
                                                     <th>Size</th>
                                                     <th>Status</th>
+                                                    <th>Created By</th>
                                                     <th>Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                @forelse($backups as $backup)
                                                 <tr>
                                                     <td>
-                                                        <span class="badge bg-primary">Database</span>
+                                                        @if($backup->type == 'database')
+                                                            <span class="badge bg-primary">Database</span>
+                                                        @elseif($backup->type == 'files')
+                                                            <span class="badge bg-warning">Files</span>
+                                                        @else
+                                                            <span class="badge bg-danger">Full System</span>
+                                                        @endif
                                                     </td>
-                                                    <td>Dec 15, 2024 10:30 AM</td>
-                                                    <td>45.2 MB</td>
+                                                    <td>{{ $backup->created_at->format('M d, Y h:i A') }}</td>
+                                                    <td>{{ $backup->size }}</td>
                                                     <td>
-                                                        <span class="badge bg-success">Completed</span>
+                                                        @if($backup->status == 'completed')
+                                                            <span class="badge bg-success">Completed</span>
+                                                        @elseif($backup->status == 'in_progress')
+                                                            <span class="badge bg-warning">In Progress</span>
+                                                        @else
+                                                            <span class="badge bg-danger">Failed</span>
+                                                        @endif
                                                     </td>
+                                                    <td>{{ $backup->createdBy->name ?? 'System' }}</td>
                                                     <td>
-                                                        <button class="btn btn-outline-primary btn-sm me-2">
+                                                        @if($backup->status == 'completed')
+                                                        <a href="{{ route('superadmin.backup.download', $backup) }}" class="btn btn-outline-primary btn-sm me-2">
                                                             <i class="fas fa-download me-1"></i> Download
-                                                        </button>
-                                                        <button class="btn btn-outline-danger btn-sm">
-                                                            <i class="fas fa-trash me-1"></i> Delete
-                                                        </button>
+                                                        </a>
+                                                        @endif
+                                                        <form action="{{ route('superadmin.backup.delete', $backup) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to delete this backup?')">
+                                                                <i class="fas fa-trash me-1"></i> Delete
+                                                            </button>
+                                                        </form>
                                                     </td>
                                                 </tr>
+                                                @empty
                                                 <tr>
-                                                    <td>
-                                                        <span class="badge bg-warning">Files</span>
-                                                    </td>
-                                                    <td>Dec 14, 2024 2:00 AM</td>
-                                                    <td>128.7 MB</td>
-                                                    <td>
-                                                        <span class="badge bg-success">Completed</span>
-                                                    </td>
-                                                    <td>
-                                                        <button class="btn btn-outline-primary btn-sm me-2">
-                                                            <i class="fas fa-download me-1"></i> Download
-                                                        </button>
-                                                        <button class="btn btn-outline-danger btn-sm">
-                                                            <i class="fas fa-trash me-1"></i> Delete
-                                                        </button>
+                                                    <td colspan="6" class="text-center py-4">
+                                                        <i class="fas fa-history fa-2x text-muted mb-2"></i>
+                                                        <p class="text-muted mb-0">No backups found. Create your first backup above!</p>
                                                     </td>
                                                 </tr>
-                                                <tr>
-                                                    <td>
-                                                        <span class="badge bg-danger">Full System</span>
-                                                    </td>
-                                                    <td>Dec 13, 2024 2:00 AM</td>
-                                                    <td>1.2 GB</td>
-                                                    <td>
-                                                        <span class="badge bg-success">Completed</span>
-                                                    </td>
-                                                    <td>
-                                                        <button class="btn btn-outline-primary btn-sm me-2">
-                                                            <i class="fas fa-download me-1"></i> Download
-                                                        </button>
-                                                        <button class="btn btn-outline-danger btn-sm">
-                                                            <i class="fas fa-trash me-1"></i> Delete
-                                                        </button>
-                                                    </td>
-                                                </tr>
+                                                @endforelse
                                             </tbody>
                                         </table>
                                     </div>
+                                    @if($backups->hasPages())
+                                    <div class="mt-3">
+                                        {{ $backups->links() }}
+                                    </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+@endsection
 
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-        @csrf
-    </form>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+@push('scripts')
     <script>
-        function createBackup(type) {
+        function createBackup(type, buttonElement) {
             if (confirm(`Are you sure you want to create a ${type} backup?`)) {
-                const button = event.target;
+                const button = buttonElement || event.target;
                 const originalText = button.innerHTML;
                 button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Creating...';
                 button.disabled = true;
 
-                // Simulate backup process
                 fetch('{{ route("superadmin.backup.create") }}', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({ type: type })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        return response.json().then(data => Promise.reject(data));
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    alert(`${type.charAt(0).toUpperCase() + type.slice(1)} backup completed successfully!`);
-                    button.innerHTML = originalText;
-                    button.disabled = false;
-                    // Refresh the page to show updated backup list
-                    location.reload();
+                    console.log('Backup response:', data);
+                    if (data.success) {
+                        alert(data.message || `${type.charAt(0).toUpperCase() + type.slice(1)} backup completed successfully!`);
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Backup failed!');
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    }
                 })
                 .catch(error => {
-                    alert('Error creating backup: ' + error);
+                    console.error('Backup error:', error);
+                    alert('Error creating backup: ' + (error.message || JSON.stringify(error)));
                     button.innerHTML = originalText;
                     button.disabled = false;
                 });
@@ -413,5 +336,4 @@
             }
         }
     </script>
-</body>
-</html>
+@endpush

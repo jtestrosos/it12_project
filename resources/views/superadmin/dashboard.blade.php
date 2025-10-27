@@ -1,46 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barangay Health Center - Staff Management System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .sidebar {
-            background: #f8f9fa;
-            min-height: 100vh;
-            border-right: 1px solid #e9ecef;
-        }
-        .sidebar .nav-link {
-            color: #495057;
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin: 4px 8px;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover {
-            background-color: #e9ecef;
-            color: #495057;
-        }
-        .sidebar .nav-link.active {
-            background-color: #007bff;
-            color: white;
-        }
-        .main-content {
-            background-color: #f0f0f0;
-            min-height: 100vh;
-        }
-        .header {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-            padding: 1rem 2rem;
-        }
+@extends('superadmin.layout')
+
+@section('title', 'Dashboard - Barangay Health Center')
+@section('page-title', 'Dashboard Overview')
+
+
+@section('page-styles')
+<style>
         .metric-card {
             background: white;
             border-radius: 12px;
@@ -112,70 +77,9 @@
             color: #0c5460;
         }
     </style>
-</head>
-<body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-2 p-0">
-                <div class="sidebar">
-                    <div class="p-3">
-                        <div class="d-flex align-items-center mb-4">
-                            <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 40px; height: 40px;">
-                            <div>
-                                <h6 class="mb-0 fw-bold">Barangay Health Center</h6>
-                                <small class="text-muted">Staff Management System</small>
-                            </div>
-                        </div>
-                        <nav class="nav flex-column">
-                            <a class="nav-link active" href="#">
-                                <i class="fas fa-th-large me-2"></i> Dashboard
-                            </a>
-                            <a class="nav-link" href="{{ route('superadmin.users') }}">
-                                <i class="fas fa-user me-2"></i> User Management
-                            </a>
-                            <a class="nav-link" href="{{ route('superadmin.system-logs') }}">
-                                <i class="fas fa-list me-2"></i> System Logs
-                            </a>
-                            <a class="nav-link" href="{{ route('superadmin.analytics') }}">
-                                <i class="fas fa-chart-bar me-2"></i> Analytics
-                            </a>
-                            <a class="nav-link" href="{{ route('superadmin.backup') }}">
-                                <i class="fas fa-download me-2"></i> Backup
-                            </a>
-                        </nav>
-                    </div>
-                </div>
-            </div>
+@endsection
 
-            <!-- Main Content -->
-            <div class="col-md-10 p-0">
-                <div class="main-content">
-                    <!-- Header -->
-                    <div class="header d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="mb-0">Dashboard Overview</h4>
-                            <p class="text-muted mb-0">Welcome back! Here's what's happening today.</p>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-bell text-muted me-3"></i>
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                    SA
-                                </div>
-                                <div>
-                                    <div class="fw-bold">Super Admin</div>
-                                    <small class="text-muted">Administrator</small>
-                                </div>
-                            </div>
-                            <a href="{{ route('logout') }}" class="btn btn-outline-secondary ms-3" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Content -->
-                    <div class="p-4">
+@section('content')
                         <!-- Metrics Cards -->
                         <div class="row mb-4">
                             <div class="col-md-3 mb-3">
@@ -197,8 +101,8 @@
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div>
                                             <div class="metric-label">Today's Appointments</div>
-                                            <div class="metric-number">{{ $totalAppointments ?? 0 }}</div>
-                                            <div class="metric-change text-info">8 completed, 16 pending</div>
+                                            <div class="metric-number">{{ ($todayCompleted ?? 0) + ($todayPending ?? 0) }}</div>
+                                            <div class="metric-change text-info">{{ $todayCompleted ?? 0 }} completed, {{ $todayPending ?? 0 }} pending</div>
                                         </div>
                                         <div class="text-warning">
                                             <i class="fas fa-calendar-check fa-2x"></i>
@@ -224,9 +128,9 @@
                                 <div class="metric-card">
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div>
-                                            <div class="metric-label">Services This Month</div>
-                                            <div class="metric-number">{{ $totalPatients ?? 0 }}</div>
-                                            <div class="metric-change text-success">+8% from last month</div>
+                                            <div class="metric-label">Total Appointments</div>
+                                            <div class="metric-number">{{ $totalAppointments ?? 0 }}</div>
+                                            <div class="metric-change text-success">{{ $pendingAppointments ?? 0 }} pending</div>
                                         </div>
                                         <div class="text-success">
                                             <i class="fas fa-heartbeat fa-2x"></i>
@@ -297,27 +201,36 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+@endsection
 
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-        @csrf
-    </form>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // Get data from Laravel
+        const weeklyData = @json($weeklyAppointments ?? []);
+        const serviceData = @json($serviceTypes ?? []);
+        const barangayData = @json($patientsByBarangay ?? []);
+
         // Overview Chart (Weekly Appointments)
         const overviewCtx = document.getElementById('overviewChart').getContext('2d');
+        
+        const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const weeklyLabels = [];
+        const weeklyCounts = [];
+        
+        for (let i = 0; i < 7; i++) {
+            weeklyLabels.push(daysOfWeek[i]);
+            const dayData = weeklyData.find(item => item.day_of_week == i + 1);
+            weeklyCounts.push(dayData ? dayData.count : 0);
+        }
+        
         new Chart(overviewCtx, {
             type: 'line',
             data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                labels: weeklyLabels,
                 datasets: [{
                     label: 'Appointments',
-                    data: [12, 19, 3, 5, 2, 3, 8],
+                    data: weeklyCounts,
                     borderColor: '#007bff',
                     backgroundColor: 'rgba(0, 123, 255, 0.1)',
                     tension: 0.4
@@ -337,14 +250,17 @@
 
         // Service Chart (Monthly Services)
         const serviceCtx = document.getElementById('serviceChart').getContext('2d');
+        const serviceLabels = serviceData.map(item => item.service_type || 'Other');
+        const serviceCounts = serviceData.map(item => item.count);
+        
         new Chart(serviceCtx, {
             type: 'bar',
             data: {
-                labels: ['General Checkup', 'Prenatal'],
+                labels: serviceLabels,
                 datasets: [{
                     label: 'Services This Month',
-                    data: [2, 1],
-                    backgroundColor: ['#007bff', '#28a745']
+                    data: serviceCounts,
+                    backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1']
                 }]
             },
             options: {
@@ -361,13 +277,16 @@
 
         // Barangay Chart
         const barangayCtx = document.getElementById('barangayChart').getContext('2d');
+        const barangayLabels = barangayData.map(item => item.barangay);
+        const barangayCounts = barangayData.map(item => item.count);
+        
         new Chart(barangayCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Barangay 12', 'Others'],
+                labels: barangayLabels.length > 0 ? barangayLabels : ['No Data'],
                 datasets: [{
-                    data: [85, 15],
-                    backgroundColor: ['#007bff', '#e9ecef']
+                    data: barangayCounts.length > 0 ? barangayCounts : [0],
+                    backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#17a2b8']
                 }]
             },
             options: {
@@ -382,5 +301,4 @@
             }
         });
     </script>
-</body>
-</html>
+@endpush

@@ -1,45 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient Management - Barangay Health Center</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .sidebar {
-            background: #f8f9fa;
-            min-height: 100vh;
-            border-right: 1px solid #e9ecef;
-        }
-        .sidebar .nav-link {
-            color: #495057;
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin: 4px 8px;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover {
-            background-color: #e9ecef;
-            color: #495057;
-        }
-        .sidebar .nav-link.active {
-            background-color: #007bff;
-            color: white;
-        }
-        .main-content {
-            background-color: #f0f0f0;
-            min-height: 100vh;
-        }
-        .header {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-            padding: 1rem 2rem;
-        }
+@extends('superadmin.layout')
+
+@section('title', 'User Management - Barangay Health Center')
+@section('page-title', 'User Management')
+@section('page-description', 'View and manage all registered users')
+
+@section('page-styles')
+<style>
         .patient-card {
             background: white;
             border-radius: 12px;
@@ -103,69 +69,9 @@
             box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         }
     </style>
-</head>
-<body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-2 p-0">
-                <div class="sidebar">
-                    <div class="p-3">
-                        <div class="d-flex align-items-center mb-4">
-                            <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 40px; height: 40px;">
-                            <div>
-                                <h6 class="mb-0 fw-bold">Barangay Health Center</h6>
-                                <small class="text-muted">Staff Management System</small>
-                            </div>
-                        </div>
-                        <nav class="nav flex-column">
-                            <a class="nav-link" href="{{ route('superadmin.dashboard') }}">
-                                <i class="fas fa-th-large me-2"></i> Dashboard
-                            </a>
-                            <a class="nav-link active" href="{{ route('superadmin.users') }}">
-                                <i class="fas fa-user me-2"></i> User Management
-                            </a>
-                            <a class="nav-link" href="{{ route('superadmin.system-logs') }}">
-                                <i class="fas fa-list me-2"></i> System Logs
-                            </a>
-                            <a class="nav-link" href="{{ route('superadmin.analytics') }}">
-                                <i class="fas fa-chart-bar me-2"></i> Analytics
-                            </a>
-                            <a class="nav-link" href="{{ route('superadmin.backup') }}">
-                                <i class="fas fa-download me-2"></i> Backup
-                            </a>
-                        </nav>
-                    </div>
-                </div>
-            </div>
+@endsection
 
-            <!-- Main Content -->
-            <div class="col-md-10 p-0">
-                <div class="main-content">
-                    <!-- Header -->
-                    <div class="header d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="mb-0">Patient Management</h4>
-                            <p class="text-muted mb-0">View and manage all registered patients</p>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                    SA
-                                </div>
-                                <div>
-                                    <div class="fw-bold">Super Admin</div>
-                                    <small class="text-muted">Administrator</small>
-                                </div>
-                            </div>
-                            <a href="{{ route('logout') }}" class="btn btn-outline-secondary ms-3" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Content -->
-                    <div class="p-4">
+@section('content')
                         <!-- Add User Button -->
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <div>
@@ -280,13 +186,9 @@
                                 @endif
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+@endsection
 
-    <!-- Add User Modal -->
+<!-- Add User Modal -->
     <div class="modal fade" id="addUserModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -370,11 +272,7 @@
     </div>
     @endforeach
 
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-        @csrf
-    </form>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+@push('scripts')
     <script>
         // Search functionality
         document.getElementById('searchInput').addEventListener('input', function() {
@@ -425,5 +323,4 @@
             filterTable();
         }
     </script>
-</body>
-</html>
+@endpush
