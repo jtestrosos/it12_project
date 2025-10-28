@@ -165,6 +165,128 @@ it12_project/
 - **System Logging**: Comprehensive audit trail for all actions
 - **Responsive Design**: Mobile-friendly interface built with Tailwind CSS
 
+## What's New 
+
+- Added `sessions` table for server-side session storage (2025-10-23).
+- Extended `users` table with `barangay`, `phone`, and `address` fields (2025-10-23, 2025-10-24).
+- Made `backups.filename`, `backups.file_path`, and `backups.size` nullable (2024-12-27).
+- Appointments support approval tracking via `approved_by` and `approved_at` and multiple statuses.
+- Inventory tracking includes stock status enum and transaction history with `inventory_transactions`.
+
+## Database Schema
+
+### users
+
+| Column              | Type        | Details |
+|---------------------|-------------|---------|
+| id                  | bigint PK   | auto-increment |
+| name                | string      | required |
+| email               | string      | unique, required |
+| email_verified_at   | timestamp   | nullable |
+| password            | string      | required |
+| role                | string      | default `user` |
+| barangay            | string      | nullable |
+| phone               | string      | nullable |
+| address             | text        | nullable |
+| remember_token      | string      | nullable |
+| created_at          | timestamp   |  |
+| updated_at          | timestamp   |  |
+
+### sessions
+
+| Column        | Type      | Details |
+|---------------|-----------|---------|
+| id            | string PK | primary key |
+| user_id       | bigint FK | nullable, indexed -> users.id |
+| ip_address    | string    | length 45, nullable |
+| user_agent    | text      | nullable |
+| payload       | longText  | required |
+| last_activity | integer   | indexed |
+
+### appointments
+
+| Column            | Type        | Details |
+|-------------------|-------------|---------|
+| id                | bigint PK   | auto-increment |
+| user_id           | bigint FK   | required -> users.id (cascade on delete) |
+| patient_name      | string      | required |
+| patient_phone     | string      | required |
+| patient_address   | text        | required |
+| appointment_date  | date        | required |
+| appointment_time  | time        | required |
+| service_type      | string      | required |
+| status            | enum        | `pending`, `approved`, `rescheduled`, `cancelled`, `completed` (default `pending`) |
+| notes             | text        | nullable |
+| medical_history   | text        | nullable |
+| is_walk_in        | boolean     | default false |
+| approved_by       | bigint FK   | nullable -> users.id |
+| approved_at       | timestamp   | nullable |
+| created_at        | timestamp   |  |
+| updated_at        | timestamp   |  |
+
+### inventory
+
+| Column         | Type        | Details |
+|----------------|-------------|---------|
+| id             | bigint PK   | auto-increment |
+| item_name      | string      | required |
+| description    | text        | nullable |
+| category       | string      | required |
+| current_stock  | integer     | required |
+| minimum_stock  | integer     | required |
+| unit           | string      | required |
+| unit_price     | decimal(10,2) | nullable |
+| expiry_date    | date        | nullable |
+| supplier       | string      | nullable |
+| status         | enum        | `in_stock`, `low_stock`, `out_of_stock`, `expired` (default `in_stock`) |
+| created_at     | timestamp   |          |
+| updated_at     | timestamp   |          |
+
+### inventory_transactions
+
+| Column           | Type        | Details |
+|------------------|-------------|---------|
+| id               | bigint PK   | auto-increment |
+| inventory_id     | bigint FK   | required -> inventory.id (cascade on delete) |
+| user_id          | bigint FK   | required -> users.id (cascade on delete) |
+| transaction_type | enum        | `restock`, `usage`, `adjustment`, `expired` |
+| quantity         | integer     | required |
+| notes            | text        | nullable |
+| created_at       | timestamp   |          |
+| updated_at       | timestamp   |          |
+
+### system_logs
+
+| Column       | Type        | Details |
+|--------------|-------------|---------|
+| id           | bigint PK   | auto-increment |
+| user_id      | bigint FK   | nullable -> users.id (`set null` on delete) |
+| action       | string      | required |
+| table_name   | string      | nullable |
+| record_id    | unsigned bigint | nullable |
+| old_values   | json        | nullable |
+| new_values   | json        | nullable |
+| ip_address   | string      | nullable |
+| user_agent   | text        | nullable |
+| created_at   | timestamp   |          |
+| updated_at   | timestamp   |          |
+
+### backups
+
+| Column       | Type        | Details |
+|--------------|-------------|---------|
+| id           | bigint PK   | auto-increment |
+| type         | string      | e.g., `database`, `files`, `full` |
+| filename     | string      | nullable |
+| file_path    | string      | nullable |
+| size         | string      | nullable (e.g., "45.2 MB") |
+| status       | enum        | `in_progress`, `completed`, `failed` (default `in_progress`) |
+| created_by   | bigint FK   | nullable -> users.id (`set null` on delete) |
+| notes        | text        | nullable |
+| completed_at | timestamp   | nullable |
+| created_at   | timestamp   |          |
+| updated_at   | timestamp   |          |
+
 ## Troubleshooting
 
 ### Common Issues
