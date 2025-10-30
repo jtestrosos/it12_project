@@ -148,51 +148,94 @@
                     <!-- Content -->
                     <div class="p-4">
                         @if($inventory->count() > 0)
-                            <div class="row">
-                                @foreach($inventory as $item)
-                                <div class="col-md-6 col-lg-4 mb-3">
-                                    <div class="inventory-card">
-                                        <div class="d-flex justify-content-between align-items-start mb-3">
-                                            <div class="flex-grow-1">
-                                                <h6 class="fw-bold mb-1">{{ $item->item_name }}</h6>
-                                                <small class="text-muted">{{ $item->category }}</small>
-                                            </div>
-                                            <span class="stock-indicator 
-                                                @if($item->current_stock == 0) stock-out
-                                                @elseif($item->current_stock <= $item->minimum_stock) stock-low
-                                                @else stock-good
-                                                @endif">
-                                            </span>
-                                        </div>
-                                        
-                                        <div class="mb-3">
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <span class="text-muted">Current Stock:</span>
-                                                <span class="fw-bold">{{ $item->current_stock }} {{ $item->unit }}</span>
-                                            </div>
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <span class="text-muted">Minimum Stock:</span>
-                                                <span>{{ $item->minimum_stock }} {{ $item->unit }}</span>
-                                            </div>
-                                            @if($item->description)
-                                            <div class="mb-2">
-                                                <small class="text-muted">{{ $item->description }}</small>
-                                            </div>
-                                            @endif
-                                        </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle bg-white rounded shadow-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col"></th>
+                                            <th scope="col">Item Name</th>
+                                            <th scope="col">Category</th>
+                                            <th scope="col">Stock</th>
+                                            <th scope="col">Min Stock</th>
+                                            <th scope="col">Unit</th>
+                                            <th scope="col">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach($inventory as $item)
+                                        <tr>
+                                            <td>
+                                                <span class="stock-indicator @if($item->current_stock == 0) stock-out @elseif($item->current_stock <= $item->minimum_stock) stock-low @else stock-good @endif"></span>
+                                            </td>
+                                            <td>{{ $item->item_name }}</td>
+                                            <td>{{ $item->category }}</td>
+                                            <td><strong>{{ $item->current_stock }}</strong></td>
+                                            <td>{{ $item->minimum_stock }}</td>
+                                            <td>{{ $item->unit }}</td>
+                                            <td class="d-flex gap-2">
+                                                <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewDetailModal{{ $item->id }}">
+                                                    <i class="fas fa-eye"></i> View
+                                                </button>
+                                                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updateItemModal{{ $item->id }}">
+                                                    <i class="fas fa-edit me-1"></i> Update
+                                                </button>
+                                                <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#restockModal{{ $item->id }}">
+                                                    <i class="fas fa-plus me-1"></i> Restock
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
 
-                                        <div class="d-flex gap-2">
-                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updateItemModal{{ $item->id }}">
-                                                <i class="fas fa-edit me-1"></i> Update
-                                            </button>
-                                            <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#restockModal{{ $item->id }}">
-                                                <i class="fas fa-plus me-1"></i> Restock
-                                            </button>
+                            <!-- Per-item View Modals -->
+                            @foreach($inventory as $item)
+                            <div class="modal fade" id="viewDetailModal{{ $item->id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Inventory Item Details</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="inventory-card">
+                                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                                    <div class="flex-grow-1">
+                                                        <h6 class="fw-bold mb-1">{{ $item->item_name }}</h6>
+                                                        <small class="text-muted">{{ $item->category }}</small>
+                                                    </div>
+                                                    <span class="stock-indicator @if($item->current_stock == 0) stock-out @elseif($item->current_stock <= $item->minimum_stock) stock-low @else stock-good @endif"></span>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span class="text-muted">Current Stock:</span>
+                                                        <span class="fw-bold">{{ $item->current_stock }} {{ $item->unit }}</span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span class="text-muted">Minimum Stock:</span>
+                                                        <span>{{ $item->minimum_stock }} {{ $item->unit }}</span>
+                                                    </div>
+                                                    @if($item->description)
+                                                    <div class="mb-2">
+                                                        <small class="text-muted">{{ $item->description }}</small>
+                                                    </div>
+                                                    @endif
+                                                </div>
+                                                <div class="d-flex gap-2">
+                                                    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updateItemModal{{ $item->id }}">
+                                                        <i class="fas fa-edit me-1"></i> Update
+                                                    </button>
+                                                    <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#restockModal{{ $item->id }}">
+                                                        <i class="fas fa-plus me-1"></i> Restock
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                @endforeach
                             </div>
+                            @endforeach
                         @else
                             <div class="text-center py-5">
                                 <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
