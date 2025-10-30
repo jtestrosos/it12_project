@@ -87,12 +87,25 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Patient created successfully.');
     }
 
-    public function appointments()
+    public function appointments(Request $request)
     {
-        $appointments = Appointment::with(['user', 'approvedBy'])
-            ->latest()
-            ->paginate(10);
-            
+        $query = Appointment::with(['user', 'approvedBy'])->latest();
+        if ($request->filled('search')) {
+            $q = $request->search;
+            $query->where(function($sub) use ($q) {
+                $sub->where('patient_name', 'like', "%$q%")
+                    ->orWhere('patient_phone', 'like', "%$q%")
+                    ->orWhere('service_type', 'like', "%$q%")
+                    ->orWhereHas('user', function($u) use ($q) {
+                        $u->where('name', 'like', "%$q%")
+                            ->orWhere('email', 'like', "%$q%") ;
+                    });
+            });
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        $appointments = $query->paginate(10)->withQueryString();
         return view('admin.appointments', compact('appointments'));
     }
 

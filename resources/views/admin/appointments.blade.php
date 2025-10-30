@@ -47,6 +47,27 @@
                             </button>
                         </div>
 
+                        <!-- Search and Filter -->
+                        <form method="GET" class="row g-2 mb-3 align-items-end">
+                            <div class="col-md-4">
+                                <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Search by patient, phone, or service...">
+                            </div>
+                            <div class="col-md-3">
+                                <select name="status" class="form-select">
+                                    <option value="">All Status</option>
+                                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                                    <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
+                                    <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search me-2"></i>Search
+                                </button>
+                            </div>
+                        </form>
+
                         <!-- Appointments Table -->
                         <div class="card">
                             <div class="card-body p-0">
@@ -91,23 +112,25 @@
                                                     @endif
                                                 </td>
                                                 <td>
+                                                    <div class="btn-group" role="group">
+                                                        <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewAppointmentModal{{ $appointment->id }}">
+                                                            <i class="fas fa-eye"></i> View
+                                                        </button>
                                                     @if($appointment->status == 'pending')
-                                                        <div class="btn-group" role="group">
-                                                            <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
-                                                                @csrf
-                                                                <input type="hidden" name="status" value="approved">
-                                                                <button type="submit" class="btn btn-success btn-sm">
-                                                                    <i class="fas fa-check"></i>
-                                                                </button>
-                                                            </form>
-                                                            <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
-                                                                @csrf
-                                                                <input type="hidden" name="status" value="cancelled">
-                                                                <button type="submit" class="btn btn-danger btn-sm">
-                                                                    <i class="fas fa-times"></i>
-                                                                </button>
-                                                            </form>
-                                                        </div>
+                                                        <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
+                                                            @csrf
+                                                            <input type="hidden" name="status" value="approved">
+                                                            <button type="submit" class="btn btn-success btn-sm">
+                                                                <i class="fas fa-check"></i>
+                                                            </button>
+                                                        </form>
+                                                        <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
+                                                            @csrf
+                                                            <input type="hidden" name="status" value="cancelled">
+                                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </form>
                                                     @elseif($appointment->status == 'approved')
                                                         <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
                                                             @csrf
@@ -119,6 +142,7 @@
                                                     @else
                                                         <span class="text-muted">-</span>
                                                     @endif
+                                                    </div>
                                                 </td>
                                             </tr>
                                             @endforeach
@@ -206,4 +230,11 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('page-scripts')
+<script>
+    // This script block is for the new per-appointment detail modals
+    // It will be added to the existing file's scripts section
+</script>
 @endsection

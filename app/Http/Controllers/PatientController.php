@@ -35,7 +35,6 @@ class PatientController extends Controller
         $request->validate([
             'patient_name' => 'required|string|max:255',
             'patient_phone' => 'required|string|max:20',
-            'patient_address' => 'required|string|max:500',
             'appointment_date' => 'required|date|after:today',
             'appointment_time' => 'required',
             'service_type' => 'required|string',
@@ -47,7 +46,6 @@ class PatientController extends Controller
             'user_id' => Auth::id(),
             'patient_name' => $request->patient_name,
             'patient_phone' => $request->patient_phone,
-            'patient_address' => $request->patient_address,
             'appointment_date' => $request->appointment_date,
             'appointment_time' => $request->appointment_time,
             'service_type' => $request->service_type,
