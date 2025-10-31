@@ -80,10 +80,11 @@ php artisan key:generate
 php artisan migrate
 ```
 
-### 7. Seed the Database (Optional)
+### 7. Seed the Database (mandatory)
 
 ```bash
 php artisan db:seed
+php artisan db:seed --class=ServiceSeeder
 ```
 
 ### 8. Build Frontend Assets
