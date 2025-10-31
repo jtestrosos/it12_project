@@ -40,6 +40,16 @@
         .table-responsive { overflow: visible; }
         /* Keep actions column flexible */
         .actions-col { white-space: nowrap; }
+        /* Dark mode modal + form fields (booking drawer/modal) */
+        body.bg-dark .offcanvas, body.bg-dark .modal-content { background: #1e2124; color: #e6e6e6; border-color: #2a2f35; }
+        body.bg-dark .offcanvas .form-label, body.bg-dark .modal-content .form-label { color: #e6e6e6; }
+        body.bg-dark .offcanvas .form-control,
+        body.bg-dark .offcanvas .form-select,
+        body.bg-dark .modal-content .form-control,
+        body.bg-dark .modal-content .form-select { background-color: #0f1316; color: #e6e6e6; border-color: #2a2f35; }
+        body.bg-dark .offcanvas .form-control::placeholder,
+        body.bg-dark .modal-content .form-control::placeholder { color: #9aa4ad; }
+        body.bg-dark .offcanvas .input-group-text { background: #1a1f24; color: #cbd3da; border-color: #2a2f35; }
     </style>
 @endsection
 

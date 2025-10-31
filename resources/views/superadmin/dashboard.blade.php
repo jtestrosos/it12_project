@@ -20,7 +20,7 @@
         .metric-number {
             font-size: 2.5rem;
             font-weight: 700;
-            color: #2c3e50;
+            color: inherit;
         }
         .metric-label {
             color: #6c757d;
@@ -76,6 +76,7 @@
             background-color: #d1ecf1;
             color: #0c5460;
         }
+        .activity-scroll { max-height: 320px; overflow-y: auto; }
     </style>
 @endsection
 
@@ -116,7 +117,6 @@
                                         <div>
                                             <div class="metric-label">Low Stock Items</div>
                                             <div class="metric-number">{{ $totalInventory ?? 0 }}</div>
-                                            <div class="metric-change text-warning">Needs restocking</div>
                                         </div>
                                         <div class="text-danger">
                                             <i class="fas fa-boxes fa-2x"></i>
@@ -167,8 +167,12 @@
                             <div class="col-md-6">
                                 <div class="chart-container">
                                     <h6 class="mb-3">Recent Activity</h6>
-                                    @if(isset($recentLogs) && $recentLogs->count() > 0)
-                                        @foreach($recentLogs->take(5) as $log)
+                                    <div class="activity-scroll">
+                                    @php
+                                        $recentCollection = collect($recentLogs ?? []);
+                                    @endphp
+                                    @if($recentCollection->count() > 0)
+                                        @foreach($recentCollection as $log)
                                         <div class="activity-item">
                                             <div class="activity-icon 
                                                 @if($log->action == 'created') status-completed
@@ -198,6 +202,7 @@
                                             <p class="text-muted mb-0">No recent activity</p>
                                         </div>
                                     @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -206,6 +211,15 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // Palette and grid based on theme
+        const isDark = document.body.classList.contains('bg-dark');
+        const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+        const textColor = isDark ? '#e6e6e6' : '#2c3e50';
+        const accentBlue = '#0d6efd';
+        const accentTeal = '#20c997';
+        const accentRed = '#dc3545';
+        const accentGreen = '#28a745';
+        const accentViolet = '#6f42c1';
         // Get data from Laravel
         const weeklyData = @json($weeklyAppointments ?? []);
         const serviceData = @json($serviceTypes ?? []);
@@ -231,9 +245,12 @@
                 datasets: [{
                     label: 'Appointments',
                     data: weeklyCounts,
-                    borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                    tension: 0.4
+                    borderColor: accentBlue,
+                    backgroundColor: 'rgba(13,110,253,0.15)',
+                    tension: 0.4,
+                    pointRadius: 3,
+                    pointHoverRadius: 7,
+                    borderWidth: 3
                 }]
             },
             options: {
@@ -242,7 +259,11 @@
                 aspectRatio: 1.8,
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        grid: { color: gridColor }
+                    },
+                    x: {
+                        grid: { color: gridColor }
                     }
                 }
             }
@@ -260,7 +281,10 @@
                 datasets: [{
                     label: 'Services This Month',
                     data: serviceCounts,
-                    backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1']
+                    backgroundColor: [accentBlue, accentGreen, '#ffc107', accentRed, accentViolet],
+                    hoverBackgroundColor: [
+                        'rgba(13,110,253,0.9)', 'rgba(40,167,69,0.9)', 'rgba(255,193,7,0.9)', 'rgba(220,53,69,0.9)', 'rgba(111,66,193,0.9)'
+                    ]
                 }]
             },
             options: {
@@ -269,7 +293,11 @@
                 aspectRatio: 1.8,
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        grid: { color: gridColor }
+                    },
+                    x: {
+                        grid: { color: gridColor }
                     }
                 }
             }
@@ -286,7 +314,7 @@
                 labels: barangayLabels.length > 0 ? barangayLabels : ['No Data'],
                 datasets: [{
                     data: barangayCounts.length > 0 ? barangayCounts : [0],
-                    backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#17a2b8']
+                    backgroundColor: [accentBlue, accentGreen, '#ffc107', accentRed, accentViolet, '#17a2b8']
                 }]
             },
             options: {
@@ -295,7 +323,8 @@
                 aspectRatio: 1.0,
                 plugins: {
                     legend: {
-                        position: 'bottom'
+                        position: 'bottom',
+                        labels: { color: textColor }
                     }
                 }
             }

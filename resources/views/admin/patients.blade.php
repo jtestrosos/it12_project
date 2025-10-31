@@ -7,6 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        body { color: #111; }
+        body.bg-dark { color: #fff; }
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -78,9 +80,33 @@
             font-weight: bold;
             font-size: 1.2rem;
         }
+        /* Cards inherit theme text color */
+        .card, .patient-card { color: inherit; }
+        /* Dark mode surfaces */
+        body.bg-dark .main-content { background-color: #151718; }
+        body.bg-dark .sidebar { background: #131516; border-right-color: #2a2f35; }
+        body.bg-dark .header { background: #1b1e20; border-bottom-color: #2a2f35; }
+        body.bg-dark .card, body.bg-dark .patient-card { background: #1e2124; color: #e6e6e6; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        body.bg-dark .table thead, body.bg-dark .table-light { background: #1a1f24 !important; color: #e6e6e6; }
+        /* Muted text visibility */
+        h1, h2, h3, h4, h5, h6 { color: inherit; }
+        body.bg-dark .text-muted, body.bg-dark small { color: #b0b0b0 !important; }
+        /* Dark mode modal (Add/Edit Patient) */
+        body.bg-dark .modal-content { background: #1e2124; color: #e6e6e6; border-color: #2a2f35; }
+        body.bg-dark .modal-content .form-label { color: #e6e6e6; }
+        body.bg-dark .modal-content .form-control,
+        body.bg-dark .modal-content .form-select { background-color: #0f1316; color: #e6e6e6; border-color: #2a2f35; }
+        body.bg-dark .modal-content .form-control::placeholder { color: #9aa4ad; }
     </style>
 </head>
 <body>
+    <script>
+        (function(){
+            if (localStorage.getItem('app-theme') === 'dark') {
+                document.body.classList.add('bg-dark','text-white');
+            }
+        })();
+    </script>
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
@@ -125,6 +151,9 @@
                             <p class="text-muted mb-0">View and manage all registered patients</p>
                         </div>
                         <div class="d-flex align-items-center">
+                            <button class="btn btn-link text-decoration-none text-muted me-2" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
+                                <i class="fas fa-moon"></i>
+                            </button>
                             <div class="d-flex align-items-center">
                                 <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                     {{ substr(Auth::user()->name, 0, 2) }}
@@ -402,6 +431,18 @@
     <script>
         // Search and Filter Functionality
         document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle persistence
+            (function(){
+                const key = 'app-theme';
+                const btn = document.getElementById('themeToggle');
+                if (btn) {
+                    btn.addEventListener('click', function(){
+                        const isDark = document.body.classList.toggle('bg-dark');
+                        document.body.classList.toggle('text-white', isDark);
+                        localStorage.setItem(key, isDark ? 'dark' : 'light');
+                    });
+                }
+            })();
             const statusFilter = document.getElementById('statusFilter');
             const appointmentFilter = document.getElementById('appointmentFilter');
             const barangayFilter = document.getElementById('barangayFilter');
