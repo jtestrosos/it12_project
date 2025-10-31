@@ -176,6 +176,12 @@
 
                     <!-- Content -->
                     <div class="p-4">
+                        <!-- Quick Shortcuts -->
+                        <div class="d-flex flex-wrap gap-2 mb-4">
+                            <a href="{{ route('admin.appointments') }}" class="btn btn-primary"><i class="fas fa-calendar-plus me-2"></i>Book appointment</a>
+                            <a href="{{ route('admin.patients') }}" class="btn btn-outline-primary"><i class="fas fa-user-plus me-2"></i>Add patient</a>
+                        </div>
+
                         <!-- Metrics Cards -->
                         <div class="row mb-4">
                             <div class="col-md-3 mb-3">
@@ -236,6 +242,8 @@
                             </div>
                         </div>
 
+                        
+
                         <!-- Charts -->
                         <div class="row mb-4">
                             <div class="col-md-6">
@@ -262,53 +270,34 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="chart-container">
-                                    <h6 class="mb-3">Recent Activity</h6>
-                                    @if($recentAppointments->count() > 0)
-                                        @foreach($recentAppointments as $appointment)
+                                    <h6 class="mb-3">Today's Schedule</h6>
+                                    @if(($todaysAppointments ?? collect([]))->count() > 0)
+                                        @foreach($todaysAppointments as $appointment)
                                         <div class="activity-item">
-                                            <div class="activity-icon 
-                                                @if($appointment->status == 'completed') status-completed
-                                                @elseif($appointment->status == 'approved') status-approved
-                                                @elseif($appointment->status == 'pending') status-pending
-                                                @elseif($appointment->status == 'cancelled') status-cancelled
-                                                @else status-progress
-                                                @endif">
-                                                @if($appointment->status == 'completed')
-                                                    <i class="fas fa-check"></i>
-                                                @elseif($appointment->status == 'approved')
-                                                    <i class="fas fa-thumbs-up"></i>
-                                                @elseif($appointment->status == 'pending')
-                                                    <i class="fas fa-clock"></i>
-                                                @elseif($appointment->status == 'cancelled')
-                                                    <i class="fas fa-times"></i>
-                                                @else
-                                                    <i class="fas fa-heartbeat"></i>
-                                                @endif
+                                            <div class="activity-icon status-progress">
+                                                <i class="fas fa-user-clock"></i>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <div class="fw-bold">{{ $appointment->patient_name ?? ($appointment->user->name ?? 'Walk-in Patient') }}</div>
-                                                <div class="text-muted">{{ $appointment->service_type }}</div>
-                                                <small class="text-muted">{{ \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A') }}</small>
+                                                <div class="text-muted">{{ $appointment->service_type }} • {{ \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A') }}</div>
                                             </div>
-                                            <span class="badge 
-                                                @if($appointment->status == 'completed') bg-success
-                                                @elseif($appointment->status == 'approved') bg-info
-                                                @elseif($appointment->status == 'pending') bg-warning
-                                                @elseif($appointment->status == 'cancelled') bg-danger
-                                                @else bg-primary
-                                                @endif">
-                                                {{ ucfirst($appointment->status) }}
-                                            </span>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <button class="btn btn-outline-secondary">Arrived</button>
+                                                <button class="btn btn-outline-secondary">In progress</button>
+                                                <button class="btn btn-outline-secondary">Completed</button>
+                                            </div>
                                         </div>
                                         @endforeach
                                     @else
                                         <div class="text-center py-3">
-                                            <p class="text-muted mb-0">No recent activity</p>
+                                            <p class="text-muted mb-0">No appointments for today</p>
                                         </div>
                                     @endif
                                 </div>
                             </div>
                         </div>
+
+                        
                     </div>
                 </div>
             </div>

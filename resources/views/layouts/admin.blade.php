@@ -107,7 +107,19 @@
                             <h4 class="mb-0">@yield('page-title', 'Dashboard')</h4>
                             <p class="text-muted mb-0">@yield('page-description', 'Welcome!')</p>
                         </div>
-                        <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center gap-3">
+                            <form action="{{ route('admin.patients') }}" method="GET" class="d-none d-md-block" role="search" aria-label="Global search">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    <input type="text" name="q" class="form-control" placeholder="Search patients or appointments…">
+                                </div>
+                            </form>
+                            <button class="btn btn-link text-decoration-none text-muted" title="Notifications" aria-label="Notifications">
+                                <i class="fas fa-bell"></i>
+                            </button>
+                            <button class="btn btn-link text-decoration-none text-muted" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
+                                <i class="fas fa-moon"></i>
+                            </button>
                             <div class="d-flex align-items-center">
                                 <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                     @yield('user-initials', 'A')
@@ -137,6 +149,13 @@
     </form>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Simple light/dark theme toggle (class-based)
+        document.getElementById('themeToggle')?.addEventListener('click', function () {
+            document.body.classList.toggle('bg-dark');
+            document.body.classList.toggle('text-white');
+        });
+    </script>
     @stack('scripts')
 </body>
 </html>

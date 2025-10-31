@@ -142,35 +142,36 @@
 
                     <!-- Content -->
                     <div class="p-4">
-                        <!-- Add Patient Button -->
-                        <div class="d-flex justify-content-end mb-4">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPatientModal">
-                                <i class="fas fa-plus me-2"></i> Add New Patient
-                            </button>
+                        <!-- Top actions -->
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPatientModal">
+                                    <i class="fas fa-plus me-2"></i> Add New Patient
+                                </button>
+                            </div>
+                            <div></div>
                         </div>
 
                         <!-- Search and Filter -->
                         <div class="card mb-4">
                             <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="input-group">
-                                            <span class="input-group-text">
-                                                <i class="fas fa-search"></i>
-                                            </span>
-                                            <input type="text" class="form-control" id="searchInput" placeholder="Search patients by name or email...">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-2">
+                                        <label class="form-label">Status</label>
                                         <select class="form-select" id="statusFilter">
-                                            <option value="">All Status</option>
+                                            <option value="">All</option>
                                             <option value="active">Active</option>
                                             <option value="inactive">Inactive</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
+                                        <label class="form-label">Barangay</label>
+                                        <input type="text" class="form-control" id="barangayFilter" placeholder="e.g. Poblacion">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Appointments</label>
                                         <select class="form-select" id="appointmentFilter">
-                                            <option value="">All Patients</option>
+                                            <option value="">All</option>
                                             <option value="with-appointments">With Appointments</option>
                                             <option value="no-appointments">No Appointments</option>
                                         </select>
@@ -183,7 +184,7 @@
                         <div class="card">
                             <div class="card-body p-0">
                                 <div class="table-responsive">
-                                    <table class="table table-hover mb-0">
+                                    <table class="table table-hover mb-0 align-middle">
                                         <thead class="table-light">
                                             <tr>
                                                 <th>Patient</th>
@@ -401,29 +402,25 @@
     <script>
         // Search and Filter Functionality
         document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
             const statusFilter = document.getElementById('statusFilter');
             const appointmentFilter = document.getElementById('appointmentFilter');
+            const barangayFilter = document.getElementById('barangayFilter');
             const tableBody = document.getElementById('patientsTableBody');
             const rows = tableBody.querySelectorAll('tr');
 
             function filterTable() {
-                const searchTerm = searchInput.value.toLowerCase();
                 const statusValue = statusFilter.value;
                 const appointmentValue = appointmentFilter.value;
+                const barangayValue = barangayFilter.value.toLowerCase();
 
                 rows.forEach(row => {
                     const name = row.cells[0].textContent.toLowerCase();
                     const email = row.cells[1].textContent.toLowerCase();
                     const status = row.cells[2].textContent.toLowerCase();
                     const appointments = parseInt(row.cells[4].textContent);
+                    const barangay = row.cells[0].textContent.toLowerCase();
 
                     let showRow = true;
-
-                    // Search filter
-                    if (searchTerm && !name.includes(searchTerm) && !email.includes(searchTerm)) {
-                        showRow = false;
-                    }
 
                     // Status filter
                     if (statusValue) {
@@ -443,13 +440,19 @@
                         }
                     }
 
+                    // Barangay filter (simple contains)
+                    if (barangayValue && !barangay.includes(barangayValue)) {
+                        showRow = false;
+                    }
+
                     row.style.display = showRow ? '' : 'none';
                 });
             }
 
-            searchInput.addEventListener('input', filterTable);
             statusFilter.addEventListener('change', filterTable);
             appointmentFilter.addEventListener('change', filterTable);
+            barangayFilter.addEventListener('input', filterTable);
+            
         });
     </script>
 </body>
