@@ -14,7 +14,7 @@
     <i class="fas fa-chart-bar me-2"></i> Services & Reports
 </a>
 <a class="nav-link @if(request()->routeIs('admin.inventory')) active @endif" href="{{ route('admin.inventory') }}">
-    <i class="fas fa-boxes me-2"></i> Inventory
+    <i class="fas fa-box me-2"></i> Inventory
 </a>
 @endsection
 

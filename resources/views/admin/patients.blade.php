@@ -140,7 +140,10 @@
                         </div>
                     </div>
 
+
                     <!-- Content -->
+                                                                                                    @if($patients->count() > 0)
+
                     <div class="p-4">
                         <!-- Add Patient Button -->
                         <div class="d-flex justify-content-end mb-4">
@@ -178,6 +181,7 @@
                                 </div>
                             </div>
                         </div>
+
 
                         <!-- Patients Table -->
                         <div class="card">
@@ -246,7 +250,14 @@
                                 </div>
                             </div>
                         </div>
-
+                                                                        @else
+                            <div class="text-center py-5">
+                                <i class="fas fa-user me-2 fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No patient found</h5>
+                                <p class="text-muted">Pending for users to create their account.</p>
+                                
+                            </div> 
+@endif
                         <!-- Pagination -->
                         <div class="d-flex justify-content-center mt-4">
                             {{ $patients->links() }}

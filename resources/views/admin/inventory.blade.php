@@ -144,16 +144,16 @@
                     </div>
 
                     <!-- Content -->
-                    
+                                                                                @if($inventory->count() > 0)
+
                     <div class="p-4">
 
                                                                         <div class="d-flex justify-content-end mb-4">
 
-                                                            @if($inventory->count() > 0)
             <button class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#addItemModal">
                 <i class="fas fa-plus me-2"></i> Add New Item
             </button>
-        @endif <!--button fix attempt-->
+        @endif
                                 </div>  
 
                         @if($inventory->count() > 0)
@@ -247,7 +247,7 @@
                             @endforeach
                         @else
                             <div class="text-center py-5">
-                                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                                <i class="fas fa-box me-2 fa-3x text-muted mb-3"></i>
                                 <h5 class="text-muted">No inventory items found</h5>
                                 <p class="text-muted">Start by adding your first inventory item.</p>
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">

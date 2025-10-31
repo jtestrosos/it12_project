@@ -41,7 +41,10 @@
 
 @section('content')
                         <!-- Add Appointment Button -->
+                                                                                                        @if($appointments->count() > 0)
+
                         <div class="d-flex justify-content-end mb-4">
+
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">
                                 <i class="fas fa-plus me-2"></i> Add New Appointment
                             </button>
@@ -156,6 +159,13 @@
                         <div class="d-flex justify-content-center mt-4">
                             {{ $appointments->links() }}
                         </div>
+                                                        @else
+                            <div class="text-center py-5">
+                                <i class="fas fa-calendar-check me-2 fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No appointment found</h5>
+                                <p class="text-muted">Pending for users to create their appointment.</p>
+                            </div>
+                            @endif
 @endsection
 @section('content')
 <!-- Add Appointment Modal -->
@@ -230,7 +240,6 @@
             </div>
         </div>
     </div>
-@endsection
 
 @section('page-scripts')
 <script>
