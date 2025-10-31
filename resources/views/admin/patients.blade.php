@@ -7,6 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        body { color: #111; }
+        body.bg-dark { color: #fff; }
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -78,9 +80,33 @@
             font-weight: bold;
             font-size: 1.2rem;
         }
+        /* Cards inherit theme text color */
+        .card, .patient-card { color: inherit; }
+        /* Dark mode surfaces */
+        body.bg-dark .main-content { background-color: #151718; }
+        body.bg-dark .sidebar { background: #131516; border-right-color: #2a2f35; }
+        body.bg-dark .header { background: #1b1e20; border-bottom-color: #2a2f35; }
+        body.bg-dark .card, body.bg-dark .patient-card { background: #1e2124; color: #e6e6e6; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        body.bg-dark .table thead, body.bg-dark .table-light { background: #1a1f24 !important; color: #e6e6e6; }
+        /* Muted text visibility */
+        h1, h2, h3, h4, h5, h6 { color: inherit; }
+        body.bg-dark .text-muted, body.bg-dark small { color: #b0b0b0 !important; }
+        /* Dark mode modal (Add/Edit Patient) */
+        body.bg-dark .modal-content { background: #1e2124; color: #e6e6e6; border-color: #2a2f35; }
+        body.bg-dark .modal-content .form-label { color: #e6e6e6; }
+        body.bg-dark .modal-content .form-control,
+        body.bg-dark .modal-content .form-select { background-color: #0f1316; color: #e6e6e6; border-color: #2a2f35; }
+        body.bg-dark .modal-content .form-control::placeholder { color: #9aa4ad; }
     </style>
 </head>
 <body>
+    <script>
+        (function(){
+            if (localStorage.getItem('app-theme') === 'dark') {
+                document.body.classList.add('bg-dark','text-white');
+            }
+        })();
+    </script>
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
@@ -125,6 +151,9 @@
                             <p class="text-muted mb-0">View and manage all registered patients</p>
                         </div>
                         <div class="d-flex align-items-center">
+                            <button class="btn btn-link text-decoration-none text-muted me-2" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
+                                <i class="fas fa-moon"></i>
+                            </button>
                             <div class="d-flex align-items-center">
                                 <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                     {{ substr(Auth::user()->name, 0, 2) }}
@@ -145,35 +174,36 @@
                                                                                                     @if($patients->count() > 0)
 
                     <div class="p-4">
-                        <!-- Add Patient Button -->
-                        <div class="d-flex justify-content-end mb-4">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPatientModal">
-                                <i class="fas fa-plus me-2"></i> Add New Patient
-                            </button>
+                        <!-- Top actions -->
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPatientModal">
+                                    <i class="fas fa-plus me-2"></i> Add New Patient
+                                </button>
+                            </div>
+                            <div></div>
                         </div>
 
                         <!-- Search and Filter -->
                         <div class="card mb-4">
                             <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="input-group">
-                                            <span class="input-group-text">
-                                                <i class="fas fa-search"></i>
-                                            </span>
-                                            <input type="text" class="form-control" id="searchInput" placeholder="Search patients by name or email...">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-2">
+                                        <label class="form-label">Status</label>
                                         <select class="form-select" id="statusFilter">
-                                            <option value="">All Status</option>
+                                            <option value="">All</option>
                                             <option value="active">Active</option>
                                             <option value="inactive">Inactive</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
+                                        <label class="form-label">Barangay</label>
+                                        <input type="text" class="form-control" id="barangayFilter" placeholder="e.g. Poblacion">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Appointments</label>
                                         <select class="form-select" id="appointmentFilter">
-                                            <option value="">All Patients</option>
+                                            <option value="">All</option>
                                             <option value="with-appointments">With Appointments</option>
                                             <option value="no-appointments">No Appointments</option>
                                         </select>
@@ -187,7 +217,7 @@
                         <div class="card">
                             <div class="card-body p-0">
                                 <div class="table-responsive">
-                                    <table class="table table-hover mb-0">
+                                    <table class="table table-hover mb-0 align-middle">
                                         <thead class="table-light">
                                             <tr>
                                                 <th>Patient</th>
@@ -412,29 +442,37 @@
     <script>
         // Search and Filter Functionality
         document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
+            // Theme toggle persistence
+            (function(){
+                const key = 'app-theme';
+                const btn = document.getElementById('themeToggle');
+                if (btn) {
+                    btn.addEventListener('click', function(){
+                        const isDark = document.body.classList.toggle('bg-dark');
+                        document.body.classList.toggle('text-white', isDark);
+                        localStorage.setItem(key, isDark ? 'dark' : 'light');
+                    });
+                }
+            })();
             const statusFilter = document.getElementById('statusFilter');
             const appointmentFilter = document.getElementById('appointmentFilter');
+            const barangayFilter = document.getElementById('barangayFilter');
             const tableBody = document.getElementById('patientsTableBody');
             const rows = tableBody.querySelectorAll('tr');
 
             function filterTable() {
-                const searchTerm = searchInput.value.toLowerCase();
                 const statusValue = statusFilter.value;
                 const appointmentValue = appointmentFilter.value;
+                const barangayValue = barangayFilter.value.toLowerCase();
 
                 rows.forEach(row => {
                     const name = row.cells[0].textContent.toLowerCase();
                     const email = row.cells[1].textContent.toLowerCase();
                     const status = row.cells[2].textContent.toLowerCase();
                     const appointments = parseInt(row.cells[4].textContent);
+                    const barangay = row.cells[0].textContent.toLowerCase();
 
                     let showRow = true;
-
-                    // Search filter
-                    if (searchTerm && !name.includes(searchTerm) && !email.includes(searchTerm)) {
-                        showRow = false;
-                    }
 
                     // Status filter
                     if (statusValue) {
@@ -454,13 +492,19 @@
                         }
                     }
 
+                    // Barangay filter (simple contains)
+                    if (barangayValue && !barangay.includes(barangayValue)) {
+                        showRow = false;
+                    }
+
                     row.style.display = showRow ? '' : 'none';
                 });
             }
 
-            searchInput.addEventListener('input', filterTable);
             statusFilter.addEventListener('change', filterTable);
             appointmentFilter.addEventListener('change', filterTable);
+            barangayFilter.addEventListener('input', filterTable);
+            
         });
     </script>
 </body>

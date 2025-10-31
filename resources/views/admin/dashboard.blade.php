@@ -8,6 +8,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* Theme-aware text */
+        body { color: #111; }
+        body.bg-dark { color: #fff; }
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -111,9 +114,33 @@
             background-color: #d1ecf1;
             color: #0c5460;
         }
+        /* Dark mode surfaces */
+        body.bg-dark .main-content { background-color: #151718; }
+        body.bg-dark .sidebar { background: #131516; border-right-color: #2a2f35; }
+        body.bg-dark .header { background: #1b1e20; border-bottom-color: #2a2f35; }
+        body.bg-dark .metric-card, body.bg-dark .chart-container { background: #1e2124; color: #e6e6e6; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        body.bg-dark .table thead { background: #1a1f24; color: #e6e6e6; }
+        .metric-number { color: inherit; }
+        /* Dark mode modal */
+        body.bg-dark .modal-content { background: #1e2124; color: #e6e6e6; border-color: #2a2f35; }
+        body.bg-dark .modal-content .form-label { color: #e6e6e6; }
+        body.bg-dark .modal-content .form-control,
+        body.bg-dark .modal-content .form-select { background-color: #0f1316; color: #e6e6e6; border-color: #2a2f35; }
+        body.bg-dark .modal-content .form-control::placeholder { color: #9aa4ad; }
+        /* Improve dark-mode text contrast for small/secondary text */
+        body.bg-dark .metric-label { color: #cbd3da; }
+        body.bg-dark .metric-change, body.bg-dark .text-muted { color: #b0b0b0 !important; }
     </style>
 </head>
 <body>
+    <script>
+        // Apply saved theme
+        (function(){
+            if (localStorage.getItem('app-theme') === 'dark') {
+                document.body.classList.add('bg-dark','text-white');
+            }
+        })();
+    </script>
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
@@ -159,6 +186,9 @@
                         </div>
                         <div class="d-flex align-items-center">
                             <i class="fas fa-bell text-muted me-3"></i>
+                            <button class="btn btn-link text-decoration-none text-muted me-2" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
+                                <i class="fas fa-moon"></i>
+                            </button>
                             <div class="d-flex align-items-center">
                                 <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                     {{ substr(Auth::user()->name, 0, 2) }}
@@ -176,6 +206,12 @@
 
                     <!-- Content -->
                     <div class="p-4">
+                        <!-- Quick Shortcuts -->
+                        <div class="d-flex flex-wrap gap-2 mb-4">
+                            <a href="{{ route('admin.appointments') }}" class="btn btn-primary"><i class="fas fa-calendar-plus me-2"></i>Book appointment</a>
+                            <a href="{{ route('admin.patients') }}" class="btn btn-outline-primary"><i class="fas fa-user-plus me-2"></i>Add patient</a>
+                        </div>
+
                         <!-- Metrics Cards -->
                         <div class="row mb-4">
                             <div class="col-md-3 mb-3">
@@ -236,6 +272,8 @@
                             </div>
                         </div>
 
+                        
+
                         <!-- Charts -->
                         <div class="row mb-4">
                             <div class="col-md-6">
@@ -262,53 +300,34 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="chart-container">
-                                    <h6 class="mb-3">Recent Activity</h6>
-                                    @if($recentAppointments->count() > 0)
-                                        @foreach($recentAppointments as $appointment)
+                                    <h6 class="mb-3">Today's Schedule</h6>
+                                    @if(($todaysAppointments ?? collect([]))->count() > 0)
+                                        @foreach($todaysAppointments as $appointment)
                                         <div class="activity-item">
-                                            <div class="activity-icon 
-                                                @if($appointment->status == 'completed') status-completed
-                                                @elseif($appointment->status == 'approved') status-approved
-                                                @elseif($appointment->status == 'pending') status-pending
-                                                @elseif($appointment->status == 'cancelled') status-cancelled
-                                                @else status-progress
-                                                @endif">
-                                                @if($appointment->status == 'completed')
-                                                    <i class="fas fa-check"></i>
-                                                @elseif($appointment->status == 'approved')
-                                                    <i class="fas fa-thumbs-up"></i>
-                                                @elseif($appointment->status == 'pending')
-                                                    <i class="fas fa-clock"></i>
-                                                @elseif($appointment->status == 'cancelled')
-                                                    <i class="fas fa-times"></i>
-                                                @else
-                                                    <i class="fas fa-heartbeat"></i>
-                                                @endif
+                                            <div class="activity-icon status-progress">
+                                                <i class="fas fa-user-clock"></i>
                                             </div>
                                             <div class="flex-grow-1">
                                                 <div class="fw-bold">{{ $appointment->patient_name ?? ($appointment->user->name ?? 'Walk-in Patient') }}</div>
-                                                <div class="text-muted">{{ $appointment->service_type }}</div>
-                                                <small class="text-muted">{{ \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A') }}</small>
+                                                <div class="text-muted">{{ $appointment->service_type }} • {{ \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A') }}</div>
                                             </div>
-                                            <span class="badge 
-                                                @if($appointment->status == 'completed') bg-success
-                                                @elseif($appointment->status == 'approved') bg-info
-                                                @elseif($appointment->status == 'pending') bg-warning
-                                                @elseif($appointment->status == 'cancelled') bg-danger
-                                                @else bg-primary
-                                                @endif">
-                                                {{ ucfirst($appointment->status) }}
-                                            </span>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <button class="btn btn-outline-secondary">Arrived</button>
+                                                <button class="btn btn-outline-secondary">In progress</button>
+                                                <button class="btn btn-outline-secondary">Completed</button>
+                                            </div>
                                         </div>
                                         @endforeach
                                     @else
                                         <div class="text-center py-3">
-                                            <p class="text-muted mb-0">No recent activity</p>
+                                            <p class="text-muted mb-0">No appointments for today</p>
                                         </div>
                                     @endif
                                 </div>
                             </div>
                         </div>
+
+                        
                     </div>
                 </div>
             </div>
@@ -373,6 +392,18 @@
         const weeklyData = @json($weeklyAppointments);
         const serviceData = @json($serviceTypes);
         const barangayData = @json($patientsByBarangay);
+        // Theme toggle persistence
+        (function(){
+            const key = 'app-theme';
+            const btn = document.getElementById('themeToggle');
+            if (btn) {
+                btn.addEventListener('click', function(){
+                    const isDark = document.body.classList.toggle('bg-dark');
+                    document.body.classList.toggle('text-white', isDark);
+                    localStorage.setItem(key, isDark ? 'dark' : 'light');
+                });
+            }
+        })();
 
         // Prepare weekly appointments data
         const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

@@ -18,7 +18,7 @@ Route::get('/policy', fn() => view('policy'))->name('policy');
 // Contact Us Page
 Route::get('/contact', fn() => view('contact'))->name('contact');
 
-// Services Page
+// Services Page (static)
 Route::get('/services', fn() => view('partials.services'))->name('services');
 
 // How It Works Page

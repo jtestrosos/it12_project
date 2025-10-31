@@ -23,6 +23,7 @@
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
+            color: #000 !important;
         }
         .status-active {
             background-color: #d4edda;
@@ -34,15 +35,15 @@
         }
         .status-user {
             background-color: #cce5ff;
-            color: #004085;
+            color: #000;
         }
         .status-admin {
             background-color: #fff3cd;
-            color: #856404;
+            color: #000;
         }
         .status-superadmin {
             background-color: #f8d7da;
-            color: #721c24;
+            color: #000;
         }
         .patient-avatar {
             width: 50px;
@@ -68,45 +69,58 @@
             border-color: #007bff;
             box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         }
+        /* Center role badges nicely */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            min-width: 90px;
+            line-height: 1;
+        }
+        /* Ensure role cell centers the pill perfectly without affecting row layout */
+        .role-cell {
+            text-align: center;
+            vertical-align: middle !important;
+        }
     </style>
 @endsection
 
 @section('content')
                         <!-- Add User Button -->
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div>
-                                <h5 class="mb-0">User Management</h5>
-                                <small class="text-muted">Manage system users and their roles</small>
-                            </div>
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
                                 <i class="fas fa-plus me-2"></i> Add User
                             </button>
                         </div>
 
-                        <!-- Search and Filter -->
-                        <div class="row mb-4">
+                        <!-- Search and Filter (server-side) -->
+                        <form method="GET" action="{{ route('superadmin.users') }}" class="row mb-4" id="userFilterForm">
                             <div class="col-md-6">
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="fas fa-search"></i>
                                     </span>
-                                    <input type="text" class="form-control" id="searchInput" placeholder="Search users by name or email...">
+                                    <input type="text" class="form-control" name="search" id="searchInput" value="{{ request('search') }}" placeholder="Search users by name or email...">
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <select class="form-select" id="roleFilter">
+                                <select class="form-select" name="role" id="roleFilter">
                                     <option value="">All Roles</option>
-                                    <option value="superadmin">Super Admin</option>
-                                    <option value="admin">Admin</option>
-                                    <option value="user">User</option>
+                                    <option value="superadmin" {{ request('role') == 'superadmin' ? 'selected' : '' }}>Super Admin</option>
+                                    <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                                    <option value="patient" {{ request('role') == 'patient' ? 'selected' : '' }}>Patient</option>
                                 </select>
                             </div>
-                            <div class="col-md-3">
-                                <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
-                                    <i class="fas fa-times me-2"></i>Clear Filters
+                            <div class="col-md-3 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search me-2"></i>Search
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" id="clearFiltersBtn">
+                                    <i class="fas fa-times me-2"></i>Clear
                                 </button>
                             </div>
-                        </div>
+                        </form>
 
                         <!-- Users Table -->
                         <div class="card">
@@ -137,13 +151,13 @@
                                                         </div>
                                                     </td>
                                                     <td>{{ $user->email }}</td>
-                                                    <td>
+                                                    <td class="role-cell">
                                                         <span class="status-badge 
                                                             @if($user->role == 'superadmin') status-superadmin
                                                             @elseif($user->role == 'admin') status-admin
                                                             @else status-user
                                                             @endif">
-                                                            {{ ucfirst($user->role) }}
+                                                            {{ ucfirst($user->role === 'user' ? 'patient' : $user->role) }}
                                                         </span>
                                                     </td>
                                                     <td>{{ $user->created_at->format('M d, Y') }}</td>
@@ -174,7 +188,7 @@
                                             Showing {{ $users->firstItem() }} to {{ $users->lastItem() }} of {{ $users->total() }} users
                                         </div>
                                         <div>
-                                            {{ $users->links() }}
+                                            {{ $users->withQueryString()->links() }}
                                         </div>
                                     </div>
                                 @else
@@ -215,7 +229,7 @@
                             <label for="role" class="form-label">Role *</label>
                             <select class="form-select" id="role" name="role" required>
                                 <option value="">Select Role</option>
-                                <option value="patient">Patient</option>
+                                <option value="user">Patient</option>
                                 <option value="admin">Admin</option>
                             </select>
                         </div>
@@ -240,7 +254,6 @@
                 </div>
                 <form method="POST" action="{{ route('superadmin.user.update', $user) }}">
                     @csrf
-                    @method('PUT')
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="name{{ $user->id }}" class="form-label">Full Name *</label>
@@ -257,7 +270,7 @@
                         <div class="mb-3">
                             <label for="role{{ $user->id }}" class="form-label">Role *</label>
                             <select class="form-select" id="role{{ $user->id }}" name="role" required>
-                                <option value="patient" {{ $user->role == 'patient' ? 'selected' : '' }}>Patient</option>
+                                <option value="user" {{ ($user->role == 'user' || $user->role == 'patient') ? 'selected' : '' }}>Patient</option>
                                 <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
                             </select>
                         </div>
@@ -274,53 +287,31 @@
 
 @push('scripts')
     <script>
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', function() {
-            filterTable();
-        });
+        (function() {
+            const form = document.getElementById('userFilterForm');
+            const searchInput = document.getElementById('searchInput');
+            const roleFilter = document.getElementById('roleFilter');
+            const clearBtn = document.getElementById('clearFiltersBtn');
 
-        document.getElementById('roleFilter').addEventListener('change', function() {
-            filterTable();
-        });
+            let debounceTimer;
+            const submitDebounced = () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => form.requestSubmit(), 400);
+            };
 
-        function filterTable() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const roleFilter = document.getElementById('roleFilter').value.toLowerCase();
-            const rows = document.querySelectorAll('tbody tr');
-
-            rows.forEach(row => {
-                const name = row.cells[0].textContent.toLowerCase();
-                const email = row.cells[1].textContent.toLowerCase();
-                const roleText = row.cells[2].textContent.toLowerCase();
-
-                const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
-                
-                // Map role filter values to actual role text
-                let matchesRole = true;
-                if (roleFilter) {
-                    if (roleFilter === 'superadmin' && roleText.includes('superadmin')) {
-                        matchesRole = true;
-                    } else if (roleFilter === 'admin' && roleText.includes('admin')) {
-                        matchesRole = true;
-                    } else if (roleFilter === 'user' && roleText.includes('user')) {
-                        matchesRole = true;
-                    } else {
-                        matchesRole = false;
-                    }
-                }
-
-                if (matchesSearch && matchesRole) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        }
-
-        function clearFilters() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('roleFilter').value = '';
-            filterTable();
-        }
+            if (searchInput) {
+                searchInput.addEventListener('input', submitDebounced);
+            }
+            if (roleFilter) {
+                roleFilter.addEventListener('change', () => form.requestSubmit());
+            }
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    if (searchInput) searchInput.value = '';
+                    if (roleFilter) roleFilter.value = '';
+                    form.requestSubmit();
+                });
+            }
+        })();
     </script>
 @endpush

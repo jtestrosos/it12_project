@@ -8,6 +8,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        body { color: #111; }
+        body.bg-dark { color: #fff; }
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -74,9 +76,29 @@
         .chart-container canvas {
             max-height: 460px !important;
         }
+        /* Ensure cards inherit theme text color */
+        .stats-card, .chart-container { color: inherit; }
+        .stat-number { color: inherit; }
+
+        /* Dark mode surfaces */
+        body.bg-dark .main-content { background-color: #151718; }
+        body.bg-dark .sidebar { background: #131516; border-right-color: #2a2f35; }
+        body.bg-dark .header { background: #1b1e20; border-bottom-color: #2a2f35; }
+        body.bg-dark .stats-card, body.bg-dark .chart-container { background: #1e2124; color: #e6e6e6; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        body.bg-dark .table thead { background: #1a1f24; color: #e6e6e6; }
+        /* Headings and muted text visibility */
+        h1, h2, h3, h4, h5, h6 { color: inherit; }
+        body.bg-dark .text-muted, body.bg-dark small, body.bg-dark .stat-label { color: #b0b0b0 !important; }
     </style>
 </head>
 <body>
+    <script>
+        (function(){
+            if (localStorage.getItem('app-theme') === 'dark') {
+                document.body.classList.add('bg-dark','text-white');
+            }
+        })();
+    </script>
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
@@ -121,6 +143,9 @@
                             <p class="text-muted mb-0">Analytics and reporting dashboard</p>
                         </div>
                         <div class="d-flex align-items-center">
+                            <button class="btn btn-link text-decoration-none text-muted me-2" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
+                                <i class="fas fa-moon"></i>
+                            </button>
                             <div class="d-flex align-items-center">
                                 <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                     {{ substr(Auth::user()->name, 0, 2) }}
@@ -228,6 +253,8 @@
                                 </div>
                             </div>
                         </div>
+
+                        
                     </div>
                 </div>
             </div>
@@ -239,6 +266,20 @@
     </form>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Theme toggle persistence
+        (function(){
+            const key = 'app-theme';
+            const btn = document.getElementById('themeToggle');
+            if (btn) {
+                btn.addEventListener('click', function(){
+                    const isDark = document.body.classList.toggle('bg-dark');
+                    document.body.classList.toggle('text-white', isDark);
+                    localStorage.setItem(key, isDark ? 'dark' : 'light');
+                });
+            }
+        })();
+    </script>
     <script>
         // Get data from Laravel
         const serviceData = @json($serviceTypes);

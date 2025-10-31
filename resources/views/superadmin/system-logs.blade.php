@@ -112,7 +112,19 @@
                     <td>{{ $log->created_at->format('M d, Y H:i') }}</td>
                     <td>{{ $log->ip_address ?? 'N/A' }}</td>
                     <td>
-                        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#logDetailsModal{{ $log->id }}">
+                        <button 
+                            class="btn btn-outline-primary btn-sm" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#logDetailsModal"
+                            data-user="{{ $log->user ? $log->user->name : 'System' }}"
+                            data-action="{{ ucfirst($log->action) }}"
+                            data-table="{{ $log->table_name ?? 'N/A' }}"
+                            data-record="{{ $log->record_id ?? 'N/A' }}"
+                            data-old='@json($log->old_values)'
+                            data-new='@json($log->new_values)'
+                            data-ip="{{ $log->ip_address ?? 'N/A' }}"
+                            data-timestamp="{{ $log->created_at->format('F d, Y \a\t g:i A') }}"
+                        >
                             <i class="fas fa-eye"></i>
                         </button>
                     </td>
@@ -135,9 +147,8 @@
     @endif
 </div>
 
-<!-- Log Details Modals -->
-@foreach($logs as $log)
-<div class="modal fade" id="logDetailsModal{{ $log->id }}" tabindex="-1">
+<!-- Log Details Modal (single, dynamic) -->
+<div class="modal fade" id="logDetailsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -150,42 +161,38 @@
                         <h6 class="fw-bold mb-3">Basic Information</h6>
                         <div class="mb-3">
                             <label class="form-label text-muted">User</label>
-                            <p class="fw-bold">{{ $log->user ? $log->user->name : 'System' }}</p>
+                            <p class="fw-bold" id="log-user">&nbsp;</p>
                         </div>
                         <div class="mb-3">
                             <label class="form-label text-muted">Action</label>
-                            <p>{{ ucfirst($log->action) }}</p>
+                            <p id="log-action">&nbsp;</p>
                         </div>
                         <div class="mb-3">
                             <label class="form-label text-muted">Table</label>
-                            <p>{{ $log->table_name ?? 'N/A' }}</p>
+                            <p id="log-table">&nbsp;</p>
                         </div>
                         <div class="mb-3">
                             <label class="form-label text-muted">Record ID</label>
-                            <p>{{ $log->record_id ?? 'N/A' }}</p>
+                            <p id="log-record">&nbsp;</p>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <h6 class="fw-bold mb-3">Change Details</h6>
-                        @if($log->old_values)
-                            <div class="mb-3">
-                                <strong class="text-dark">Old Values:</strong>
-                                <pre class="bg-light p-3 small rounded" style="border: 1px solid #e9ecef;">{{ json_encode($log->old_values, JSON_PRETTY_PRINT) }}</pre>
-                            </div>
-                        @endif
-                        @if($log->new_values)
-                            <div class="mb-3">
-                                <strong class="text-dark">New Values:</strong>
-                                <pre class="bg-light p-3 small rounded" style="border: 1px solid #e9ecef;">{{ json_encode($log->new_values, JSON_PRETTY_PRINT) }}</pre>
-                            </div>
-                        @endif
+                        <div class="mb-3" id="log-old-wrapper" style="display:none;">
+                            <strong class="text-dark">Old Values:</strong>
+                            <pre class="bg-light p-3 small rounded" style="border: 1px solid #e9ecef;" id="log-old"></pre>
+                        </div>
+                        <div class="mb-3" id="log-new-wrapper" style="display:none;">
+                            <strong class="text-dark">New Values:</strong>
+                            <pre class="bg-light p-3 small rounded" style="border: 1px solid #e9ecef;" id="log-new"></pre>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label text-muted">IP Address</label>
-                            <p>{{ $log->ip_address ?? 'N/A' }}</p>
+                            <p id="log-ip">&nbsp;</p>
                         </div>
                         <div class="mb-3">
                             <label class="form-label text-muted">Timestamp</label>
-                            <p>{{ $log->created_at->format('F d, Y \a\t g:i A') }}</p>
+                            <p id="log-timestamp">&nbsp;</p>
                         </div>
                     </div>
                 </div>
@@ -196,5 +203,69 @@
         </div>
     </div>
 </div>
-@endforeach
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('show.bs.modal', function (event) {
+            const modal = document.getElementById('logDetailsModal');
+            if (!modal || event.target !== modal) return;
+            const trigger = event.relatedTarget;
+            if (!trigger) return;
+
+            const get = (key) => trigger.getAttribute('data-' + key) || '';
+
+            const user = get('user');
+            const action = get('action');
+            const tableName = get('table');
+            const recordId = get('record');
+            const ip = get('ip');
+            const timestamp = get('timestamp');
+            const oldRaw = get('old');
+            const newRaw = get('new');
+
+            const setText = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = value || 'N/A';
+            };
+
+            setText('log-user', user);
+            setText('log-action', action);
+            setText('log-table', tableName);
+            setText('log-record', recordId);
+            setText('log-ip', ip);
+            setText('log-timestamp', timestamp);
+
+            const oldWrapper = document.getElementById('log-old-wrapper');
+            const newWrapper = document.getElementById('log-new-wrapper');
+            const oldPre = document.getElementById('log-old');
+            const newPre = document.getElementById('log-new');
+
+            try {
+                if (oldRaw && oldRaw !== 'null') {
+                    oldWrapper.style.display = '';
+                    oldPre.textContent = JSON.stringify(JSON.parse(oldRaw), null, 2);
+                } else {
+                    oldWrapper.style.display = 'none';
+                    oldPre.textContent = '';
+                }
+            } catch (e) {
+                oldWrapper.style.display = '';
+                oldPre.textContent = oldRaw;
+            }
+
+            try {
+                if (newRaw && newRaw !== 'null') {
+                    newWrapper.style.display = '';
+                    newPre.textContent = JSON.stringify(JSON.parse(newRaw), null, 2);
+                } else {
+                    newWrapper.style.display = 'none';
+                    newPre.textContent = '';
+                }
+            } catch (e) {
+                newWrapper.style.display = '';
+                newPre.textContent = newRaw;
+            }
+        });
+    </script>
+@endpush

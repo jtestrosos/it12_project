@@ -8,6 +8,8 @@ use App\Models\InventoryTransaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use App\Models\Service;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -106,26 +108,58 @@ class AdminController extends Controller
             $query->where('status', $request->status);
         }
         $appointments = $query->paginate(10)->withQueryString();
-        return view('admin.appointments', compact('appointments'));
+
+        // Populate services for filters and booking drawer
+        $services = [
+            'General Checkup',
+            'Prenatal',
+            'Medical Check-up',
+            'Immunization',
+            'Family Planning',
+        ];
+        if (class_exists(Service::class) && Schema::hasTable('services')) {
+            $dbServices = Service::where('active', true)->pluck('name')->toArray();
+            if (!empty($dbServices)) {
+                $services = array_values(array_unique(array_merge($services, $dbServices)));
+            }
+        }
+
+        // Simple availability metrics for today (all services)
+        $todaySlots = 9; // per service per day
+        $todayBooked = Appointment::whereDate('appointment_date', today())
+            ->where('status', '!=', 'cancelled')
+            ->count();
+        $todayCapacity = $todaySlots > 0 ? (int) min(100, round(($todayBooked / $todaySlots) * 100)) : 0;
+
+        return view('admin.appointments', compact('appointments', 'services', 'todaySlots', 'todayBooked', 'todayCapacity'));
     }
 
     public function createAppointment(Request $request)
     {
         $request->validate([
             'patient_name' => 'required|string|max:255',
-            'patient_phone' => 'required|string|max:20',
-            'patient_address' => 'required|string|max:500',
             'service_type' => 'required|string',
             'appointment_date' => 'required|date|after_or_equal:today',
             'appointment_time' => 'required',
+            'patient_phone' => 'nullable|string|max:20',
+            'patient_address' => 'nullable|string|max:500',
             'notes' => 'nullable|string|max:1000'
         ]);
 
+        // Enforce 9 slots per day per service (excluding cancelled)
+        $existingCount = Appointment::whereDate('appointment_date', $request->appointment_date)
+            ->where('service_type', $request->service_type)
+            ->where('status', '!=', 'cancelled')
+            ->count();
+        if ($existingCount >= 9) {
+            return redirect()->back()->with('error', 'No slots available for this service on the selected date.');
+        }
+
         Appointment::create([
-            'user_id' => null, // Walk-in appointments don't have user accounts
+            'user_id' => Auth::id(), // link to creator to satisfy FK; still marked walk-in
             'patient_name' => $request->patient_name,
-            'patient_phone' => $request->patient_phone,
-            'patient_address' => $request->patient_address,
+            'patient_phone' => $request->patient_phone ?: '',
+            'patient_address' => $request->patient_address ?: 'N/A',
             'appointment_date' => $request->appointment_date,
             'appointment_time' => $request->appointment_time,
             'service_type' => $request->service_type,
@@ -141,17 +175,29 @@ class AdminController extends Controller
     {
         $request->validate([
             'status' => 'required|in:pending,approved,rescheduled,cancelled,completed',
-            'notes' => 'nullable|string|max:1000'
+            'notes' => 'nullable|string|max:1000',
+            'new_date' => 'nullable|date|after_or_equal:today',
+            'new_time' => 'nullable'
         ]);
 
         $oldStatus = $appointment->status;
         
-        $appointment->update([
+        $update = [
             'status' => $request->status,
             'notes' => $request->notes,
             'approved_by' => Auth::id(),
             'approved_at' => now()
-        ]);
+        ];
+        if ($request->status === 'rescheduled') {
+            if ($request->filled('new_date')) {
+                $update['appointment_date'] = $request->new_date;
+            }
+            if ($request->filled('new_time')) {
+                $update['appointment_time'] = $request->new_time;
+            }
+        }
+
+        $appointment->update($update);
 
         return redirect()->back()->with('success', 'Appointment status updated successfully.');
     }
@@ -233,7 +279,7 @@ class AdminController extends Controller
         ]);
 
         Appointment::create([
-            'user_id' => null, // Walk-in patients don't have user accounts
+            'user_id' => Auth::id(), // link to admin user to satisfy FK
             'patient_name' => $request->patient_name,
             'patient_phone' => $request->patient_phone,
             'patient_address' => $request->patient_address,
