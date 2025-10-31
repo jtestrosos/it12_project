@@ -29,7 +29,7 @@
         }
         .sidebar .nav-link:hover {
             background-color: #e9ecef;
-            color: #495057;
+            color:rgb(255, 255, 255);
         }
         .sidebar .nav-link.active {
             background-color: #007bff;

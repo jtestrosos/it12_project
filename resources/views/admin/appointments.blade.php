@@ -54,21 +54,18 @@
 @endsection
 
 @section('content')
-<<<<<<< HEAD
                         <!-- Add Appointment Button -->
-                                                                                                        @if($appointments->count() > 0)
+                         @if($appointments->count() > 0)
 
                         <div class="d-flex justify-content-end mb-4">
 
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">
                                 <i class="fas fa-plus me-2"></i> Add New Appointment
-=======
                         <!-- Top Actions -->
                         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
                             <div class="d-flex align-items-center gap-2">
                                 <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#bookDrawer">
                                     <i class="fas fa-plus me-2"></i> Book for Patient
->>>>>>> 68bbfc1ffe45c26be8c5ac8e8186f9642be03340
                             </button>
                             </div>
                             <div></div>
@@ -412,11 +409,8 @@
             </div>
         </div>
     </div>
-<<<<<<< HEAD
-=======
 @endsection
  
->>>>>>> 68bbfc1ffe45c26be8c5ac8e8186f9642be03340
 
 @section('page-scripts')
 <script>
