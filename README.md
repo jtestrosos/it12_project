@@ -78,13 +78,15 @@ php artisan key:generate
 
 ```bash
 php artisan migrate
+or
+php artisan migrate:fresh
+(if already cloned this before)
 ```
 
 ### 7. Seed the Database (mandatory)
 
 ```bash
-php artisan db:seed
-php artisan db:seed --class=ServiceSeeder
+php artisan db:seed && php artisan db:seed --class=SeederService
 ```
 
 ### 8. Build Frontend Assets
@@ -173,6 +175,7 @@ it12_project/
 - Made `backups.filename`, `backups.file_path`, and `backups.size` nullable (2024-12-27).
 - Appointments support approval tracking via `approved_by` and `approved_at` and multiple statuses.
 - Inventory tracking includes stock status enum and transaction history with `inventory_transactions`.
+- DARK MODE (lol)
 
 ## Database Schema
 
