@@ -55,7 +55,7 @@
 
 @section('content')
                         <!-- Add Appointment Button -->
-                         @if($appointments->count() > 0)
+                                                                                                        @if($appointments->count() > 0)
 
                         <div class="d-flex justify-content-end mb-4">
 
