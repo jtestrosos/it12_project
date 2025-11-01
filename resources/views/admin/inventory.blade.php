@@ -176,9 +176,7 @@
 
                     <!-- Content -->
                                             @if($inventory->count() > 0)
-
                     <div class="p-4">
-
                     <div class="d-flex justify-content-end mb-4">
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
                                 <i class="fas fa-plus me-2"></i> Add Inventory
