@@ -88,7 +88,7 @@
 
 @section('content')
                         <!-- Add User Button -->
-                        <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex justify-content-end align-items-center mb-4">
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
                                 <i class="fas fa-plus me-2"></i> Add User
                             </button>
