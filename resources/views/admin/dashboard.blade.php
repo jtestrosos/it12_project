@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barangay Health Center - Staff Management System</title>
+    <title>MALASAKIT - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -148,10 +148,9 @@
                 <div class="sidebar">
                     <div class="p-3">
                         <div class="d-flex align-items-center mb-4">
-                            <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 40px; height: 40px;">
+                            <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 52px; height: 52px;">
                             <div>
-                                <h6 class="mb-0 fw-bold">Barangay Health Center</h6>
-                                <small class="text-muted">Staff Management System</small>
+                                <h6 class="mb-0 fw-bold" style="letter-spacing:.5px;">MALASAKIT</h6>
                             </div>
                         </div>
                         <nav class="nav flex-column">

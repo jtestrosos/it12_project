@@ -98,10 +98,9 @@
                 <div class="sidebar">
                     <div class="p-3">
                         <div class="d-flex align-items-center mb-4">
-                            <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 40px; height: 40px;">
+                            <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 52px; height: 52px;">
                             <div>
-                                <h6 class="mb-0 fw-bold">Barangay Health Center</h6>
-                                <small class="text-muted">Staff Management System</small>
+                                <h6 class="mb-0 fw-bold" style="letter-spacing:.5px;">MALASAKIT</h6>
                             </div>
                         </div>
                         <nav class="nav flex-column">

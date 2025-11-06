@@ -50,36 +50,61 @@
         body.bg-dark .offcanvas .form-control::placeholder,
         body.bg-dark .modal-content .form-control::placeholder { color: #9aa4ad; }
         body.bg-dark .offcanvas .input-group-text { background: #1a1f24; color: #cbd3da; border-color: #2a2f35; }
+        /* Dark mode dropdown */
+        body.bg-dark .dropdown-menu { background: #1e2124; border-color: #2a2f35; }
+        body.bg-dark .dropdown-item { color: #e6e6e6; }
+        body.bg-dark .dropdown-item:hover, body.bg-dark .dropdown-item.active { background-color: #2a2f35; color: #fff; }
     </style>
 @endsection
 
 @section('content')
                         <!-- Add Appointment Button -->
-                                                                                                        @if($appointments->count() > 0)
 
-                        <div class="d-flex justify-content-end mb-4  gap-2">
-
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">
-                                <i class="fas fa-plus me-2"></i> Add New Appointment
                         <!-- Top Actions -->
-                        <div class="d-flex flex-wrap justify-content-end align-items-center mb-3 gap-2">
-                            <div class="d-flex align-items-center">
-                                <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#bookDrawer">
-                                    <i class="fas fa-plus me-2"></i> Book for Patient
-                            </button>
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">
+                                    <i class="fas fa-plus me-2"></i> Add New Appointment
+                                </button>
+                                <!-- Bulk Actions (hidden by default) -->
+                                <div id="bulkActions" class="d-none d-flex align-items-center gap-2">
+                                    <span class="text-muted" id="selectedCount">0 selected</span>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-outline-success" id="bulkApprove">
+                                            <i class="fas fa-check me-1"></i> Approve
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" id="bulkCancel">
+                                            <i class="fas fa-times me-1"></i> Cancel
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-info" id="bulkComplete">
+                                            <i class="fas fa-check-circle me-1"></i> Complete
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <div></div>
+                            <div class="d-flex align-items-center gap-2">
+                                <!-- Status Dropdown -->
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="statusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        @php($current = request('status'))
+                                        @if($current == '')
+                                            All Appointments
+                                        @elseif($current == 'approved')
+                                            Confirmed
+                                        @else
+                                            {{ ucfirst($current) }}
+                                        @endif
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="statusDropdown">
+                                        <li><a class="dropdown-item {{ $current=='' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status' => null]) }}">All Appointments</a></li>
+                                        <li><a class="dropdown-item {{ $current=='pending' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status' => 'pending']) }}">Pending</a></li>
+                                        <li><a class="dropdown-item {{ $current=='approved' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status' => 'approved']) }}">Confirmed</a></li>
+                                        <li><a class="dropdown-item {{ $current=='completed' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status' => 'completed']) }}">Completed</a></li>
+                                        <li><a class="dropdown-item {{ $current=='cancelled' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status' => 'cancelled']) }}">Cancelled</a></li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-
-                        <!-- Status Tabs -->
-                        <ul class="nav nav-tabs mb-3">
-                            @php($current = request('status'))
-                            <li class="nav-item"><a class="nav-link {{ $current=='' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status' => null]) }}">All</a></li>
-                            <li class="nav-item"><a class="nav-link {{ $current=='pending' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status' => 'pending']) }}">Pending</a></li>
-                            <li class="nav-item"><a class="nav-link {{ $current=='approved' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status' => 'approved']) }}">Confirmed</a></li>
-                            <li class="nav-item"><a class="nav-link {{ $current=='completed' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status' => 'completed']) }}">Completed</a></li>
-                            <li class="nav-item"><a class="nav-link {{ $current=='cancelled' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status' => 'cancelled']) }}">Cancelled</a></li>
-                        </ul>
 
                         <!-- Filters -->
                         <form method="GET" class="filter-card">
@@ -132,7 +157,7 @@
                                         <tbody>
                                         @forelse($appointments as $appointment)
                                         <tr>
-                                            <td><input type="checkbox" class="row-check"></td>
+                                            <td><input type="checkbox" class="row-check" value="{{ $appointment->id }}" data-appointment-id="{{ $appointment->id }}"></td>
                                             <td>
                                                 <div class="fw-bold">{{ $appointment->appointment_date->format('M d, Y') }} {{ $appointment->appointment_time }}</div>
                                                 <div class="progress" style="height:6px;">
@@ -250,9 +275,9 @@
                                         </div>
                                         @empty
                                         <tr>
-                                            <td colspan="7" class="text-center py-5">
+                                            <td colspan="6" class="text-center py-5">
                                                 <div class="mb-2">No appointments match your filters.</div>
-                                                <a class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#bookDrawer">Book an appointment</a>
+                                                <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">Add an appointment</a>
                                             </td>
                                         </tr>
                                         @endforelse
@@ -265,79 +290,8 @@
                         <div class="d-flex justify-content-center mt-3">
                             {{ $appointments->links() }}
                         </div>
-                                                        @else
-                            <div class="text-center py-5">
-                                <i class="fas fa-calendar-check me-2 fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">No appointment found</h5>
-                                <p class="text-muted">Pending for users to create their appointment.</p>
-                            </div>
-                            @endif
-@endsection
-@section('content')
-<!-- Add Appointment Modal -->
 
-                        <!-- Book Drawer (Right Side) -->
-                        <div class="offcanvas offcanvas-end" tabindex="-1" id="bookDrawer" style="width: 520px;">
-                            <div class="offcanvas-header">
-                                <h5 class="offcanvas-title">Book Appointment</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
-                            </div>
-                            <div class="offcanvas-body">
-                                <form action="{{ route('admin.appointment.create') }}" method="POST">
-                                    @csrf
-                                    <div class="mb-3">
-                                        <label class="form-label">Patient Full Name</label>
-                                        <input type="text" class="form-control" name="patient_name" placeholder="e.g., Juan Dela Cruz" required>
-                                    </div>
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Phone (optional)</label>
-                                            <input type="tel" class="form-control" name="patient_phone" placeholder="09XXXXXXXXX">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Address (optional)</label>
-                                            <input type="text" class="form-control" name="patient_address" placeholder="Barangay / Street">
-                                        </div>
-                                    </div>
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Service</label>
-                                            <select class="form-select" name="service_type" required>
-                                                <option value="">Select service</option>
-                                                @foreach(($services ?? []) as $service)
-                                                    <option value="{{ $service }}">{{ $service }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        
-                                        <div class="col-md-6">
-                                            <label class="form-label">Date</label>
-                                            <input type="date" class="form-control" name="appointment_date" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Time</label>
-                                            <input type="time" class="form-control" name="appointment_time" required>
-                                        </div>
-                                    </div>
-                                    <div class="mt-3">
-                                        <label class="form-label">Availability (today)</label>
-                                        <div class="progress" style="height: 10px;">
-                                            <div class="progress-bar" role="progressbar" style="width: {{ $todayCapacity ?? 0 }}%"></div>
-                                        </div>
-                                        <small class="text-muted">{{ $todayBooked ?? 0 }} booked / {{ $todaySlots ?? 0 }} slots</small>
-                                    </div>
-                                    <div class="mt-3">
-                                        <label class="form-label">Notes</label>
-                                        <textarea class="form-control" name="notes" rows="3"></textarea>
-                                    </div>
-                                    <div class="d-grid mt-3">
-                                        <button type="submit" class="btn btn-primary">Create booking</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-
-                        <!-- Add Appointment Modal (legacy, kept for now) -->
+    <!-- Add Appointment Modal -->
     <div class="modal fade" id="addAppointmentModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -412,9 +366,125 @@
 @endsection
  
 
-@section('page-scripts')
+@push('scripts')
 <script>
-    // This script block is for the new per-appointment detail modals
-    // It will be added to the existing file's scripts section
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const rowCheckboxes = document.querySelectorAll('.row-check');
+        const bulkActions = document.getElementById('bulkActions');
+        const selectedCount = document.getElementById('selectedCount');
+        const bulkApproveBtn = document.getElementById('bulkApprove');
+        const bulkCancelBtn = document.getElementById('bulkCancel');
+        const bulkCompleteBtn = document.getElementById('bulkComplete');
+
+        // Select All functionality
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                rowCheckboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+                updateBulkActions();
+            });
+        }
+
+        // Individual checkbox change
+        rowCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectAll();
+                updateBulkActions();
+            });
+        });
+
+        function updateSelectAll() {
+            if (selectAllCheckbox) {
+                const allChecked = Array.from(rowCheckboxes).every(cb => cb.checked);
+                const someChecked = Array.from(rowCheckboxes).some(cb => cb.checked);
+                selectAllCheckbox.checked = allChecked;
+                selectAllCheckbox.indeterminate = someChecked && !allChecked;
+            }
+        }
+
+        function updateBulkActions() {
+            const checkedBoxes = Array.from(rowCheckboxes).filter(cb => cb.checked);
+            const count = checkedBoxes.length;
+
+            if (count > 0) {
+                bulkActions.classList.remove('d-none');
+                selectedCount.textContent = count + ' selected';
+            } else {
+                bulkActions.classList.add('d-none');
+            }
+        }
+
+        // Bulk Approve
+        if (bulkApproveBtn) {
+            bulkApproveBtn.addEventListener('click', function() {
+                const selectedIds = getSelectedIds();
+                if (selectedIds.length > 0 && confirm('Are you sure you want to approve ' + selectedIds.length + ' appointment(s)?')) {
+                    bulkUpdateStatus(selectedIds, 'approved');
+                }
+            });
+        }
+
+        // Bulk Cancel
+        if (bulkCancelBtn) {
+            bulkCancelBtn.addEventListener('click', function() {
+                const selectedIds = getSelectedIds();
+                if (selectedIds.length > 0 && confirm('Are you sure you want to cancel ' + selectedIds.length + ' appointment(s)?')) {
+                    bulkUpdateStatus(selectedIds, 'cancelled');
+                }
+            });
+        }
+
+        // Bulk Complete
+        if (bulkCompleteBtn) {
+            bulkCompleteBtn.addEventListener('click', function() {
+                const selectedIds = getSelectedIds();
+                if (selectedIds.length > 0 && confirm('Are you sure you want to mark ' + selectedIds.length + ' appointment(s) as completed?')) {
+                    bulkUpdateStatus(selectedIds, 'completed');
+                }
+            });
+        }
+
+        function getSelectedIds() {
+            return Array.from(rowCheckboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.getAttribute('data-appointment-id'));
+        }
+
+        function bulkUpdateStatus(ids, status) {
+            // Update appointments one by one using fetch API
+            let completed = 0;
+            const total = ids.length;
+            
+            ids.forEach((id, index) => {
+                const formData = new FormData();
+                formData.append('_token', '{{ csrf_token() }}');
+                formData.append('status', status);
+                
+                fetch(`/admin/appointment/${id}/update`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    completed++;
+                    if (completed === total) {
+                        // All requests completed, reload the page
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating appointment:', error);
+                    completed++;
+                    if (completed === total) {
+                        window.location.reload();
+                    }
+                });
+            });
+        }
+    });
 </script>
-@endsection
+@endpush

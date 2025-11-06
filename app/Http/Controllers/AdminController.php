@@ -89,6 +89,34 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Patient created successfully.');
     }
 
+    public function updatePatient(Request $request, User $user)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'barangay' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'password' => 'nullable|string|min:6|confirmed'
+        ]);
+
+        $updateData = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'barangay' => $request->barangay,
+            'phone' => $request->phone,
+            'address' => $request->address,
+        ];
+
+        if ($request->filled('password')) {
+            $updateData['password'] = Hash::make($request->password);
+        }
+
+        $user->update($updateData);
+
+        return redirect()->back()->with('success', 'Patient updated successfully.');
+    }
+
     public function appointments(Request $request)
     {
         $query = Appointment::with(['user', 'approvedBy'])->latest();
@@ -155,8 +183,12 @@ class AdminController extends Controller
             return redirect()->back()->with('error', 'No slots available for this service on the selected date.');
         }
 
+        // If user_id is provided, link to registered patient; otherwise link to admin
+        $userId = $request->filled('user_id') ? $request->user_id : Auth::id();
+        $isWalkIn = !$request->filled('user_id'); // Only walk-in if no user_id provided
+
         Appointment::create([
-            'user_id' => Auth::id(), // link to creator to satisfy FK; still marked walk-in
+            'user_id' => $userId,
             'patient_name' => $request->patient_name,
             'patient_phone' => $request->patient_phone ?: '',
             'patient_address' => $request->patient_address ?: 'N/A',
@@ -164,7 +196,7 @@ class AdminController extends Controller
             'appointment_time' => $request->appointment_time,
             'service_type' => $request->service_type,
             'notes' => $request->notes,
-            'is_walk_in' => true,
+            'is_walk_in' => $isWalkIn,
             'status' => 'pending'
         ]);
 
@@ -202,10 +234,31 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Appointment status updated successfully.');
     }
 
-    public function inventory()
+    public function inventory(Request $request)
     {
-        $inventory = Inventory::latest()->paginate(15);
-        return view('admin.inventory', compact('inventory'));
+        $query = Inventory::query()->latest();
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+        $inventory = $query->paginate(15)->withQueryString();
+
+        // Build category options from existing items
+        $defaultCategories = [
+            'Medicines','Medical Supplies','Equipment','Vaccines','PPE',
+            'Syringes & Needles','Lab Supplies','Test Kits','Disinfectants',
+            'Consumables','Dressings','Nutritional Supplements','Oxygen Supplies','Other'
+        ];
+
+        $categories = Inventory::select('category')
+            ->whereNotNull('category')
+            ->distinct()
+            ->orderBy('category')
+            ->pluck('category')
+            ->toArray();
+
+        $categories = array_values(array_unique(array_merge($defaultCategories, $categories)));
+
+        return view('admin.inventory', compact('inventory', 'categories'));
     }
 
     public function addInventory(Request $request)
