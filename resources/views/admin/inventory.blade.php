@@ -118,10 +118,9 @@
                 <div class="sidebar">
                     <div class="p-3">
                         <div class="d-flex align-items-center mb-4">
-                            <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 40px; height: 40px;">
+                            <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 52px; height: 52px;">
                             <div>
-                                <h6 class="mb-0 fw-bold">Barangay Health Center</h6>
-                                <small class="text-muted">Staff Management System</small>
+                                <h6 class="mb-0 fw-bold" style="letter-spacing: .5px;">MALASAKIT</h6>
                             </div>
                         </div>
                         <nav class="nav flex-column">
@@ -175,14 +174,27 @@
                     </div>
 
                     <!-- Content -->
-                                            @if($inventory->count() > 0)
                     <div class="p-4">
-                    <div class="d-flex justify-content-end mb-4">
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
-                                <i class="fas fa-plus me-2"></i> Add Inventory
-                            </button>
-                        
-                        </div>  
+                        <div class="d-flex flex-wrap justify-content-between align-items-end mb-3 gap-2">
+                            <form method="GET" class="d-flex align-items-end gap-2">
+                                <div>
+                                    <label class="form-label mb-1">Category</label>
+                                    <select class="form-select" name="category" onchange="this.form.submit()" style="min-width:220px;">
+                                        <option value="" @selected(!request('category'))>All Categories</option>
+                                        @foreach(($categories ?? []) as $cat)
+                                            <option value="{{ $cat }}" @selected(request('category')==$cat)>{{ $cat }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </form>
+                            <div class="ms-auto">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                                    <i class="fas fa-plus me-2"></i> Add Inventory
+                                </button>
+                            </div>
+                        </div>
+
+                        @if($inventory->count() > 0)
 
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle bg-white rounded shadow-sm">
@@ -315,6 +327,15 @@
                                 <option value="Medical Supplies">Medical Supplies</option>
                                 <option value="Equipment">Equipment</option>
                                 <option value="Vaccines">Vaccines</option>
+                                <option value="PPE">PPE</option>
+                                <option value="Syringes & Needles">Syringes & Needles</option>
+                                <option value="Lab Supplies">Lab Supplies</option>
+                                <option value="Test Kits">Test Kits</option>
+                                <option value="Disinfectants">Disinfectants</option>
+                                <option value="Consumables">Consumables</option>
+                                <option value="Dressings">Dressings</option>
+                                <option value="Nutritional Supplements">Nutritional Supplements</option>
+                                <option value="Oxygen Supplies">Oxygen Supplies</option>
                                 <option value="Other">Other</option>
                             </select>
                         </div>

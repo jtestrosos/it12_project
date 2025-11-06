@@ -97,6 +97,9 @@
         body.bg-dark .modal-content .form-control,
         body.bg-dark .modal-content .form-select { background-color: #0f1316; color: #e6e6e6; border-color: #2a2f35; }
         body.bg-dark .modal-content .form-control::placeholder { color: #9aa4ad; }
+        /* Dark mode alerts */
+        body.bg-dark .alert-success { background-color: #1e3a1e; color: #d4edda; border-color: #28a745; }
+        body.bg-dark .alert-danger { background-color: #3a1e1e; color: #f8d7da; border-color: #dc3545; }
     </style>
 </head>
 <body>
@@ -114,10 +117,9 @@
                 <div class="sidebar">
                     <div class="p-3">
                         <div class="d-flex align-items-center mb-4">
-                            <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 40px; height: 40px;">
+                            <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 52px; height: 52px;">
                             <div>
-                                <h6 class="mb-0 fw-bold">Barangay Health Center</h6>
-                                <small class="text-muted">Staff Management System</small>
+                                <h6 class="mb-0 fw-bold" style="letter-spacing:.5px;">MALASAKIT</h6>
                             </div>
                         </div>
                         <nav class="nav flex-column">
@@ -169,6 +171,30 @@
                         </div>
                     </div>
 
+                    <!-- Success/Error Messages -->
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show m-4" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show m-4" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+                    @if($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show m-4" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
 
                     <!-- Content -->
                                                                                                     @if($patients->count() > 0)
@@ -429,6 +455,160 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
+
+    <!-- Edit Patient Modal -->
+    @foreach($patients as $patient)
+    <div class="modal fade" id="editPatientModal{{ $patient->id }}" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Patient - {{ $patient->name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ route('admin.patient.update', $patient->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_name{{ $patient->id }}" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="edit_name{{ $patient->id }}" name="name" value="{{ $patient->name }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_email{{ $patient->id }}" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="edit_email{{ $patient->id }}" name="email" value="{{ $patient->email }}" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_barangay{{ $patient->id }}" class="form-label">Barangay <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="edit_barangay{{ $patient->id }}" name="barangay" value="{{ $patient->barangay ?? '' }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_phone{{ $patient->id }}" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="edit_phone{{ $patient->id }}" name="phone" value="{{ $patient->phone ?? '' }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="edit_address{{ $patient->id }}" class="form-label">Address</label>
+                                    <input type="text" class="form-control" id="edit_address{{ $patient->id }}" name="address" value="{{ $patient->address ?? '' }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_password{{ $patient->id }}" class="form-label">New Password</label>
+                                    <input type="password" class="form-control" id="edit_password{{ $patient->id }}" name="password" placeholder="Leave blank to keep current password">
+                                    <small class="text-muted">Leave blank if you don't want to change the password</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_password_confirmation{{ $patient->id }}" class="form-label">Confirm New Password</label>
+                                    <input type="password" class="form-control" id="edit_password_confirmation{{ $patient->id }}" name="password_confirmation" placeholder="Confirm new password">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update Patient</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endforeach
+
+    <!-- Create Appointment Modal -->
+    @foreach($patients as $patient)
+    <div class="modal fade" id="appointmentModal{{ $patient->id }}" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Appointment for {{ $patient->name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ route('admin.appointment.create') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="user_id" value="{{ $patient->id }}">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="appointment_patient_name{{ $patient->id }}" class="form-label">Patient Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="appointment_patient_name{{ $patient->id }}" name="patient_name" value="{{ $patient->name }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="appointment_patient_phone{{ $patient->id }}" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="appointment_patient_phone{{ $patient->id }}" name="patient_phone" value="{{ $patient->phone ?? '' }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="appointment_patient_address{{ $patient->id }}" class="form-label">Address</label>
+                                    <input type="text" class="form-control" id="appointment_patient_address{{ $patient->id }}" name="patient_address" value="{{ $patient->address ?? $patient->barangay ?? '' }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="appointment_service_type{{ $patient->id }}" class="form-label">Service Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="appointment_service_type{{ $patient->id }}" name="service_type" required>
+                                        <option value="">Select Service</option>
+                                        <option value="General Checkup">General Checkup</option>
+                                        <option value="Prenatal">Prenatal</option>
+                                        <option value="Medical Check-up">Medical Check-up</option>
+                                        <option value="Immunization">Immunization</option>
+                                        <option value="Family Planning">Family Planning</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="appointment_date{{ $patient->id }}" class="form-label">Appointment Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="appointment_date{{ $patient->id }}" name="appointment_date" min="{{ date('Y-m-d') }}" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="appointment_time{{ $patient->id }}" class="form-label">Appointment Time <span class="text-danger">*</span></label>
+                                    <input type="time" class="form-control" id="appointment_time{{ $patient->id }}" name="appointment_time" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="appointment_notes{{ $patient->id }}" class="form-label">Notes</label>
+                            <textarea class="form-control" id="appointment_notes{{ $patient->id }}" name="notes" rows="3" placeholder="Additional notes or comments"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Appointment</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

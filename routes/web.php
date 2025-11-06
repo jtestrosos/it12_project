@@ -103,6 +103,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
             Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
             Route::get('/patients', [AdminController::class, 'patients'])->name('patients');
             Route::post('/patient/create', [AdminController::class, 'createPatient'])->name('patient.create');
+            Route::put('/patient/{user}/update', [AdminController::class, 'updatePatient'])->name('patient.update');
             Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
             Route::post('/appointment/create', [AdminController::class, 'createAppointment'])->name('appointment.create');
             Route::post('/appointment/{appointment}/update', [AdminController::class, 'updateAppointmentStatus'])->name('appointment.update');
