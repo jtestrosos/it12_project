@@ -9,6 +9,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Mail\AppointmentApproved;
 use App\Models\Service;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -230,6 +233,36 @@ class AdminController extends Controller
         }
 
         $appointment->update($update);
+
+        // Send approval email only when transitioning to approved
+        if ($oldStatus !== 'approved' && $request->status === 'approved') {
+            $appointment->loadMissing('user');
+            $targetEmail = $appointment->user->email ?? null;
+            Log::info('[AppointmentApprovedEmail] Preparing to send', [
+                'appointment_id' => $appointment->id,
+                'user_id' => $appointment->user->id ?? null,
+                'target_email' => $targetEmail,
+            ]);
+            if (!empty($targetEmail)) {
+                try {
+                    Mail::to($targetEmail)->send(new AppointmentApproved($appointment));
+                    Log::info('[AppointmentApprovedEmail] Sent successfully', [
+                        'appointment_id' => $appointment->id,
+                        'target_email' => $targetEmail,
+                    ]);
+                } catch (\Throwable $e) {
+                    Log::error('[AppointmentApprovedEmail] Failed to send', [
+                        'appointment_id' => $appointment->id,
+                        'target_email' => $targetEmail,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            } else {
+                Log::warning('[AppointmentApprovedEmail] No recipient email found for appointment approval', [
+                    'appointment_id' => $appointment->id,
+                ]);
+            }
+        }
 
         return redirect()->back()->with('success', 'Appointment status updated successfully.');
     }
