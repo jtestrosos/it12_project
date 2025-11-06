@@ -26,7 +26,7 @@ class AppointmentApproved extends Mailable
     {
         return $this
             ->subject('Your appointment has been approved')
-            ->view('emails.appointment-approved')
+            ->view('emails.appt-email-confirmed')
             ->with([
                 'appointment' => $this->appointment,
                 'clinicLocation' => $this->clinicLocation,
