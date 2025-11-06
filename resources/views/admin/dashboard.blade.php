@@ -207,7 +207,7 @@
                     <!-- Content -->
                     <div class="p-4">
                         <!-- Quick Shortcuts -->
-                        <div class="d-flex flex-wrap gap-2 mb-4">
+                        <div class="d-flex justify-content-end flex-wrap gap-2 mb-4">
                             <a href="{{ route('admin.appointments') }}" class="btn btn-primary"><i class="fas fa-calendar-plus me-2"></i>Book appointment</a>
                             <a href="{{ route('admin.patients') }}" class="btn btn-outline-primary"><i class="fas fa-user-plus me-2"></i>Add patient</a>
                         </div>
