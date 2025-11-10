@@ -15,6 +15,8 @@ use App\Mail\AppointmentApproved;
 use App\Models\Service;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\AppointmentRangeExport;
 
 class AdminController extends Controller
 {
@@ -273,7 +275,28 @@ class AdminController extends Controller
         if ($request->filled('category')) {
             $query->where('category', $request->category);
         }
+        if ($request->filled('search')) {
+            $q = trim($request->search);
+            $query->where(function ($sub) use ($q) {
+                $sub->where('item_name', 'like', "%{$q}%")
+                    ->orWhere('category', 'like', "%{$q}%")
+                    ->orWhere('location', 'like', "%{$q}%")
+                    ->orWhere('unit', 'like', "%{$q}%");
+            });
+            // Allow exact ID search when numeric
+            if (is_numeric($q)) {
+                $query->orWhere('id', (int) $q);
+            }
+        }
         $inventory = $query->paginate(15)->withQueryString();
+
+        // Stats for header cards and alerts
+        $totalItems = Inventory::count();
+        $lowStockCount = Inventory::whereColumn('current_stock', '<=', 'minimum_stock')->count();
+        $outOfStockCount = Inventory::where('current_stock', 0)->count();
+        $expiringSoonCount = Inventory::whereNotNull('expiry_date')
+            ->whereBetween('expiry_date', [now(), now()->addDays(90)])
+            ->count();
 
         // Build category options from existing items
         $defaultCategories = [
@@ -291,7 +314,14 @@ class AdminController extends Controller
 
         $categories = array_values(array_unique(array_merge($defaultCategories, $categories)));
 
-        return view('admin.inventory', compact('inventory', 'categories'));
+        $stats = [
+            'total_items' => $totalItems,
+            'low_stock' => $lowStockCount,
+            'out_of_stock' => $outOfStockCount,
+            'expiring_soon' => $expiringSoonCount,
+        ];
+
+        return view('admin.inventory', compact('inventory', 'categories', 'stats'));
     }
 
     public function addInventory(Request $request)
@@ -305,7 +335,8 @@ class AdminController extends Controller
             'unit' => 'required|string|max:50',
             'unit_price' => 'nullable|numeric|min:0',
             'expiry_date' => 'nullable|date|after:today',
-            'supplier' => 'nullable|string|max:255'
+            'supplier' => 'nullable|string|max:255',
+            'location' => 'nullable|string|max:255'
         ]);
 
         $inventory = Inventory::create($request->all());
@@ -352,6 +383,51 @@ class AdminController extends Controller
         }
 
         return redirect()->back()->with('success', 'Inventory updated successfully.');
+    }
+
+    public function restockInventory(Request $request, Inventory $inventory)
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        $inventory->current_stock += (int) $request->quantity;
+        $inventory->save();
+        $inventory->updateStatus();
+
+        InventoryTransaction::create([
+            'inventory_id' => $inventory->id,
+            'user_id' => Auth::id(),
+            'transaction_type' => 'restock',
+            'quantity' => (int) $request->quantity,
+            'notes' => $request->notes,
+        ]);
+
+        return redirect()->back()->with('success', 'Stock restocked successfully.');
+    }
+
+    public function deductInventory(Request $request, Inventory $inventory)
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        $quantity = (int) $request->quantity;
+        $inventory->current_stock = max(0, $inventory->current_stock - $quantity);
+        $inventory->save();
+        $inventory->updateStatus();
+
+        InventoryTransaction::create([
+            'inventory_id' => $inventory->id,
+            'user_id' => Auth::id(),
+            'transaction_type' => 'usage',
+            'quantity' => $quantity,
+            'notes' => $request->notes,
+        ]);
+
+        return redirect()->back()->with('success', 'Stock deducted successfully.');
     }
 
     public function addWalkIn(Request $request)
@@ -413,5 +489,23 @@ class AdminController extends Controller
             ->get();
 
         return view('admin.reports', compact('appointmentStats', 'inventoryStats', 'serviceTypes', 'monthlyTrend'));
+    }
+
+    public function exportAppointmentsExcel(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+        $appointments = Appointment::whereBetween('appointment_date', [
+                $request->start_date,
+                $request->end_date,
+            ])
+            ->orderBy('appointment_date')
+            ->get();
+
+        $filename = 'appointments_' . $request->start_date . '_to_' . $request->end_date . '.xlsx';
+        return Excel::download(new AppointmentRangeExport($appointments), $filename);
     }
 }

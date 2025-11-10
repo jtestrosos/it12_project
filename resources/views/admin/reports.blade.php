@@ -162,6 +162,23 @@
 
                     <!-- Content -->
                     <div class="p-2">
+                        <div class="d-flex flex-wrap justify-content-end align-items-end mb-3 gap-2">
+                            <form class="d-flex align-items-end gap-2" method="GET" action="{{ route('admin.reports.export.appointments') }}">
+                                <div>
+                                    <label class="form-label mb-1">From</label>
+                                    <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}" required>
+                                </div>
+                                <div>
+                                    <label class="form-label mb-1">To</label>
+                                    <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}" required>
+                                </div>
+                                <div class="mb-0">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-file-excel me-2"></i> Export Excel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                         <!-- Statistics Row -->
                         <div class="row mb-2">
                             <!-- Appointment Statistics -->

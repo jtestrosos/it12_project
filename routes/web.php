@@ -110,8 +110,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
             Route::get('/inventory', [AdminController::class, 'inventory'])->name('inventory');
             Route::post('/inventory/add', [AdminController::class, 'addInventory'])->name('inventory.add');
             Route::post('/inventory/{inventory}/update', [AdminController::class, 'updateInventory'])->name('inventory.update');
+            Route::post('/inventory/{inventory}/restock', [AdminController::class, 'restockInventory'])->name('inventory.restock');
+            Route::post('/inventory/{inventory}/deduct', [AdminController::class, 'deductInventory'])->name('inventory.deduct');
             Route::post('/walk-in', [AdminController::class, 'addWalkIn'])->name('walk-in');
             Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
+            Route::get('/reports/export/appointments', [AdminController::class, 'exportAppointmentsExcel'])->name('reports.export.appointments');
         });
 });
 

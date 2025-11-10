@@ -21,6 +21,7 @@ class Inventory extends Model
         'unit_price',
         'expiry_date',
         'supplier',
+        'location',
         'status'
     ];
 
