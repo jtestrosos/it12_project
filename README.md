@@ -169,13 +169,32 @@ it12_project/
 - **Responsive Design**: Mobile-friendly interface built with Tailwind CSS
 
 ## What's New 
-
+ 
 - Added `sessions` table for server-side session storage (2025-10-23).
 - Extended `users` table with `barangay`, `phone`, and `address` fields (2025-10-23, 2025-10-24).
 - Made `backups.filename`, `backups.file_path`, and `backups.size` nullable (2024-12-27).
 - Appointments support approval tracking via `approved_by` and `approved_at` and multiple statuses.
 - Inventory tracking includes stock status enum and transaction history with `inventory_transactions`.
 - DARK MODE (lol)
+
+### Updates – November 2025
+- Services & Reports: Added Excel export for appointments with date-range filter.
+  - Endpoint: `GET /admin/reports/export/appointments?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD`
+  - Output columns: `ID, Patient Name, Date, Status, Created At`
+- Inventory: New `location` column and UI fields for adding items.
+- Inventory: Restock and Deduct actions with transaction logging.
+- Inventory: DB-driven alerts and stat cards (Total, Low Stock, Out of Stock, Expiring Soon).
+- Inventory: Search bar (by name, ID, category, location) and category filter.
+- Inventory: Table shows Expiry Date, Location, and Status badges.
+
+### After Pulling These Updates
+Run the following to install the Excel package and run migrations:
+```bash
+composer install
+php artisan migrate
+php artisan config:clear
+```
+The Excel export relies on `maatwebsite/excel` (^3.1) which is now included in `composer.json`.
 
 ## Database Schema
 
