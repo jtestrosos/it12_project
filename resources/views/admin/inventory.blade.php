@@ -157,7 +157,6 @@
                             <button class="btn btn-link text-decoration-none text-muted me-2" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
                                 <i class="fas fa-moon"></i>
                             </button>
-                            
                             <div class="d-flex align-items-center">
                                 <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                     {{ substr(Auth::user()->name, 0, 2) }}
@@ -175,24 +174,89 @@
 
                     <!-- Content -->
                     <div class="p-4">
-                        <div class="d-flex flex-wrap justify-content-between align-items-end mb-3 gap-2">
-                            <form method="GET" class="d-flex align-items-end gap-2">
-                                <div>
-                                    <label class="form-label mb-1">Category</label>
-                                    <select class="form-select" name="category" onchange="this.form.submit()" style="min-width:220px;">
-                                        <option value="" @selected(!request('category'))>All Categories</option>
-                                        @foreach(($categories ?? []) as $cat)
-                                            <option value="{{ $cat }}" @selected(request('category')==$cat)>{{ $cat }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </form>
-                            <div class="ms-auto">
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
-                                    <i class="fas fa-plus me-2"></i> Add Inventory
-                                </button>
+                        <div class="d-flex justify-content-end mb-3">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
+                                <i class="fas fa-plus me-2"></i> Add New Item
+                            </button>
+                        </div>
+                        <!-- Alerts -->
+                        @if(($stats['low_stock'] ?? 0) > 0)
+                        <div class="alert alert-warning border-danger-subtle mb-3" role="alert">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-triangle-exclamation me-2 text-danger"></i>
+                                <strong>{{ $stats['low_stock'] }} items</strong>
+                                <span class="ms-2">are running low on stock and need restocking.</span>
                             </div>
                         </div>
+                        @endif
+                        @if(($stats['expiring_soon'] ?? 0) > 0)
+                        <div class="alert alert-light border-warning mb-4" role="alert">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-exclamation-circle me-2 text-warning"></i>
+                                <strong>{{ $stats['expiring_soon'] }} items</strong>
+                                <span class="ms-2">are expiring within 90 days.</span>
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- Stat Cards -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-3">
+                                <div class="inventory-card py-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="small text-muted">Total Items</div>
+                                        <i class="fas fa-box text-primary"></i>
+                                    </div>
+                                    <div class="h5 mb-0">{{ $stats['total_items'] ?? 0 }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="inventory-card py-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="small text-muted">Low Stock</div>
+                                        <i class="fas fa-cubes-stacked text-warning"></i>
+                                    </div>
+                                    <div class="h5 mb-0">{{ $stats['low_stock'] ?? 0 }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="inventory-card py-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="small text-muted">Out of Stock</div>
+                                        <i class="fas fa-triangle-exclamation text-danger"></i>
+                                    </div>
+                                    <div class="h5 mb-0">{{ $stats['out_of_stock'] ?? 0 }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="inventory-card py-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="small text-muted">Expiring Soon</div>
+                                        <i class="fas fa-hourglass-half text-warning"></i>
+                                    </div>
+                                    <div class="h5 mb-0">{{ $stats['expiring_soon'] ?? 0 }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form method="GET" class="d-flex align-items-end mb-3 gap-2">
+                            <div class="flex-grow-1">
+                                <label class="form-label mb-1">Search</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                                    <input type="search" name="search" value="{{ request('search') }}" class="form-control" placeholder="Search by item name, ID, category, or location...">
+                                </div>
+                            </div>
+                            <div style="min-width:220px;">
+                                <label class="form-label mb-1">Category</label>
+                                <select class="form-select" name="category" onchange="this.form.submit()">
+                                    <option value="" @selected(!request('category'))>All Categories</option>
+                                    @foreach(($categories ?? []) as $cat)
+                                        <option value="{{ $cat }}" @selected(request('category')==$cat)>{{ $cat }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </form>
 
                         @if($inventory->count() > 0)
 
@@ -205,7 +269,9 @@
                                             <th scope="col">Category</th>
                                             <th scope="col">Stock</th>
                                             <th scope="col">Min Stock</th>
-                                            <th scope="col">Unit</th>
+                                            <th scope="col">Expiry Date</th>
+                                            <th scope="col">Location</th>
+                                            <th scope="col">Status</th>
                                             <th scope="col">Actions</th>
                                         </tr>
                                     </thead>
@@ -219,16 +285,27 @@
                                             <td>{{ $item->category }}</td>
                                             <td><strong>{{ $item->current_stock }}</strong></td>
                                             <td>{{ $item->minimum_stock }}</td>
-                                            <td>{{ $item->unit }}</td>
+                                            <td>{{ $item->expiry_date ? \Illuminate\Support\Carbon::parse($item->expiry_date)->format('Y-m-d') : 'N/A' }}</td>
+                                            <td>{{ $item->location ?? 'N/A' }}</td>
+                                            <td>
+                                                @php
+                                                    $badge = 'secondary';
+                                                    if ($item->status === 'in_stock') $badge = 'success';
+                                                    elseif ($item->status === 'low_stock') $badge = 'warning';
+                                                    elseif ($item->status === 'out_of_stock') $badge = 'danger';
+                                                    elseif ($item->status === 'expired') $badge = 'dark';
+                                                @endphp
+                                                <span class="badge bg-{{ $badge }}">{{ str_replace('_',' ', ucfirst($item->status)) }}</span>
+                                            </td>
                                             <td class="d-flex gap-2">
                                                 <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewDetailModal{{ $item->id }}">
                                                     <i class="fas fa-eye"></i> View
                                                 </button>
-                                                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updateItemModal{{ $item->id }}">
-                                                    <i class="fas fa-edit me-1"></i> Update
-                                                </button>
                                                 <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#restockModal{{ $item->id }}">
                                                     <i class="fas fa-plus me-1"></i> Restock
+                                                </button>
+                                                <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deductModal{{ $item->id }}">
+                                                    <i class="fas fa-minus me-1"></i> Deduct
                                                 </button>
                                             </td>
                                         </tr>
@@ -271,15 +348,71 @@
                                                     @endif
                                                 </div>
                                                 <div class="d-flex gap-2">
-                                                    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updateItemModal{{ $item->id }}">
-                                                        <i class="fas fa-edit me-1"></i> Update
-                                                    </button>
                                                     <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#restockModal{{ $item->id }}">
                                                         <i class="fas fa-plus me-1"></i> Restock
+                                                    </button>
+                                                    <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deductModal{{ $item->id }}">
+                                                        <i class="fas fa-minus me-1"></i> Deduct
                                                     </button>
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Restock Modal -->
+                            <div class="modal fade" id="restockModal{{ $item->id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Restock: {{ $item->item_name }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <form method="POST" action="{{ route('admin.inventory.restock', $item) }}">
+                                            @csrf
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Quantity</label>
+                                                    <input type="number" class="form-control" name="quantity" min="1" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Notes</label>
+                                                    <textarea class="form-control" name="notes" rows="2"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-success">Restock</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Deduct Modal -->
+                            <div class="modal fade" id="deductModal{{ $item->id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Deduct: {{ $item->item_name }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <form method="POST" action="{{ route('admin.inventory.deduct', $item) }}">
+                                            @csrf
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Quantity</label>
+                                                    <input type="number" class="form-control" name="quantity" min="1" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Notes</label>
+                                                    <textarea class="form-control" name="notes" rows="2"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-danger">Deduct</button>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -350,6 +483,20 @@
                                 <div class="mb-3">
                                     <label for="minimum_stock" class="form-label">Minimum Stock *</label>
                                     <input type="number" class="form-control" id="minimum_stock" name="minimum_stock" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="expiry_date" class="form-label">Expiry Date</label>
+                                    <input type="date" class="form-control" id="expiry_date" name="expiry_date">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="location" class="form-label">Location</label>
+                                    <input type="text" class="form-control" id="location" name="location" placeholder="e.g., Cabinet A1">
                                 </div>
                             </div>
                         </div>
