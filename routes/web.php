@@ -63,17 +63,33 @@ Route::post('/logout', function (Request $request) {
 Route::get('/register', fn() => view('auth.register'))->name('register');
 Route::post('/register', function (Request $request) {
     $request->validate([
-        'name' => 'required|string|max:255',
+        'name' => [
+            'required',
+            'string',
+            'max:255',
+            'regex:/^[a-zA-Z\s\.\-\']+$/',
+        ],
         'email' => 'required|email|unique:users,email',
+        'gender' => 'required|in:male,female,other',
         'phone' => 'nullable|string|max:20',
         'address' => 'nullable|string|max:500',
         'barangay' => 'required|string|max:255',
-        'password' => 'required|min:6|confirmed',
+        'password' => [
+            'required',
+            'min:8',
+            'confirmed',
+            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]).+$/',
+        ],
+    ], [
+        'name.regex' => 'The name field should not contain numbers. Only letters, spaces, periods, hyphens, and apostrophes are allowed.',
+        'password.regex' => 'The password must contain at least one lowercase letter, one uppercase letter, and one special character.',
+        'gender.required' => 'Please select a gender.',
     ]);
 
     $user = \App\Models\User::create([
         'name' => $request->name,
         'email' => $request->email,
+        'gender' => $request->gender,
         'phone' => $request->phone,
         'address' => $request->address,
         'barangay' => $request->barangay,

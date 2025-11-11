@@ -81,15 +81,31 @@ class SuperAdminController extends Controller
     public function createUser(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[a-zA-Z\s\.\-\']+$/',
+            ],
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'gender' => 'required|in:male,female,other',
+            'password' => [
+                'required',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]).+$/',
+            ],
             'role' => 'required|in:user,admin,superadmin'
+        ], [
+            'name.regex' => 'The name field should not contain numbers. Only letters, spaces, periods, hyphens, and apostrophes are allowed.',
+            'password.regex' => 'The password must contain at least one lowercase letter, one uppercase letter, and one special character.',
+            'gender.required' => 'Please select a gender.',
         ]);
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'gender' => $request->gender,
             'password' => Hash::make($request->password),
             'role' => $request->role
         ]);
@@ -100,19 +116,35 @@ class SuperAdminController extends Controller
     public function updateUser(Request $request, User $user)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[a-zA-Z\s\.\-\']+$/',
+            ],
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'gender' => 'required|in:male,female,other',
             'role' => 'required|in:user,admin,superadmin',
-            'password' => 'nullable|string|min:8|confirmed'
+            'password' => [
+                'nullable',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]).+$/',
+            ],
+        ], [
+            'name.regex' => 'The name field should not contain numbers. Only letters, spaces, periods, hyphens, and apostrophes are allowed.',
+            'password.regex' => 'The password must contain at least one lowercase letter, one uppercase letter, and one special character.',
+            'gender.required' => 'Please select a gender.',
         ]);
 
         $updateData = [
             'name' => $request->name,
             'email' => $request->email,
+            'gender' => $request->gender,
             'role' => $request->role
         ];
 
-        if ($request->password) {
+        if ($request->filled('password')) {
             $updateData['password'] = Hash::make($request->password);
         }
 

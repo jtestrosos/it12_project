@@ -21,6 +21,47 @@
             background: #f8f9fa;
             min-height: 100vh;
             border-right: 1px solid #e9ecef;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+        @media (min-width: 992px) {
+            .sidebar:not(.collapsed) {
+                transform: translateX(0);
+            }
+            .sidebar.collapsed {
+                transform: translateX(-100%);
+            }
+        }
+        @media (max-width: 991px) {
+            .sidebar:not(.show) {
+                transform: translateX(-100%);
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            transition: opacity 0.3s ease;
+        }
+        .sidebar-overlay.show {
+            display: block;
         }
         .sidebar .nav-link {
             color: #495057;
@@ -39,14 +80,56 @@
             color: white;
             border-left: 3px solid #66b2ff;
         }
+        .burger-menu-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #495057;
+            cursor: pointer;
+            padding: 0.5rem;
+            margin-right: 1rem;
+            transition: color 0.3s ease;
+        }
+        .burger-menu-btn:hover {
+            color: #0d6efd;
+        }
         .main-content {
             background-color: #f0f0f0;
             min-height: 100vh;
+            transition: margin-left 0.3s ease-in-out;
+            margin-left: 0;
+        }
+        @media (min-width: 992px) {
+            .main-content {
+                margin-left: 250px;
+            }
+            .main-content.sidebar-closed {
+                margin-left: 0;
+            }
+        }
+        @media (max-width: 991px) {
+            .main-content {
+                margin-left: 0;
+            }
         }
         .header {
             background: white;
             border-bottom: 1px solid #e9ecef;
             padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        @media (max-width: 576px) {
+            .header {
+                padding: 1rem;
+            }
+            .header h4 {
+                font-size: 1.1rem;
+            }
+            .header .text-muted {
+                font-size: 0.85rem;
+            }
         }
         .filter-card {
             background: white;
@@ -91,62 +174,67 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-2 p-0">
-                <div class="sidebar">
-                    <div class="p-3">
-                        <div class="d-flex align-items-center mb-4">
-                            <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 52px; height: 52px;">
-                            <div>
-                                <h6 class="mb-0 fw-bold" style="letter-spacing:.5px;">MALASAKIT</h6>
-                            </div>
-                        </div>
-                        <nav class="nav flex-column">
-                            @yield('sidebar-menu')
-                        </nav>
+    <!-- Sidebar Overlay (for mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="p-3">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="d-flex align-items-center">
+                    <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 52px; height: 52px;">
+                    <div>
+                        <h6 class="mb-0 fw-bold" style="letter-spacing:.5px;">MALASAKIT</h6>
                     </div>
                 </div>
+                <button class="burger-menu-btn d-lg-none" id="closeSidebarBtn" aria-label="Close sidebar">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
+            <nav class="nav flex-column">
+                @yield('sidebar-menu')
+            </nav>
+        </div>
+    </div>
 
-            <!-- Main Content -->
-            <div class="col-md-10 p-0">
-                <div class="main-content">
-                    <!-- Header -->
-                    <div class="header d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="mb-0">@yield('page-title', 'Dashboard')</h4>
-                            <p class="text-muted mb-0">@yield('page-description', 'Welcome!')</p>
-                        </div>
-                        <div class="d-flex align-items-center gap-3">
-                            <button class="btn btn-link text-decoration-none text-muted" title="Notifications" aria-label="Notifications">
-                                <i class="fas fa-bell"></i>
-                            </button>
-                            <button class="btn btn-link text-decoration-none text-muted" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
-                                <i class="fas fa-moon"></i>
-                            </button>
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                    @yield('user-initials', 'A')
-                                </div>
-                                <div>
-                                    <div class="fw-bold">@yield('user-name', 'Admin')</div>
-                                    <small class="text-muted">@yield('user-role', 'Administrator')</small>
-                                </div>
-                            </div>
-                            <a href="{{ route('logout') }}" class="btn btn-outline-secondary ms-3" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Content -->
-                    <div class="p-4">
-                        @yield('content')
-                    </div>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Header -->
+        <div class="header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <button class="burger-menu-btn" id="toggleSidebarBtn" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div>
+                    <h4 class="mb-0">@yield('page-title', 'Dashboard')</h4>
+                    <p class="text-muted mb-0">@yield('page-description', 'Welcome!')</p>
                 </div>
             </div>
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-link text-decoration-none text-muted" title="Notifications" aria-label="Notifications">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <button class="btn btn-link text-decoration-none text-muted" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                        @yield('user-initials', 'A')
+                    </div>
+                    <div>
+                        <div class="fw-bold">@yield('user-name', 'Admin')</div>
+                        <small class="text-muted">@yield('user-role', 'Administrator')</small>
+                    </div>
+                </div>
+                <a href="{{ route('logout') }}" class="btn btn-outline-secondary ms-3" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-4">
+            @yield('content')
         </div>
     </div>
 
@@ -156,6 +244,123 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Sidebar toggle functionality
+        (function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const toggleBtn = document.getElementById('toggleSidebarBtn');
+            const closeBtn = document.getElementById('closeSidebarBtn');
+            const overlay = document.getElementById('sidebarOverlay');
+            const sidebarKey = 'sidebar-state';
+            
+            // Check if sidebar should be open by default (desktop) or closed (mobile)
+            function isDesktop() {
+                return window.innerWidth >= 992;
+            }
+            
+            // Initialize sidebar state
+            function initSidebar() {
+                if (isDesktop()) {
+                    // Desktop: check localStorage, default to open
+                    const savedState = localStorage.getItem(sidebarKey);
+                    if (savedState === 'closed') {
+                        sidebar.classList.add('collapsed');
+                        sidebar.classList.remove('show');
+                        mainContent.classList.add('sidebar-closed');
+                    } else {
+                        sidebar.classList.remove('collapsed');
+                        sidebar.classList.add('show');
+                        mainContent.classList.remove('sidebar-closed');
+                        // Only set localStorage if it wasn't already set to avoid overwriting user preference
+                        if (!savedState) {
+                            localStorage.setItem(sidebarKey, 'open');
+                        }
+                    }
+                } else {
+                    // Mobile: always start closed
+                    sidebar.classList.add('collapsed');
+                    sidebar.classList.remove('show');
+                    overlay.classList.remove('show');
+                }
+            }
+            
+            function openSidebar() {
+                sidebar.classList.remove('collapsed');
+                sidebar.classList.add('show');
+                if (isDesktop()) {
+                    mainContent.classList.remove('sidebar-closed');
+                    localStorage.setItem(sidebarKey, 'open');
+                } else {
+                    overlay.classList.add('show');
+                }
+            }
+            
+            function closeSidebar() {
+                sidebar.classList.add('collapsed');
+                sidebar.classList.remove('show');
+                if (isDesktop()) {
+                    mainContent.classList.add('sidebar-closed');
+                    localStorage.setItem(sidebarKey, 'closed');
+                } else {
+                    overlay.classList.remove('show');
+                }
+            }
+            
+            function toggleSidebar() {
+                const isCollapsed = sidebar.classList.contains('collapsed');
+                const isNotShowing = !sidebar.classList.contains('show');
+                
+                if (isCollapsed || isNotShowing) {
+                    openSidebar();
+                } else {
+                    closeSidebar();
+                }
+            }
+            
+            // Event listeners
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', toggleSidebar);
+            }
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeSidebar);
+            }
+            
+            if (overlay) {
+                overlay.addEventListener('click', closeSidebar);
+            }
+            
+            // Handle window resize
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    if (isDesktop()) {
+                        // Desktop: restore saved state
+                        const savedState = localStorage.getItem(sidebarKey);
+                        if (savedState === 'closed') {
+                            sidebar.classList.add('collapsed');
+                            sidebar.classList.remove('show');
+                            mainContent.classList.add('sidebar-closed');
+                        } else {
+                            sidebar.classList.remove('collapsed');
+                            sidebar.classList.add('show');
+                            mainContent.classList.remove('sidebar-closed');
+                        }
+                    } else {
+                        // Mobile: always close on resize to mobile
+                        sidebar.classList.add('collapsed');
+                        sidebar.classList.remove('show');
+                        overlay.classList.remove('show');
+                        mainContent.classList.remove('sidebar-closed');
+                    }
+                }, 250);
+            });
+            
+            // Initialize on page load
+            initSidebar();
+        })();
+        
         // Theme persistence + toggle
         (function() {
             const body = document.body;
@@ -180,6 +385,9 @@
         body.bg-dark .main-content { background-color: #151718; }
         body.bg-dark .sidebar { background: #131516; border-right-color: #2a2f35; }
         body.bg-dark .header { background: #1b1e20; border-bottom-color: #2a2f35; }
+        body.bg-dark .sidebar-overlay { background: rgba(0, 0, 0, 0.7); }
+        body.bg-dark .burger-menu-btn { color: #cbd3da; }
+        body.bg-dark .burger-menu-btn:hover { color: #6ea8fe; }
         body.bg-dark .filter-card,
         body.bg-dark .table-card,
         body.bg-dark .metric-card,

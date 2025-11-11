@@ -45,6 +45,7 @@ class SystemLogObserver
             'record_id' => $model->getKey(),
             'new_values' => $newValues,
             'old_values' => $oldValues,
+            'status' => 'active',
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent()
         ]);

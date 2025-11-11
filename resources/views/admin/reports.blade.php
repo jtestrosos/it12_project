@@ -1,48 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Services & Reports - Barangay Health Center</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { color: #111; }
-        body.bg-dark { color: #fff; }
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .sidebar {
-            background: #f8f9fa;
-            min-height: 100vh;
-            border-right: 1px solid #e9ecef;
-        }
-        .sidebar .nav-link {
-            color: #495057;
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin: 4px 8px;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover {
-            background-color: #e9ecef;
-            color: #495057;
-        }
-        .sidebar .nav-link.active {
-            background-color: #007bff;
-            color: white;
-        }
-        .main-content {
-            background-color: #f0f0f0;
-            min-height: 100vh;
-        }
-        .header {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-            padding: 1rem 2rem;
-        }
+@extends('admin.layout')
+
+@section('title', 'Services & Reports - Barangay Health Center')
+@section('page-title', 'Services & Reports')
+@section('page-description', 'Analytics and reporting dashboard')
+
+@section('page-styles')
+<style>
+        body { color: inherit; }
         .stats-card {
             background: white;
             border-radius: 6px;
@@ -90,78 +54,10 @@
         h1, h2, h3, h4, h5, h6 { color: inherit; }
         body.bg-dark .text-muted, body.bg-dark small, body.bg-dark .stat-label { color: #b0b0b0 !important; }
     </style>
-</head>
-<body>
-    <script>
-        (function(){
-            if (localStorage.getItem('app-theme') === 'dark') {
-                document.body.classList.add('bg-dark','text-white');
-            }
-        })();
-    </script>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-2 p-0">
-                <div class="sidebar">
-                    <div class="p-3">
-                        <div class="d-flex align-items-center mb-4">
-                            <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 52px; height: 52px;">
-                            <div>
-                                <h6 class="mb-0 fw-bold" style="letter-spacing:.5px;">MALASAKIT</h6>
-                            </div>
-                        </div>
-                        <nav class="nav flex-column">
-                            <a class="nav-link" href="{{ route('admin.dashboard') }}">
-                                <i class="fas fa-th-large me-2"></i> Dashboard
-                            </a>
-                            <a class="nav-link" href="{{ route('admin.patients') }}">
-                                <i class="fas fa-user me-2"></i> Patient Management
-                            </a>
-                            <a class="nav-link" href="{{ route('admin.appointments') }}">
-                                <i class="fas fa-calendar-check me-2"></i> Appointments
-                            </a>
-                            <a class="nav-link active" href="{{ route('admin.reports') }}">
-                                <i class="fas fa-chart-bar me-2"></i> Services & Reports
-                            </a>
-                            <a class="nav-link" href="{{ route('admin.inventory') }}">
-                                <i class="fas fa-box me-2"></i> Inventory
-                            </a>
-                        </nav>
-                    </div>
-                </div>
-            </div>
+@endsection
 
-            <!-- Main Content -->
-            <div class="col-md-10 p-0">
-                <div class="main-content">
-                    <!-- Header -->
-                    <div class="header d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="mb-0">Services & Reports</h4>
-                            <p class="text-muted mb-0">Analytics and reporting dashboard</p>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <button class="btn btn-link text-decoration-none text-muted me-2" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
-                                <i class="fas fa-moon"></i>
-                            </button>
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                    {{ substr(Auth::user()->name, 0, 2) }}
-                                </div>
-                                <div>
-                                    <div class="fw-bold">{{ Auth::user()->name }}</div>
-                                    <small class="text-muted">Admin</small>
-                                </div>
-                            </div>
-                            <a href="{{ route('logout') }}" class="btn btn-outline-secondary ms-3" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Content -->
-                    <div class="p-2">
+@section('content')
+                    <div class="p-0 p-md-2">
                         <div class="d-flex flex-wrap justify-content-end align-items-end mb-3 gap-2">
                             <form class="d-flex align-items-end gap-2" method="GET" action="{{ route('admin.reports.export.appointments') }}">
                                 <div>
@@ -272,31 +168,11 @@
 
                         
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+@endsection
 
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-        @csrf
-    </form>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Theme toggle persistence
-        (function(){
-            const key = 'app-theme';
-            const btn = document.getElementById('themeToggle');
-            if (btn) {
-                btn.addEventListener('click', function(){
-                    const isDark = document.body.classList.toggle('bg-dark');
-                    document.body.classList.toggle('text-white', isDark);
-                    localStorage.setItem(key, isDark ? 'dark' : 'light');
-                });
-            }
-        })();
-    </script>
-    <script>
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
         // Get data from Laravel
         const serviceData = @json($serviceTypes);
         const monthlyData = @json($monthlyTrend);
@@ -402,5 +278,4 @@
             }
         });
     </script>
-</body>
-</html>
+@endpush

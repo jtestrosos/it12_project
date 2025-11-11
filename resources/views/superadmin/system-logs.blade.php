@@ -79,6 +79,7 @@
                     <th>Action</th>
                     <th>Table</th>
                     <th>Record ID</th>
+                    <th>Status</th>
                     <th>Date</th>
                     <th>IP Address</th>
                     <th>Actions</th>
@@ -109,6 +110,17 @@
                     </td>
                     <td>{{ $log->table_name ?? 'N/A' }}</td>
                     <td>{{ $log->record_id ?? 'N/A' }}</td>
+                    <td>
+                        @if($log->status == 'active')
+                            <span class="badge bg-success">{{ ucfirst($log->status) }}</span>
+                        @elseif($log->status == 'inactive')
+                            <span class="badge bg-secondary">{{ ucfirst($log->status) }}</span>
+                        @elseif($log->status == 'archived')
+                            <span class="badge bg-warning text-dark">{{ ucfirst($log->status) }}</span>
+                        @else
+                            <span class="badge bg-info">{{ ucfirst($log->status ?? 'active') }}</span>
+                        @endif
+                    </td>
                     <td>{{ $log->created_at->format('M d, Y H:i') }}</td>
                     <td>{{ $log->ip_address ?? 'N/A' }}</td>
                     <td>
@@ -120,6 +132,7 @@
                             data-action="{{ ucfirst($log->action) }}"
                             data-table="{{ $log->table_name ?? 'N/A' }}"
                             data-record="{{ $log->record_id ?? 'N/A' }}"
+                            data-status="{{ ucfirst($log->status ?? 'active') }}"
                             data-old='@json($log->old_values)'
                             data-new='@json($log->new_values)'
                             data-ip="{{ $log->ip_address ?? 'N/A' }}"
@@ -175,6 +188,10 @@
                             <label class="form-label text-muted">Record ID</label>
                             <p id="log-record">&nbsp;</p>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Status</label>
+                            <p id="log-status">&nbsp;</p>
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <h6 class="fw-bold mb-3">Change Details</h6>
@@ -219,6 +236,7 @@
             const action = get('action');
             const tableName = get('table');
             const recordId = get('record');
+            const status = get('status');
             const ip = get('ip');
             const timestamp = get('timestamp');
             const oldRaw = get('old');
@@ -233,6 +251,7 @@
             setText('log-action', action);
             setText('log-table', tableName);
             setText('log-record', recordId);
+            setText('log-status', status);
             setText('log-ip', ip);
             setText('log-timestamp', timestamp);
 

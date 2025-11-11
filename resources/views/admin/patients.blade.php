@@ -1,47 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient Management - Barangay Health Center</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body { color: #111; }
-        body.bg-dark { color: #fff; }
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .sidebar {
-            background: #f8f9fa;
-            min-height: 100vh;
-            border-right: 1px solid #e9ecef;
-        }
-        .sidebar .nav-link {
-            color: #495057;
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin: 4px 8px;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover {
-            background-color: #e9ecef;
-            color: #495057;
-        }
-        .sidebar .nav-link.active {
-            background-color: #007bff;
-            color: white;
-        }
-        .main-content {
-            background-color: #f0f0f0;
-            min-height: 100vh;
-        }
-        .header {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-            padding: 1rem 2rem;
-        }
+@extends('admin.layout')
+
+@section('title', 'Patient Management - Barangay Health Center')
+@section('page-title', 'Patient Management')
+@section('page-description', 'View and manage all registered patients')
+
+@section('page-styles')
+<style>
+        body { color: inherit; }
         .patient-card {
             background: white;
             border-radius: 12px;
@@ -101,76 +66,9 @@
         body.bg-dark .alert-success { background-color: #1e3a1e; color: #d4edda; border-color: #28a745; }
         body.bg-dark .alert-danger { background-color: #3a1e1e; color: #f8d7da; border-color: #dc3545; }
     </style>
-</head>
-<body>
-    <script>
-        (function(){
-            if (localStorage.getItem('app-theme') === 'dark') {
-                document.body.classList.add('bg-dark','text-white');
-            }
-        })();
-    </script>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-2 p-0">
-                <div class="sidebar">
-                    <div class="p-3">
-                        <div class="d-flex align-items-center mb-4">
-                            <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 52px; height: 52px;">
-                            <div>
-                                <h6 class="mb-0 fw-bold" style="letter-spacing:.5px;">MALASAKIT</h6>
-                            </div>
-                        </div>
-                        <nav class="nav flex-column">
-                            <a class="nav-link" href="{{ route('admin.dashboard') }}">
-                                <i class="fas fa-th-large me-2"></i> Dashboard
-                            </a>
-                            <a class="nav-link active" href="{{ route('admin.patients') }}">
-                                <i class="fas fa-user me-2"></i> Patient Management
-                            </a>
-                            <a class="nav-link" href="{{ route('admin.appointments') }}">
-                                <i class="fas fa-calendar-check me-2"></i> Appointments
-                            </a>
-                            <a class="nav-link" href="{{ route('admin.reports') }}">
-                                <i class="fas fa-chart-bar me-2"></i> Services & Reports
-                            </a>
-                            <a class="nav-link" href="{{ route('admin.inventory') }}">
-                                <i class="fas fa-box me-2"></i> Inventory
-                            </a>
-                        </nav>
-                    </div>
-                </div>
-            </div>
+@endsection
 
-            <!-- Main Content -->
-            <div class="col-md-10 p-0">
-                <div class="main-content">
-                    <!-- Header -->
-                    <div class="header d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="mb-0">Patient Management</h4>
-                            <p class="text-muted mb-0">View and manage all registered patients</p>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <button class="btn btn-link text-decoration-none text-muted me-2" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
-                                <i class="fas fa-moon"></i>
-                            </button>
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                    {{ substr(Auth::user()->name, 0, 2) }}
-                                </div>
-                                <div>
-                                    <div class="fw-bold">{{ Auth::user()->name }}</div>
-                                    <small class="text-muted">Admin</small>
-                                </div>
-                            </div>
-                            <a href="{{ route('logout') }}" class="btn btn-outline-secondary ms-3" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </a>
-                        </div>
-                    </div>
-
+@section('content')
                     <!-- Success/Error Messages -->
                     @if(session('success'))
                         <div class="alert alert-success alert-dismissible fade show m-4" role="alert">
@@ -199,7 +97,7 @@
                     <!-- Content -->
                                                                                                     @if($patients->count() > 0)
 
-                    <div class="p-4">
+                    <div class="p-0 p-md-4">
                         <!-- Top actions -->
                         <div class="d-flex flex-wrap justify-content-end align-items-center mb-3 ">
                             <div class="d-flex align-items-center gap-2">
@@ -320,9 +218,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
+@endsection
 
     <!-- Add Patient Modal -->
     <div class="modal fade" id="addPatientModal" tabindex="-1">
@@ -339,27 +235,56 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="name" name="name" required>
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
+                                    @error('name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">Name should not contain numbers</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
-                                    <input type="email" class="form-control" id="email" name="email" required>
+                                    <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
+                                    <select class="form-control @error('gender') is-invalid @enderror" id="gender" name="gender" required>
+                                        <option value="">Select Gender</option>
+                                        <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
+                                        <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
+                                        <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Other</option>
+                                    </select>
+                                    @error('gender')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="barangay" class="form-label">Barangay <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="barangay" name="barangay" required>
+                                    <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required>
+                                    @error('email')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
+                                    <label for="barangay" class="form-label">Barangay <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control @error('barangay') is-invalid @enderror" id="barangay" name="barangay" value="{{ old('barangay') }}" required>
+                                    @error('barangay')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
                                     <label for="phone" class="form-label">Phone Number</label>
-                                    <input type="tel" class="form-control" id="phone" name="phone">
+                                    <input type="tel" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') }}">
+                                    @error('phone')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -367,13 +292,20 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
-                                    <input type="password" class="form-control" id="password" name="password" required>
+                                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required>
+                                    @error('password')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">Must contain lowercase, uppercase, and special character</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="password_confirmation" class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+                                    <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" id="password_confirmation" name="password_confirmation" required>
+                                    @error('password_confirmation')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -403,6 +335,10 @@
                             <div class="mb-3">
                                 <label class="form-label text-muted">Full Name</label>
                                 <p class="fw-bold">{{ $patient->name }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Gender</label>
+                                <p>{{ ucfirst($patient->gender ?? 'N/A') }}</p>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label text-muted">Email</label>
@@ -477,35 +413,65 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="edit_name{{ $patient->id }}" class="form-label">Full Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="edit_name{{ $patient->id }}" name="name" value="{{ $patient->name }}" required>
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror" id="edit_name{{ $patient->id }}" name="name" value="{{ old('name', $patient->name) }}" required>
+                                    @error('name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">Name should not contain numbers</small>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_gender{{ $patient->id }}" class="form-label">Gender <span class="text-danger">*</span></label>
+                                    <select class="form-control @error('gender') is-invalid @enderror" id="edit_gender{{ $patient->id }}" name="gender" required>
+                                        <option value="">Select Gender</option>
+                                        <option value="male" {{ old('gender', $patient->gender) == 'male' ? 'selected' : '' }}>Male</option>
+                                        <option value="female" {{ old('gender', $patient->gender) == 'female' ? 'selected' : '' }}>Female</option>
+                                        <option value="other" {{ old('gender', $patient->gender) == 'other' ? 'selected' : '' }}>Other</option>
+                                    </select>
+                                    @error('gender')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="edit_email{{ $patient->id }}" class="form-label">Email Address <span class="text-danger">*</span></label>
-                                    <input type="email" class="form-control" id="edit_email{{ $patient->id }}" name="email" value="{{ $patient->email }}" required>
+                                    <input type="email" class="form-control @error('email') is-invalid @enderror" id="edit_email{{ $patient->id }}" name="email" value="{{ old('email', $patient->email) }}" required>
+                                    @error('email')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="edit_barangay{{ $patient->id }}" class="form-label">Barangay <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="edit_barangay{{ $patient->id }}" name="barangay" value="{{ $patient->barangay ?? '' }}" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="edit_phone{{ $patient->id }}" class="form-label">Phone Number</label>
-                                    <input type="tel" class="form-control" id="edit_phone{{ $patient->id }}" name="phone" value="{{ $patient->phone ?? '' }}">
+                                    <input type="text" class="form-control @error('barangay') is-invalid @enderror" id="edit_barangay{{ $patient->id }}" name="barangay" value="{{ old('barangay', $patient->barangay ?? '') }}" required>
+                                    @error('barangay')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_phone{{ $patient->id }}" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control @error('phone') is-invalid @enderror" id="edit_phone{{ $patient->id }}" name="phone" value="{{ old('phone', $patient->phone ?? '') }}">
+                                    @error('phone')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="edit_address{{ $patient->id }}" class="form-label">Address</label>
-                                    <input type="text" class="form-control" id="edit_address{{ $patient->id }}" name="address" value="{{ $patient->address ?? '' }}">
+                                    <input type="text" class="form-control @error('address') is-invalid @enderror" id="edit_address{{ $patient->id }}" name="address" value="{{ old('address', $patient->address ?? '') }}">
+                                    @error('address')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -513,14 +479,20 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="edit_password{{ $patient->id }}" class="form-label">New Password</label>
-                                    <input type="password" class="form-control" id="edit_password{{ $patient->id }}" name="password" placeholder="Leave blank to keep current password">
-                                    <small class="text-muted">Leave blank if you don't want to change the password</small>
+                                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="edit_password{{ $patient->id }}" name="password" placeholder="Leave blank to keep current password">
+                                    @error('password')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">Must contain lowercase, uppercase, and special character (leave blank to keep current)</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="edit_password_confirmation{{ $patient->id }}" class="form-label">Confirm New Password</label>
-                                    <input type="password" class="form-control" id="edit_password_confirmation{{ $patient->id }}" name="password_confirmation" placeholder="Confirm new password">
+                                    <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" id="edit_password_confirmation{{ $patient->id }}" name="password_confirmation" placeholder="Confirm new password">
+                                    @error('password_confirmation')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -614,26 +586,10 @@
     </div>
     @endforeach
 
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-        @csrf
-    </form>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+@push('scripts')
+<script>
         // Search and Filter Functionality
         document.addEventListener('DOMContentLoaded', function() {
-            // Theme toggle persistence
-            (function(){
-                const key = 'app-theme';
-                const btn = document.getElementById('themeToggle');
-                if (btn) {
-                    btn.addEventListener('click', function(){
-                        const isDark = document.body.classList.toggle('bg-dark');
-                        document.body.classList.toggle('text-white', isDark);
-                        localStorage.setItem(key, isDark ? 'dark' : 'light');
-                    });
-                }
-            })();
             const statusFilter = document.getElementById('statusFilter');
             const appointmentFilter = document.getElementById('appointmentFilter');
             const barangayFilter = document.getElementById('barangayFilter');
@@ -687,5 +643,4 @@
             
         });
     </script>
-</body>
-</html>
+@endpush
