@@ -505,7 +505,9 @@ class AdminController extends Controller
             ->orderBy('appointment_date')
             ->get();
 
+        $inventory = Inventory::with('transactions')->orderBy('item_name')->get();
+
         $filename = 'appointments_' . $request->start_date . '_to_' . $request->end_date . '.xlsx';
-        return Excel::download(new AppointmentRangeExport($appointments), $filename);
+        return Excel::download(new AppointmentRangeExport($appointments, $inventory), $filename);
     }
 }
