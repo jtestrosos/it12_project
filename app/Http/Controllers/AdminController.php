@@ -75,16 +75,32 @@ class AdminController extends Controller
     public function createPatient(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[a-zA-Z\s\.\-\']+$/',
+            ],
             'email' => 'required|string|email|max:255|unique:users',
+            'gender' => 'required|in:male,female,other',
             'barangay' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
-            'password' => 'required|string|min:6|confirmed'
+            'password' => [
+                'required',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]).+$/',
+            ],
+        ], [
+            'name.regex' => 'The name field should not contain numbers. Only letters, spaces, periods, hyphens, and apostrophes are allowed.',
+            'password.regex' => 'The password must contain at least one lowercase letter, one uppercase letter, and one special character.',
+            'gender.required' => 'Please select a gender.',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'gender' => $request->gender,
             'barangay' => $request->barangay,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
@@ -97,17 +113,33 @@ class AdminController extends Controller
     public function updatePatient(Request $request, User $user)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[a-zA-Z\s\.\-\']+$/',
+            ],
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'gender' => 'required|in:male,female,other',
             'barangay' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
-            'password' => 'nullable|string|min:6|confirmed'
+            'password' => [
+                'nullable',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]).+$/',
+            ],
+        ], [
+            'name.regex' => 'The name field should not contain numbers. Only letters, spaces, periods, hyphens, and apostrophes are allowed.',
+            'password.regex' => 'The password must contain at least one lowercase letter, one uppercase letter, and one special character.',
+            'gender.required' => 'Please select a gender.',
         ]);
 
         $updateData = [
             'name' => $request->name,
             'email' => $request->email,
+            'gender' => $request->gender,
             'barangay' => $request->barangay,
             'phone' => $request->phone,
             'address' => $request->address,

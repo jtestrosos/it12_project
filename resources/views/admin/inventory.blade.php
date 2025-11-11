@@ -1,47 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory - Barangay Health Center</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body { color: #111; }
-        body.bg-dark { color: #fff; }
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .sidebar {
-            background: #f8f9fa;
-            min-height: 100vh;
-            border-right: 1px solid #e9ecef;
-        }
-        .sidebar .nav-link {
-            color: #495057;
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin: 4px 8px;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover {
-            background-color: #e9ecef;
-            color: #495057;
-        }
-        .sidebar .nav-link.active {
-            background-color: #007bff;
-            color: white;
-        }
-        .main-content {
-            background-color: #f0f0f0;
-            min-height: 100vh;
-        }
-        .header {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
-            padding: 1rem 2rem;
-        }
+@extends('admin.layout')
+
+@section('title', 'Inventory - Barangay Health Center')
+@section('page-title', 'Inventory Management')
+@section('page-description', 'Manage medical supplies and equipment')
+
+@section('page-styles')
+<style>
+        body { color: inherit; }
         .inventory-card {
             background: white;
             border-radius: 12px;
@@ -102,78 +67,10 @@
         body.bg-dark .form-select { background-color: #0f1316; color: #e6e6e6; border-color: #2a2f35; }
         body.bg-dark .modal-content .form-control::placeholder { color: #9aa4ad; }
     </style>
-</head>
-<body>
-    <script>
-        (function(){
-            if (localStorage.getItem('app-theme') === 'dark') {
-                document.body.classList.add('bg-dark','text-white');
-            }
-        })();
-    </script>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-2 p-0">
-                <div class="sidebar">
-                    <div class="p-3">
-                        <div class="d-flex align-items-center mb-4">
-                            <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" class="me-3" style="width: 52px; height: 52px;">
-                            <div>
-                                <h6 class="mb-0 fw-bold" style="letter-spacing: .5px;">MALASAKIT</h6>
-                            </div>
-                        </div>
-                        <nav class="nav flex-column">
-                            <a class="nav-link" href="{{ route('admin.dashboard') }}">
-                                <i class="fas fa-th-large me-2"></i> Dashboard
-                            </a>
-                            <a class="nav-link" href="{{ route('admin.patients') }}">
-                                <i class="fas fa-user me-2"></i> Patient Management
-                            </a>
-                            <a class="nav-link" href="{{ route('admin.appointments') }}">
-                                <i class="fas fa-calendar-check me-2"></i> Appointments
-                            </a>
-                            <a class="nav-link" href="{{ route('admin.reports') }}">
-                                <i class="fas fa-chart-bar me-2"></i> Services & Reports
-                            </a>
-                            <a class="nav-link active" href="{{ route('admin.inventory') }}">
-                                <i class="fas fa-box me-2"></i> Inventory
-                            </a>
-                        </nav>
-                    </div>
-                </div>
-            </div>
+@endsection
 
-            <!-- Main Content -->
-            <div class="col-md-10 p-0">
-                <div class="main-content">
-                    <!-- Header -->
-                    <div class="header d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="mb-0">Inventory Management</h4>
-                            <p class="text-muted mb-0">Manage medical supplies and equipment</p>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <button class="btn btn-link text-decoration-none text-muted me-2" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
-                                <i class="fas fa-moon"></i>
-                            </button>
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                    {{ substr(Auth::user()->name, 0, 2) }}
-                                </div>
-                                <div>
-                                    <div class="fw-bold">{{ Auth::user()->name }}</div>
-                                    <small class="text-muted">Admin</small>
-                                </div>
-                            </div>
-                            <a href="{{ route('logout') }}" class="btn btn-outline-secondary ms-3" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Content -->
-                    <div class="p-4">
+@section('content')
+                    <div class="p-0 p-md-4">
                         <div class="d-flex justify-content-end mb-3">
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">
                                 <i class="fas fa-plus me-2"></i> Add New Item
@@ -428,10 +325,7 @@
                             </div>
                         @endif
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+@endsection
 
     <!-- Add Item Modal -->
     <div class="modal fade" id="addItemModal" tabindex="-1">
@@ -521,24 +415,8 @@
         </div>
     </div>
 
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-        @csrf
-    </form>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Theme toggle persistence
-        (function(){
-            const key = 'app-theme';
-            const btn = document.getElementById('themeToggle');
-            if (btn) {
-                btn.addEventListener('click', function(){
-                    const isDark = document.body.classList.toggle('bg-dark');
-                    document.body.classList.toggle('text-white', isDark);
-                    localStorage.setItem(key, isDark ? 'dark' : 'light');
-                });
-            }
-        })();
-    </script>
-</body>
-</html>
+@push('scripts')
+<script>
+    // (page-specific scripts if needed)
+</script>
+@endpush
