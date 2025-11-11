@@ -61,7 +61,7 @@
                         <!-- Add Appointment Button -->
 
                         <!-- Top Actions -->
-                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                        <div class="d-flex flex-wrap justify-content-end align-items-center mb-3 gap-2">
                             <div class="d-flex align-items-center gap-2">
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">
                                     <i class="fas fa-plus me-2"></i> Add New Appointment
