@@ -361,37 +361,40 @@
             }
             
             // Initialize sidebar state
-            function initSidebar() {
-                // Disable transitions during initialization
-                sidebar.classList.add('no-transition');
-                mainContent.classList.add('no-transition');
-                
-                if (isDesktop()) {
-                    // Desktop: check localStorage for collapsed state
-                    const isCollapsed = localStorage.getItem(sidebarKey) === 'true';
-                    if (isCollapsed) {
-                        sidebar.classList.add('collapsed');
-                        mainContent.classList.add('sidebar-closed');
-                    } else {
-                        sidebar.classList.remove('collapsed');
-                        mainContent.classList.remove('sidebar-closed');
-                    }
-                    sidebar.classList.add('show');
-                } else {
-                    // Mobile: always start closed (hidden)
-                    sidebar.classList.remove('collapsed');
-                    sidebar.classList.remove('show');
-                    overlay.classList.remove('show');
-                }
-                
-                // Re-enable transitions after a brief delay to allow state to be set
-                requestAnimationFrame(function() {
-                    requestAnimationFrame(function() {
-                        sidebar.classList.remove('no-transition');
-                        mainContent.classList.remove('no-transition');
-                    });
-                });
-            }
+function initSidebar() {
+    // Disable transitions during initialization
+    sidebar.classList.add('no-transition');
+    mainContent.classList.add('no-transition');
+
+    if (isDesktop()) {
+        // Desktop: DEFAULT TO COLLAPSED (unless user previously expanded it)
+        const saved = localStorage.getItem(sidebarKey);
+        const shouldCollapse = saved === null || saved === 'true'; // null = first visit → collapse
+
+        if (shouldCollapse) {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('sidebar-closed');
+            localStorage.setItem(sidebarKey, 'true'); // save default
+        } else {
+            sidebar.classList.remove('collapsed');
+            mainContent.classList.remove('sidebar-closed');
+        }
+        sidebar.classList.add('show');
+    } else {
+        // Mobile: always start hidden
+        sidebar.classList.remove('collapsed');
+        sidebar.classList.remove('show');
+        overlay.classList.remove('show');
+    }
+
+    // Re-enable transitions
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            sidebar.classList.remove('no-transition');
+            mainContent.classList.remove('no-transition');
+        });
+    });
+}
             
             function toggleCollapse() {
                 if (!isDesktop()) return;
