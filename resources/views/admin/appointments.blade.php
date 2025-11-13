@@ -36,6 +36,25 @@
             background-color: #f8d7da;
             color: #721c24;
         }
+        .table-modern {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .table-modern thead th {
+            background-color: #f8f9fa;
+            border: none;
+            font-weight: 600;
+            color: #495057;
+            padding: 1rem;
+        }
+        .table-modern tbody td {
+            border: none;
+            padding: 1rem;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .table-modern tbody tr:hover {
+            background-color: #f8f9fa;
+        }
         /* Ensure dropdowns inside responsive tables are not clipped */
         .table-responsive { overflow: visible; }
         /* Keep actions column flexible */
@@ -54,6 +73,9 @@
         body.bg-dark .dropdown-menu { background: #1e2124; border-color: #2a2f35; }
         body.bg-dark .dropdown-item { color: #e6e6e6; }
         body.bg-dark .dropdown-item:hover, body.bg-dark .dropdown-item.active { background-color: #2a2f35; color: #fff; }
+        body.bg-dark .table-modern thead th { background-color: #1a1f24; color: #e6e6e6; }
+        body.bg-dark .table-modern tbody td { border-bottom-color: #2a2f35; color: #d6d6d6; }
+        body.bg-dark .table-modern tbody tr:hover { background-color: #2a2f35; }
     </style>
 @endsection
 
@@ -83,70 +105,69 @@
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">
                                     <i class="fas fa-plus me-2"></i> Add New Appointment
                                 </button>
-                                <!-- Status Dropdown -->
-                                <div class="dropdown">
-                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="statusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                        @php($current = request('status'))
-                                        @if($current == '')
-                                            All Appointments
-                                        @elseif($current == 'approved')
-                                            Confirmed
-                                        @else
-                                            {{ ucfirst($current) }}
-                                        @endif
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="statusDropdown">
-                                        <li><a class="dropdown-item {{ $current=='' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status' => null]) }}">All Appointments</a></li>
-                                        <li><a class="dropdown-item {{ $current=='pending' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status' => 'pending']) }}">Pending</a></li>
-                                        <li><a class="dropdown-item {{ $current=='approved' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status' => 'approved']) }}">Confirmed</a></li>
-                                        <li><a class="dropdown-item {{ $current=='completed' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status' => 'completed']) }}">Completed</a></li>
-                                        <li><a class="dropdown-item {{ $current=='cancelled' ? 'active' : '' }}" href="{{ request()->fullUrlWithQuery(['status' => 'cancelled']) }}">Cancelled</a></li>
-                                    </ul>
-                                </div>
                             </div>
                         </div>
 
                         <!-- Filters -->
-                        <form method="GET" class="filter-card">
+                        <div class="filter-card mb-3">
                             <div class="row g-3 align-items-end">
                                 <div class="col-md-3">
-                                    <label class="form-label">Date range</label>
-                                    <div class="input-group">
-                                        <input type="date" name="from" value="{{ request('from') }}" class="form-control">
-                                        <span class="input-group-text">to</span>
-                                        <input type="date" name="to" value="{{ request('to') }}" class="form-control">
-                                    </div>
-                            </div>
-                                <div class="col-md-2">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select" id="appointmentStatusFilter">
+                                        <option value="">All</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="approved">Confirmed</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="cancelled">Cancelled</option>
+                                        <option value="rescheduled">Rescheduled</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
                                     <label class="form-label">Service</label>
-                                    <select name="service" class="form-select">
+                                    <select class="form-select" id="appointmentServiceFilter">
                                         <option value="">All</option>
                                         @foreach(($services ?? []) as $service)
-                                            <option value="{{ $service }}" @selected(request('service')==$service)>{{ $service }}</option>
+                                            <option value="{{ strtolower($service) }}">{{ $service }}</option>
                                         @endforeach
-                                </select>
-                            </div>
-                                
-                                <div class="col-md-3">
-                                    <label class="form-label">Patient</label>
-                                    <input type="text" name="q" value="{{ request('q') }}" class="form-control" placeholder="Name, phone, or email">
+                                    </select>
                                 </div>
-                                <div class="col-md-2 d-flex gap-2">
-                                    <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search me-2"></i>Search</button>
-                                    <a href="{{ route('admin.appointments') }}" class="btn btn-outline-secondary">Reset</a>
+                                <div class="col-md-4">
+                                    <label class="form-label">Search</label>
+                                    <input type="text" id="appointmentSearch" class="form-control" placeholder="Search by patient, email, or phone">
+                                </div>
+                                <div class="col-md-2 d-flex align-items-center">
+                                    <button type="button" class="btn btn-outline-secondary w-100" id="appointmentFiltersReset">
+                                        <i class="fas fa-undo me-1"></i> Clear
+                                    </button>
                                 </div>
                             </div>
-                            <div class="mt-2 small text-muted">Showing {{ $appointments->total() ?? count($appointments) }} results</div>
-                        </form>
+                            <div class="mt-2 small text-muted" id="appointmentsFilterSummary">
+                                Showing {{ $appointments->count() }} appointments
+                            </div>
+                        </div>
 
                         <!-- Appointments Table -->
                         <div class="table-card p-0">
                                 <div class="table-responsive">
-                                <table class="table table-hover mb-0 align-middle">
+                                @php
+                                    $currentSort = request('sort');
+                                    $currentDirection = strtolower(request('direction', 'desc')) === 'asc' ? 'asc' : 'desc';
+                                    $nextDirection = $currentSort === 'date' && $currentDirection === 'asc' ? 'desc' : 'asc';
+                                @endphp
+                                <table class="table table-modern table-hover mb-0 align-middle">
                                     <thead class="table-light position-sticky top-0" style="z-index:1;">
                                             <tr>
                                             <th style="width:30px"><input type="checkbox" id="selectAll"></th>
-                                            <th><a href="{{ request()->fullUrlWithQuery(['sort' => 'date']) }}" class="text-decoration-none">Date</a></th>
+                                            <th>
+                                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'date', 'direction' => $nextDirection]) }}" class="text-decoration-none d-inline-flex align-items-center gap-1">
+                                                    Date
+                                                    @if($currentSort === 'date')
+                                                        <i class="fas fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} fa-sm ms-1"></i>
+                                                    @else
+                                                        <i class="fas fa-sort fa-sm ms-1 text-muted"></i>
+                                                    @endif
+                                                </a>
+                                            </th>
                                                 <th>Patient</th>
                                                 <th>Service</th>
                                             
@@ -154,9 +175,15 @@
                                             <th class="actions-col">Actions</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody id="appointmentsTableBody">
                                         @forelse($appointments as $appointment)
-                                        <tr>
+                                        <tr
+                                            data-status="{{ strtolower($appointment->status) }}"
+                                            data-service="{{ strtolower($appointment->service_type) }}"
+                                            data-patient="{{ strtolower($appointment->patient_name) }}"
+                                            data-email="{{ strtolower($appointment->user->email ?? '') }}"
+                                            data-phone="{{ strtolower($appointment->patient_phone ?? '') }}"
+                                        >
                                             <td><input type="checkbox" class="row-check" value="{{ $appointment->id }}" data-appointment-id="{{ $appointment->id }}"></td>
                                             <td>
                                                 <div class="fw-bold">{{ $appointment->appointment_date->format('M d, Y') }} {{ $appointment->appointment_time }}</div>
@@ -288,7 +315,7 @@
 
                         <!-- Pagination -->
                         <div class="d-flex justify-content-center mt-3">
-                            {{ $appointments->links() }}
+                            {{ $appointments->links('pagination::bootstrap-5') }}
                         </div>
 
     <!-- Add Appointment Modal -->
@@ -369,6 +396,90 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const statusFilter = document.getElementById('appointmentStatusFilter');
+        const serviceFilter = document.getElementById('appointmentServiceFilter');
+        const searchInput = document.getElementById('appointmentSearch');
+        const resetButton = document.getElementById('appointmentFiltersReset');
+        const tableBody = document.getElementById('appointmentsTableBody');
+        const summary = document.getElementById('appointmentsFilterSummary');
+        const tableRows = tableBody ? Array.from(tableBody.querySelectorAll('tr[data-status]')) : [];
+
+        const normalize = (value) => (value ?? '').toString().trim().toLowerCase();
+
+        const applyAppointmentFilters = () => {
+            const statusValue = normalize(statusFilter ? statusFilter.value : '');
+            const serviceValue = normalize(serviceFilter ? serviceFilter.value : '');
+            const searchValue = normalize(searchInput ? searchInput.value : '');
+
+            let visibleCount = 0;
+
+            tableRows.forEach((row) => {
+                const rowStatus = normalize(row.dataset.status);
+                const rowService = normalize(row.dataset.service);
+                const rowSearchTargets = normalize(
+                    [row.dataset.patient, row.dataset.email, row.dataset.phone, row.dataset.service]
+                        .filter(Boolean)
+                        .join(' ')
+                );
+
+                let showRow = true;
+
+                if (statusValue && rowStatus !== statusValue) {
+                    showRow = false;
+                }
+
+                if (serviceValue && rowService !== serviceValue) {
+                    showRow = false;
+                }
+
+                if (searchValue && !rowSearchTargets.includes(searchValue)) {
+                    showRow = false;
+                }
+
+                row.style.display = showRow ? '' : 'none';
+                if (showRow) {
+                    visibleCount++;
+                }
+            });
+
+            if (summary) {
+                summary.textContent = `Showing ${visibleCount} of ${tableRows.length} appointments`;
+            }
+        };
+
+        const debounce = (fn, delay = 300) => {
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn(...args), delay);
+            };
+        };
+
+        const debouncedApplyFilters = debounce(applyAppointmentFilters, 250);
+
+        if (statusFilter) {
+            statusFilter.addEventListener('change', applyAppointmentFilters);
+        }
+
+        if (serviceFilter) {
+            serviceFilter.addEventListener('change', applyAppointmentFilters);
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', debouncedApplyFilters);
+        }
+
+        if (resetButton) {
+            resetButton.addEventListener('click', () => {
+                if (statusFilter) statusFilter.value = '';
+                if (serviceFilter) serviceFilter.value = '';
+                if (searchInput) searchInput.value = '';
+                applyAppointmentFilters();
+            });
+        }
+
+        applyAppointmentFilters();
+
         const selectAllCheckbox = document.getElementById('selectAll');
         const rowCheckboxes = document.querySelectorAll('.row-check');
         const bulkActions = document.getElementById('bulkActions');

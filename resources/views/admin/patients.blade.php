@@ -121,8 +121,8 @@
                                         </select>
                                     </div>
                                     <div class="col-md-2">
-                                        <label class="form-label">Barangay</label>
-                                        <input type="text" class="form-control" id="barangayFilter" placeholder="e.g. Poblacion">
+                                        <label class="form-label">Patient Name</label>
+                                        <input type="text" class="form-control" id="barangayFilter" placeholder="Enter Patient's Name">
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label">Appointments</label>

@@ -265,7 +265,7 @@
             <div class="admin-sidebar">
                 <div class="sidebar-header">
                     <div class="d-flex align-items-center">
-                        <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="MALASAKIT Logo" style="width: 40px; height: 40px; margin-right: 0.5rem;">
+                        <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="MALASAKIT Logo" style="width: 90px; height: 90px; margin-right: 0.5rem;">
                         <div><h4>MALASAKIT</h4></div>
                     </div>
                 </div>

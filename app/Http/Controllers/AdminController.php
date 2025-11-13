@@ -156,22 +156,49 @@ class AdminController extends Controller
 
     public function appointments(Request $request)
     {
-        $query = Appointment::with(['user', 'approvedBy'])->latest();
-        if ($request->filled('search')) {
-            $q = $request->search;
-            $query->where(function($sub) use ($q) {
-                $sub->where('patient_name', 'like', "%$q%")
-                    ->orWhere('patient_phone', 'like', "%$q%")
-                    ->orWhere('service_type', 'like', "%$q%")
-                    ->orWhereHas('user', function($u) use ($q) {
-                        $u->where('name', 'like', "%$q%")
-                            ->orWhere('email', 'like', "%$q%") ;
+        $query = Appointment::with(['user', 'approvedBy']);
+
+        $sort = $request->get('sort');
+        $direction = strtolower($request->get('direction', 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        if ($sort === 'date') {
+            $query->orderBy('appointment_date', $direction)
+                ->orderBy('appointment_time', $direction);
+        } else {
+            $query->orderByDesc('appointment_date')
+                ->orderByDesc('appointment_time');
+        }
+
+        $searchInput = $request->input('search', $request->input('q'));
+        if (filled($searchInput)) {
+            $search = trim($searchInput);
+            $query->where(function ($sub) use ($search) {
+                $sub->where('patient_name', 'like', "%{$search}%")
+                    ->orWhere('patient_phone', 'like', "%{$search}%")
+                    ->orWhere('service_type', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($u) use ($search) {
+                        $u->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
                     });
             });
         }
+
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
+
+        if ($request->filled('service')) {
+            $query->where('service_type', $request->service);
+        }
+
+        if ($request->filled('from')) {
+            $query->whereDate('appointment_date', '>=', $request->from);
+        }
+
+        if ($request->filled('to')) {
+            $query->whereDate('appointment_date', '<=', $request->to);
+        }
+
         $appointments = $query->paginate(10)->withQueryString();
 
         // Populate services for filters and booking drawer
@@ -307,6 +334,7 @@ class AdminController extends Controller
         if ($request->filled('category')) {
             $query->where('category', $request->category);
         }
+
         if ($request->filled('search')) {
             $q = trim($request->search);
             $query->where(function ($sub) use ($q) {
@@ -314,13 +342,13 @@ class AdminController extends Controller
                     ->orWhere('category', 'like', "%{$q}%")
                     ->orWhere('location', 'like', "%{$q}%")
                     ->orWhere('unit', 'like', "%{$q}%");
+
+                if (is_numeric($q)) {
+                    $sub->orWhere('id', (int) $q);
+                }
             });
-            // Allow exact ID search when numeric
-            if (is_numeric($q)) {
-                $query->orWhere('id', (int) $q);
-            }
         }
-        $inventory = $query->paginate(15)->withQueryString();
+        $inventory = $query->paginate(10)->withQueryString();
 
         // Stats for header cards and alerts
         $totalItems = Inventory::count();
@@ -422,9 +450,13 @@ class AdminController extends Controller
         $request->validate([
             'quantity' => 'required|integer|min:1',
             'notes' => 'nullable|string|max:1000',
+            'expiry_date' => 'nullable|date|after:today',
         ]);
 
         $inventory->current_stock += (int) $request->quantity;
+        if ($request->filled('expiry_date')) {
+            $inventory->expiry_date = $request->expiry_date;
+        }
         $inventory->save();
         $inventory->updateStatus();
 

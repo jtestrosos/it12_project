@@ -74,7 +74,7 @@
         <table class="table table-hover">
             <thead class="table-light">
                 <tr>
-                    <th>ID</th>
+                    <th>User ID</th>
                     <th>User</th>
                     <th>Action</th>
                     <th>Table</th>
@@ -87,8 +87,24 @@
             </thead>
             <tbody>
                 @foreach($logs as $log)
+                @php
+                    $formattedUserId = 'N/A';
+                    if ($log->user) {
+                        $role = $log->user->role;
+                        $userId = $log->user->id;
+                        if ($role === 'user') {
+                            $formattedUserId = 'PA' . str_pad($userId, 3, '0', STR_PAD_LEFT);
+                        } elseif ($role === 'admin') {
+                            $formattedUserId = 'BHW' . str_pad($userId, 3, '0', STR_PAD_LEFT);
+                        } elseif ($role === 'superadmin') {
+                            $formattedUserId = 'DEV' . str_pad($userId, 3, '0', STR_PAD_LEFT);
+                        } else {
+                            $formattedUserId = 'USR' . str_pad($userId, 3, '0', STR_PAD_LEFT);
+                        }
+                    }
+                @endphp
                 <tr>
-                    <td>{{ $log->id }}</td>
+                    <td>{{ $formattedUserId }}</td>
                     <td>
                         <div class="d-flex align-items-center">
                             <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.8rem;">

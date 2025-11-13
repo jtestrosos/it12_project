@@ -66,6 +66,28 @@
         body.bg-dark .form-control,
         body.bg-dark .form-select { background-color: #0f1316; color: #e6e6e6; border-color: #2a2f35; }
         body.bg-dark .modal-content .form-control::placeholder { color: #9aa4ad; }
+        .table-modern {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .table-modern thead th {
+            background-color: #f8f9fa;
+            border: none;
+            font-weight: 600;
+            color: #495057;
+            padding: 0.85rem 1rem;
+        }
+        .table-modern tbody td {
+            border: none;
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .table-modern tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        body.bg-dark .table-modern thead th { background-color: #1a1f24; color: #e6e6e6; }
+        body.bg-dark .table-modern tbody td { border-bottom-color: #2a2f35; color: #d6d6d6; }
+        body.bg-dark .table-modern tbody tr:hover { background-color: #2a2f35; }
     </style>
 @endsection
 
@@ -136,29 +158,35 @@
                             </div>
                         </div>
 
-                        <form method="GET" class="d-flex align-items-end mb-3 gap-2">
-                            <div class="flex-grow-1">
-                                <label class="form-label mb-1">Search</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
-                                    <input type="search" name="search" value="{{ request('search') }}" class="form-control" placeholder="Search by item name, ID, category, or location...">
+                        <div class="filter-card mb-3">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-8">
+                                    <label class="form-label mb-1">Search</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+                                        <input type="text" id="inventorySearch" class="form-control" placeholder="Search by name, location, or ID">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label mb-1">Category</label>
+                                    <select class="form-select" id="inventoryCategoryFilter">
+                                        <option value="">All</option>
+                                        @foreach(($categories ?? []) as $cat)
+                                            <option value="{{ strtolower($cat) }}">{{ $cat }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
-                            <div style="min-width:220px;">
-                                <label class="form-label mb-1">Category</label>
-                                <select class="form-select" name="category" onchange="this.form.submit()">
-                                    <option value="" @selected(!request('category'))>All Categories</option>
-                                    @foreach(($categories ?? []) as $cat)
-                                        <option value="{{ $cat }}" @selected(request('category')==$cat)>{{ $cat }}</option>
-                                    @endforeach
-                                </select>
+                            <div class="mt-2 small text-muted" id="inventoryFilterSummary">
+                                Showing {{ $inventory->count() }} items
                             </div>
-                        </form>
+                        </div>
 
                         @if($inventory->count() > 0)
 
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle bg-white rounded shadow-sm">
+                            <div class="table-card p-0">
+                                <div class="table-responsive">
+                                <table class="table table-modern table-hover mb-0 align-middle">
                                     <thead class="table-light">
                                         <tr>
                                             <th scope="col"></th>
@@ -172,9 +200,15 @@
                                             <th scope="col">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="inventoryTableBody">
                                     @foreach($inventory as $item)
-                                        <tr>
+                                        <tr
+                                            data-name="{{ strtolower($item->item_name ?? '') }}"
+                                            data-category="{{ strtolower($item->category ?? '') }}"
+                                            data-status="{{ strtolower($item->status ?? '') }}"
+                                            data-location="{{ strtolower($item->location ?? '') }}"
+                                            data-id="{{ $item->id }}"
+                                        >
                                             <td>
                                                 <span class="stock-indicator @if($item->current_stock == 0) stock-out @elseif($item->current_stock <= $item->minimum_stock) stock-low @else stock-good @endif"></span>
                                             </td>
@@ -195,9 +229,6 @@
                                                 <span class="badge bg-{{ $badge }}">{{ str_replace('_',' ', ucfirst($item->status)) }}</span>
                                             </td>
                                             <td class="d-flex gap-2">
-                                                <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewDetailModal{{ $item->id }}">
-                                                    <i class="fas fa-eye"></i> View
-                                                </button>
                                                 <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#restockModal{{ $item->id }}">
                                                     <i class="fas fa-plus me-1"></i> Restock
                                                 </button>
@@ -209,6 +240,19 @@
                                     @endforeach
                                     </tbody>
                                 </table>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 gap-2">
+                                <div class="small text-muted mb-0">
+                                    @if($inventory->total() > 0)
+                                        Showing {{ $inventory->firstItem() }}-{{ $inventory->lastItem() }} of {{ $inventory->total() }} items
+                                    @else
+                                        Showing 0 items
+                                    @endif
+                                </div>
+                                <div>
+                                    {{ $inventory->links('pagination::bootstrap-5') }}
+                                </div>
                             </div>
 
                             <!-- Per-item View Modals -->
@@ -271,6 +315,11 @@
                                                 <div class="mb-3">
                                                     <label class="form-label">Quantity</label>
                                                     <input type="number" class="form-control" name="quantity" min="1" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">New Expiry Date</label>
+                                                    <input type="date" class="form-control" name="expiry_date">
+                                                    <small class="text-muted">Leave blank to keep the current expiry date.</small>
                                                 </div>
                                                 <div class="mb-3">
                                                     <label class="form-label">Notes</label>
@@ -417,6 +466,75 @@
 
 @push('scripts')
 <script>
-    // (page-specific scripts if needed)
+    document.addEventListener('DOMContentLoaded', function () {
+        const categoryFilter = document.getElementById('inventoryCategoryFilter');
+        const searchInput = document.getElementById('inventorySearch');
+        const tableBody = document.getElementById('inventoryTableBody');
+        const summary = document.getElementById('inventoryFilterSummary');
+
+        const rows = tableBody ? Array.from(tableBody.querySelectorAll('tr[data-name]')) : [];
+
+        const normalize = (value) => (value ?? '').toString().trim().toLowerCase();
+
+        const applyFilters = () => {
+            const categoryValue = normalize(categoryFilter ? categoryFilter.value : '');
+            const searchValue = normalize(searchInput ? searchInput.value : '');
+
+            let visibleCount = 0;
+
+            rows.forEach((row) => {
+                const rowCategory = normalize(row.dataset.category);
+                const searchTargets = normalize(
+                    [
+                        row.dataset.name,
+                        row.dataset.location,
+                        row.dataset.category,
+                        row.dataset.id
+                    ]
+                        .filter(Boolean)
+                        .join(' ')
+                );
+
+                let showRow = true;
+
+                if (categoryValue && rowCategory !== categoryValue) {
+                    showRow = false;
+                }
+
+                if (searchValue && !searchTargets.includes(searchValue)) {
+                    showRow = false;
+                }
+
+                row.style.display = showRow ? '' : 'none';
+                if (showRow) {
+                    visibleCount++;
+                }
+            });
+
+            if (summary) {
+                summary.textContent = `Showing ${visibleCount} of ${rows.length} items`;
+            }
+        };
+
+        const debounce = (fn, delay = 300) => {
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn(...args), delay);
+            };
+        };
+
+        const debouncedApplyFilters = debounce(applyFilters, 250);
+
+        if (categoryFilter) {
+            categoryFilter.addEventListener('change', applyFilters);
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', debouncedApplyFilters);
+        }
+
+        applyFilters();
+    });
 </script>
 @endpush
