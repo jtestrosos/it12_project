@@ -210,8 +210,18 @@
                     <h5 class="modal-title">Add New User</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form method="POST" action="{{ route('superadmin.user.create') }}">
+                <form method="POST" action="{{ route('superadmin.user.create') }}" class="superadmin-user-form">
                     @csrf
+                    @php
+                        $createRole = old('role');
+                        $createBarangay = old('barangay');
+                        $createPurokOptions = match ($createBarangay) {
+                            'Barangay 11' => ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
+                            'Barangay 12' => ['Purok 1', 'Purok 2', 'Purok 3'],
+                            default => [],
+                        };
+                        $createBirthDate = old('birth_date');
+                    @endphp
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="name" class="form-label">Full Name *</label>
@@ -219,7 +229,6 @@
                             @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="text-muted">Name should not contain numbers</small>
                         </div>
                         <div class="mb-3">
                             <label for="gender" class="form-label">Gender *</label>
@@ -241,12 +250,23 @@
                             @enderror
                         </div>
                         <div class="mb-3">
+                            <label for="role" class="form-label">Role *</label>
+                            <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" data-role="user-role" required>
+                                <option value="">Select Role</option>
+                                <option value="user" {{ $createRole == 'user' ? 'selected' : '' }}>Patient</option>
+                                <option value="admin" {{ $createRole == 'admin' ? 'selected' : '' }}>Admin</option>
+                                <option value="superadmin" {{ $createRole == 'superadmin' ? 'selected' : '' }}>Super Admin</option>
+                            </select>
+                            @error('role')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
                             <label for="password" class="form-label">Password *</label>
                             <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required>
                             @error('password')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="text-muted">Must contain lowercase, uppercase, and special character</small>
                         </div>
                         <div class="mb-3">
                             <label for="password_confirmation" class="form-label">Confirm Password *</label>
@@ -255,17 +275,59 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="mb-3">
-                            <label for="role" class="form-label">Role *</label>
-                            <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
-                                <option value="">Select Role</option>
-                                <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>Patient</option>
-                                <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                                <option value="superadmin" {{ old('role') == 'superadmin' ? 'selected' : '' }}>Super Admin</option>
-                            </select>
-                            @error('role')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div class="{{ $createRole === 'user' ? '' : 'd-none' }}" data-role="patient-fields">
+                            <div class="mb-3">
+                                <label for="patient_phone_create" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control @error('phone') is-invalid @enderror" id="patient_phone_create" name="phone" value="{{ old('phone') }}" data-role="patient-phone">
+                                @error('phone')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="patient_address_create" class="form-label">Address <small class="text-muted">(Optional)</small></label>
+                                <textarea class="form-control @error('address') is-invalid @enderror" id="patient_address_create" name="address" rows="2" placeholder="Enter complete address (optional)">{{ old('address') }}</textarea>
+                                @error('address')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="patient_barangay_create" class="form-label">Barangay <span class="text-danger">*</span></label>
+                                <select class="form-select @error('barangay') is-invalid @enderror" id="patient_barangay_create" name="barangay" data-role="barangay">
+                                    <option value="">Select Barangay</option>
+                                    <option value="Barangay 11" {{ $createBarangay === 'Barangay 11' ? 'selected' : '' }}>Barangay 11</option>
+                                    <option value="Barangay 12" {{ $createBarangay === 'Barangay 12' ? 'selected' : '' }}>Barangay 12</option>
+                                    <option value="Other" {{ $createBarangay === 'Other' ? 'selected' : '' }}>Other</option>
+                                </select>
+                                @error('barangay')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3 {{ $createBarangay === 'Other' ? '' : 'd-none' }}" data-role="barangay-other-group">
+                                <label for="patient_barangay_other_create" class="form-label">Specify Barangay <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control @error('barangay_other') is-invalid @enderror" id="patient_barangay_other_create" name="barangay_other" value="{{ old('barangay_other') }}" data-role="barangay-other">
+                                @error('barangay_other')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3 {{ in_array($createBarangay, ['Barangay 11', 'Barangay 12']) ? '' : 'd-none' }}" data-role="purok-group">
+                                <label for="patient_purok_create" class="form-label">Purok <span class="text-danger">*</span></label>
+                                <select class="form-select @error('purok') is-invalid @enderror" id="patient_purok_create" name="purok" data-role="purok" data-selected="{{ old('purok') }}">
+                                    <option value="">Select Purok</option>
+                                    @foreach ($createPurokOptions as $purok)
+                                        <option value="{{ $purok }}" {{ old('purok') === $purok ? 'selected' : '' }}>{{ $purok }}</option>
+                                    @endforeach
+                                </select>
+                                @error('purok')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="patient_birth_date_create" class="form-label">Birth Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control @error('birth_date') is-invalid @enderror" id="patient_birth_date_create" name="birth_date" value="{{ $createBirthDate }}" data-role="birth-date" max="{{ now()->toDateString() }}">
+                                @error('birth_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -286,8 +348,21 @@
                     <h5 class="modal-title">Edit User - {{ $user->name }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form method="POST" action="{{ route('superadmin.user.update', $user) }}">
+                <form method="POST" action="{{ route('superadmin.user.update', $user) }}" class="superadmin-user-form">
                     @csrf
+                    @php
+                        $editRole = old('role', $user->role);
+                        $editBarangay = old('barangay', $user->barangay);
+                        $editPurokOptions = match ($editBarangay) {
+                            'Barangay 11' => ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
+                            'Barangay 12' => ['Purok 1', 'Purok 2', 'Purok 3'],
+                            default => [],
+                        };
+                        $editBirthDateRaw = old(
+                            'birth_date',
+                            $user->birth_date ? \Illuminate\Support\Carbon::parse($user->birth_date)->format('Y-m-d') : ''
+                        );
+                    @endphp
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="name{{ $user->id }}" class="form-label">Full Name *</label>
@@ -295,7 +370,6 @@
                             @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="text-muted">Name should not contain numbers</small>
                         </div>
                         <div class="mb-3">
                             <label for="gender{{ $user->id }}" class="form-label">Gender *</label>
@@ -317,12 +391,22 @@
                             @enderror
                         </div>
                         <div class="mb-3">
+                            <label for="role{{ $user->id }}" class="form-label">Role *</label>
+                            <select class="form-select @error('role') is-invalid @enderror" id="role{{ $user->id }}" name="role" data-role="user-role" required>
+                                <option value="user" {{ $editRole == 'user' ? 'selected' : '' }}>Patient</option>
+                                <option value="admin" {{ $editRole == 'admin' ? 'selected' : '' }}>Admin</option>
+                                <option value="superadmin" {{ $editRole == 'superadmin' ? 'selected' : '' }}>Super Admin</option>
+                            </select>
+                            @error('role')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
                             <label for="password{{ $user->id }}" class="form-label">Password (leave blank to keep current)</label>
                             <input type="password" class="form-control @error('password') is-invalid @enderror" id="password{{ $user->id }}" name="password">
                             @error('password')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <small class="text-muted">Must contain lowercase, uppercase, and special character (leave blank to keep current)</small>
                         </div>
                         <div class="mb-3">
                             <label for="password_confirmation{{ $user->id }}" class="form-label">Confirm Password</label>
@@ -331,16 +415,59 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="mb-3">
-                            <label for="role{{ $user->id }}" class="form-label">Role *</label>
-                            <select class="form-select @error('role') is-invalid @enderror" id="role{{ $user->id }}" name="role" required>
-                                <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>Patient</option>
-                                <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
-                                <option value="superadmin" {{ old('role', $user->role) == 'superadmin' ? 'selected' : '' }}>Super Admin</option>
-                            </select>
-                            @error('role')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div class="{{ $editRole === 'user' ? '' : 'd-none' }}" data-role="patient-fields">
+                            <div class="mb-3">
+                                <label for="patient_phone_edit{{ $user->id }}" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control @error('phone') is-invalid @enderror" id="patient_phone_edit{{ $user->id }}" name="phone" value="{{ old('phone', $user->phone ?? '') }}" data-role="patient-phone">
+                                @error('phone')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="patient_address_edit{{ $user->id }}" class="form-label">Address <small class="text-muted">(Optional)</small></label>
+                                <textarea class="form-control @error('address') is-invalid @enderror" id="patient_address_edit{{ $user->id }}" name="address" rows="2" placeholder="Enter complete address (optional)">{{ old('address', $user->address ?? '') }}</textarea>
+                                @error('address')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="patient_barangay_edit{{ $user->id }}" class="form-label">Barangay <span class="text-danger">*</span></label>
+                                <select class="form-select @error('barangay') is-invalid @enderror" id="patient_barangay_edit{{ $user->id }}" name="barangay" data-role="barangay">
+                                    <option value="">Select Barangay</option>
+                                    <option value="Barangay 11" {{ $editBarangay === 'Barangay 11' ? 'selected' : '' }}>Barangay 11</option>
+                                    <option value="Barangay 12" {{ $editBarangay === 'Barangay 12' ? 'selected' : '' }}>Barangay 12</option>
+                                    <option value="Other" {{ $editBarangay === 'Other' ? 'selected' : '' }}>Other</option>
+                                </select>
+                                @error('barangay')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3 {{ $editBarangay === 'Other' ? '' : 'd-none' }}" data-role="barangay-other-group">
+                                <label for="patient_barangay_other_edit{{ $user->id }}" class="form-label">Specify Barangay <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control @error('barangay_other') is-invalid @enderror" id="patient_barangay_other_edit{{ $user->id }}" name="barangay_other" value="{{ old('barangay_other', $user->barangay_other ?? '') }}" data-role="barangay-other">
+                                @error('barangay_other')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3 {{ in_array($editBarangay, ['Barangay 11', 'Barangay 12']) ? '' : 'd-none' }}" data-role="purok-group">
+                                <label for="patient_purok_edit{{ $user->id }}" class="form-label">Purok <span class="text-danger">*</span></label>
+                                <select class="form-select @error('purok') is-invalid @enderror" id="patient_purok_edit{{ $user->id }}" name="purok" data-role="purok" data-selected="{{ old('purok', $user->purok ?? '') }}">
+                                    <option value="">Select Purok</option>
+                                    @foreach ($editPurokOptions as $purok)
+                                        <option value="{{ $purok }}" {{ old('purok', $user->purok ?? '') === $purok ? 'selected' : '' }}>{{ $purok }}</option>
+                                    @endforeach
+                                </select>
+                                @error('purok')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="mb-3">
+                                <label for="patient_birth_date_edit{{ $user->id }}" class="form-label">Birth Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control @error('birth_date') is-invalid @enderror" id="patient_birth_date_edit{{ $user->id }}" name="birth_date" value="{{ $editBirthDateRaw }}" data-role="birth-date" max="{{ now()->toDateString() }}">
+                                @error('birth_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -381,5 +508,153 @@
                 });
             }
         })();
+
+        const barangayPurokMap = {
+            'Barangay 11': ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
+            'Barangay 12': ['Purok 1', 'Purok 2', 'Purok 3'],
+        };
+
+        function initSuperadminUserForms() {
+            const forms = document.querySelectorAll('.superadmin-user-form');
+
+            forms.forEach((form) => {
+                const roleSelect = form.querySelector('[data-role="user-role"]');
+                const patientFields = form.querySelector('[data-role="patient-fields"]');
+                const phoneInput = form.querySelector('[data-role="patient-phone"]');
+                const barangaySelect = form.querySelector('[data-role="barangay"]');
+                const barangayOtherGroup = form.querySelector('[data-role="barangay-other-group"]');
+                const barangayOtherInput = form.querySelector('[data-role="barangay-other"]');
+                const purokGroup = form.querySelector('[data-role="purok-group"]');
+                const purokSelect = form.querySelector('[data-role="purok"]');
+                const birthDateInput = form.querySelector('[data-role="birth-date"]');
+
+                const togglePatientFields = () => {
+                    const isPatient = roleSelect && roleSelect.value === 'user';
+                    if (patientFields) {
+                        patientFields.classList.toggle('d-none', !isPatient);
+                    }
+                    if (phoneInput) {
+                        if (isPatient) {
+                            phoneInput.setAttribute('required', 'required');
+                        } else {
+                            phoneInput.removeAttribute('required');
+                            phoneInput.value = '';
+                        }
+                    }
+                    if (barangaySelect) {
+                        if (isPatient) {
+                            barangaySelect.setAttribute('required', 'required');
+                        } else {
+                            barangaySelect.removeAttribute('required');
+                            barangaySelect.value = '';
+                        }
+                    }
+                    if (birthDateInput) {
+                        if (isPatient) {
+                            birthDateInput.setAttribute('required', 'required');
+                        } else {
+                            birthDateInput.removeAttribute('required');
+                            birthDateInput.value = '';
+                        }
+                    }
+                    if (!isPatient) {
+                        if (barangayOtherInput) {
+                            barangayOtherInput.value = '';
+                            barangayOtherInput.removeAttribute('required');
+                        }
+                        if (purokSelect) {
+                            purokSelect.value = '';
+                            purokSelect.removeAttribute('required');
+                        }
+                        if (barangayOtherGroup) {
+                            barangayOtherGroup.classList.add('d-none');
+                        }
+                        if (purokGroup) {
+                            purokGroup.classList.add('d-none');
+                        }
+                    } else {
+                        handleBarangayChange();
+                    }
+                };
+
+                const updatePurokOptions = (barangay) => {
+                    if (!purokSelect) {
+                        return;
+                    }
+                    const previouslySelected = purokSelect.getAttribute('data-selected');
+                    purokSelect.innerHTML = '<option value="">Select Purok</option>';
+
+                    if (!barangayPurokMap[barangay]) {
+                        purokSelect.removeAttribute('required');
+                        purokSelect.setAttribute('data-selected', '');
+                        return;
+                    }
+
+                    barangayPurokMap[barangay].forEach((purok) => {
+                        const option = document.createElement('option');
+                        option.value = purok;
+                        option.textContent = purok;
+                        if (previouslySelected === purok) {
+                            option.selected = true;
+                        }
+                        purokSelect.appendChild(option);
+                    });
+                    purokSelect.setAttribute('required', 'required');
+                };
+
+                const handleBarangayChange = () => {
+                    if (!barangaySelect) {
+                        return;
+                    }
+                    const selectedBarangay = barangaySelect.value;
+                    if (barangayOtherGroup && barangayOtherInput) {
+                        if (selectedBarangay === 'Other') {
+                            barangayOtherGroup.classList.remove('d-none');
+                            barangayOtherInput.setAttribute('required', 'required');
+                        } else {
+                            barangayOtherGroup.classList.add('d-none');
+                            barangayOtherInput.removeAttribute('required');
+                            barangayOtherInput.value = '';
+                        }
+                    }
+
+                    if (purokGroup && purokSelect) {
+                        if (barangayPurokMap[selectedBarangay]) {
+                            purokGroup.classList.remove('d-none');
+                            updatePurokOptions(selectedBarangay);
+                        } else {
+                            purokGroup.classList.add('d-none');
+                            purokSelect.removeAttribute('required');
+                            purokSelect.value = '';
+                            purokSelect.setAttribute('data-selected', '');
+                        }
+                    }
+                };
+
+                if (roleSelect) {
+                    roleSelect.addEventListener('change', togglePatientFields);
+                    togglePatientFields();
+                }
+
+                if (barangaySelect) {
+                    barangaySelect.addEventListener('change', () => {
+                        if (purokSelect) {
+                            purokSelect.setAttribute('data-selected', '');
+                        }
+                        handleBarangayChange();
+                    });
+                    handleBarangayChange();
+                }
+
+                if (birthDateInput) {
+                    birthDateInput.addEventListener('change', () => {});
+                    birthDateInput.addEventListener('keyup', () => {});
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initSuperadminUserForms();
+        });
     </script>
 @endpush

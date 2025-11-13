@@ -568,12 +568,100 @@ function initSidebar() {
             }
         })();
 
+        const barangayPurokMap = {
+            'Barangay 11': ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
+            'Barangay 12': ['Purok 1', 'Purok 2', 'Purok 3'],
+        };
+
+        function initPatientRegistrationForms() {
+            const forms = document.querySelectorAll('.patient-registration-form');
+
+            forms.forEach((form) => {
+                const barangaySelect = form.querySelector('[data-role="barangay"]');
+                const barangayOtherGroup = form.querySelector('[data-role="barangay-other-group"]');
+                const barangayOtherInput = form.querySelector('[data-role="barangay-other"]');
+                const purokGroup = form.querySelector('[data-role="purok-group"]');
+                const purokSelect = form.querySelector('[data-role="purok"]');
+                const birthDateInput = form.querySelector('[data-role="birth-date"]');
+
+                const updatePurokOptions = (barangay) => {
+                    if (!purokSelect) {
+                        return;
+                    }
+
+                    const previouslySelected = purokSelect.getAttribute('data-selected');
+                    purokSelect.innerHTML = '<option value="">Select Purok</option>';
+
+                    if (!barangayPurokMap[barangay]) {
+                        purokSelect.removeAttribute('required');
+                        purokSelect.setAttribute('data-selected', '');
+                        return;
+                    }
+
+                    barangayPurokMap[barangay].forEach((purok) => {
+                        const option = document.createElement('option');
+                        option.value = purok;
+                        option.textContent = purok;
+                        if (previouslySelected === purok) {
+                            option.selected = true;
+                        }
+                        purokSelect.appendChild(option);
+                    });
+                    purokSelect.setAttribute('required', 'required');
+                };
+
+                const handleBarangayChange = () => {
+                    const selectedBarangay = barangaySelect ? barangaySelect.value : '';
+
+                    if (barangayOtherGroup && barangayOtherInput) {
+                        if (selectedBarangay === 'Other') {
+                            barangayOtherGroup.classList.remove('d-none');
+                            barangayOtherInput.setAttribute('required', 'required');
+                        } else {
+                            barangayOtherGroup.classList.add('d-none');
+                            barangayOtherInput.removeAttribute('required');
+                            barangayOtherInput.value = '';
+                        }
+                    }
+
+                    if (purokGroup && purokSelect) {
+                        if (barangayPurokMap[selectedBarangay]) {
+                            purokGroup.classList.remove('d-none');
+                            updatePurokOptions(selectedBarangay);
+                        } else {
+                            purokGroup.classList.add('d-none');
+                            purokSelect.removeAttribute('required');
+                            purokSelect.value = '';
+                            purokSelect.setAttribute('data-selected', '');
+                        }
+                    }
+                };
+
+                if (barangaySelect) {
+                    barangaySelect.addEventListener('change', () => {
+                        if (purokSelect) {
+                            purokSelect.setAttribute('data-selected', '');
+                        }
+                        handleBarangayChange();
+                    });
+                    handleBarangayChange();
+                }
+
+                if (birthDateInput) {
+                    birthDateInput.addEventListener('change', () => {});
+                    birthDateInput.addEventListener('keyup', () => {});
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             const feedbackModalEl = document.getElementById('feedbackModal');
             if (feedbackModalEl) {
                 const feedbackModal = new bootstrap.Modal(feedbackModalEl);
                 feedbackModal.show();
             }
+
+            initPatientRegistrationForms();
         });
     </script>
     <style>

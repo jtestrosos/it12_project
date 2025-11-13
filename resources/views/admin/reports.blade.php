@@ -59,7 +59,7 @@
 @section('content')
                     <div class="p-0 p-md-2">
                         <div class="d-flex flex-wrap justify-content-end align-items-end mb-3 gap-2">
-                            <form class="d-flex align-items-end gap-2" method="GET" action="{{ route('admin.reports.export.appointments') }}">
+                            <form class="d-flex align-items-end gap-2 flex-wrap" method="GET" action="{{ route('admin.reports.export.appointments') }}">
                                 <div>
                                     <label class="form-label mb-1">From</label>
                                     <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}" required>
@@ -68,9 +68,12 @@
                                     <label class="form-label mb-1">To</label>
                                     <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}" required>
                                 </div>
-                                <div class="mb-0">
+                                <div class="mb-0 d-flex gap-2">
                                     <button type="submit" class="btn btn-success">
                                         <i class="fas fa-file-excel me-2"></i> Export Excel
+                                    </button>
+                                    <button type="submit" class="btn btn-danger" formaction="{{ route('admin.reports.export.appointments.pdf') }}">
+                                        <i class="fas fa-file-pdf me-2"></i> Export PDF
                                     </button>
                                 </div>
                             </form>

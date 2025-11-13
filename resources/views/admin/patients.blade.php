@@ -121,9 +121,9 @@
                                         </select>
                                     </div>
                                     <div class="col-md-2">
-                                        <label class="form-label">Patient Name</label>
-                                        <input type="text" class="form-control" id="barangayFilter" placeholder="Enter Patient's Name">
-                                    </div>
+                                        <label class="form-label">Search</label>
+                                        <input type="text" class="form-control" id="barangayFilter" placeholder="Enter Patient's Name, Barangay or Purok">
+                                    </div>  
                                     <div class="col-md-2">
                                         <label class="form-label">Appointments</label>
                                         <select class="form-select" id="appointmentFilter">
@@ -163,7 +163,17 @@
                                                         </div>
                                                         <div>
                                                             <div class="fw-bold">{{ $patient->name }}</div>
-                                                            <small class="text-muted">{{ $patient->barangay ?? 'N/A' }}</small>
+                                                            @php
+                                                                $listBarangayLabel = $patient->barangay === 'Other'
+                                                                    ? ($patient->barangay_other ?? 'Other Barangay')
+                                                                    : ($patient->barangay ?? 'N/A');
+                                                            @endphp
+                                                            <small class="text-muted">
+                                                                {{ $listBarangayLabel }}
+                                                                @if($patient->purok)
+                                                                    · {{ $patient->purok }}
+                                                                @endif
+                                                            </small>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -228,8 +238,16 @@
                     <h5 class="modal-title">Add New Patient</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ route('admin.patient.create') }}" method="POST">
+                <form action="{{ route('admin.patient.create') }}" method="POST" class="patient-registration-form">
                     @csrf
+                    @php
+                        $oldBarangay = old('barangay');
+                        $purokOptions = match ($oldBarangay) {
+                            'Barangay 11' => ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
+                            'Barangay 12' => ['Purok 1', 'Purok 2', 'Purok 3'],
+                            default => [],
+                        };
+                    @endphp
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
@@ -239,7 +257,6 @@
                                     @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="text-muted">Name should not contain numbers</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -269,9 +286,48 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone Number <small class="text-muted">(Optional)</small></label>
+                                    <input type="tel" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') }}">
+                                    @error('phone')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
                                     <label for="barangay" class="form-label">Barangay <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('barangay') is-invalid @enderror" id="barangay" name="barangay" value="{{ old('barangay') }}" required>
+                                    <select class="form-control @error('barangay') is-invalid @enderror" id="barangay" name="barangay" data-role="barangay" required>
+                                        <option value="">Select Barangay</option>
+                                        <option value="Barangay 11" {{ $oldBarangay === 'Barangay 11' ? 'selected' : '' }}>Barangay 11</option>
+                                        <option value="Barangay 12" {{ $oldBarangay === 'Barangay 12' ? 'selected' : '' }}>Barangay 12</option>
+                                        <option value="Other" {{ $oldBarangay === 'Other' ? 'selected' : '' }}>Other</option>
+                                    </select>
                                     @error('barangay')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row align-items-end">
+                            <div class="col-md-6">
+                                <div class="mb-3 {{ $oldBarangay === 'Other' ? '' : 'd-none' }}" data-role="barangay-other-group">
+                                    <label for="barangay_other" class="form-label">Specify Barangay <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control @error('barangay_other') is-invalid @enderror" id="barangay_other" name="barangay_other" value="{{ old('barangay_other') }}" data-role="barangay-other">
+                                    @error('barangay_other')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 {{ in_array($oldBarangay, ['Barangay 11', 'Barangay 12']) ? '' : 'd-none' }}" data-role="purok-group">
+                                    <label for="purok" class="form-label">Purok <span class="text-danger">*</span></label>
+                                    <select class="form-control @error('purok') is-invalid @enderror" id="purok" name="purok" data-role="purok" data-selected="{{ old('purok') }}">
+                                        <option value="">Select Purok</option>
+                                        @foreach ($purokOptions as $purok)
+                                            <option value="{{ $purok }}" {{ old('purok') === $purok ? 'selected' : '' }}>{{ $purok }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('purok')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -280,13 +336,20 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="phone" class="form-label">Phone Number</label>
-                                    <input type="tel" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') }}">
-                                    @error('phone')
+                                    <label for="birth_date" class="form-label">Birth Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control @error('birth_date') is-invalid @enderror" id="birth_date" name="birth_date" value="{{ old('birth_date') }}" data-role="birth-date" max="{{ now()->toDateString() }}" required>
+                                    @error('birth_date')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address <small class="text-muted">(Optional)</small></label>
+                            <textarea class="form-control @error('address') is-invalid @enderror" id="address" name="address" rows="2" placeholder="Enter complete address (optional)">{{ old('address') }}</textarea>
+                            @error('address')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="row">
                             <div class="col-md-6">
@@ -296,7 +359,6 @@
                                     @error('password')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="text-muted">Must contain lowercase, uppercase, and special character</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -343,6 +405,36 @@
                             <div class="mb-3">
                                 <label class="form-label text-muted">Email</label>
                                 <p>{{ $patient->email }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Phone</label>
+                                <p>{{ $patient->phone ?? 'N/A' }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Barangay / Purok</label>
+                                <p>
+                                    @php
+                                        $barangayLabel = $patient->barangay === 'Other'
+                                            ? ($patient->barangay_other ?? 'Other Barangay')
+                                            : ($patient->barangay ?? 'N/A');
+                                    @endphp
+                                    {{ $barangayLabel }}
+                                    @if($patient->purok)
+                                        <span class="text-muted">· {{ $patient->purok }}</span>
+                                    @endif
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Birth Date</label>
+                                <p>{{ $patient->birth_date ? \Illuminate\Support\Carbon::parse($patient->birth_date)->format('F d, Y') : 'N/A' }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Age</label>
+                                <p>{{ $patient->age ?? 'N/A' }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Address</label>
+                                <p>{{ $patient->address ?? 'N/A' }}</p>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label text-muted">Registration Date</label>
@@ -405,9 +497,19 @@
                     <h5 class="modal-title">Edit Patient - {{ $patient->name }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ route('admin.patient.update', $patient->id) }}" method="POST">
+                <form action="{{ route('admin.patient.update', $patient->id) }}" method="POST" class="patient-registration-form">
                     @csrf
                     @method('PUT')
+                    @php
+                        $editBarangay = old('barangay', $patient->barangay);
+                        $editPurokOptions = match ($editBarangay) {
+                            'Barangay 11' => ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
+                            'Barangay 12' => ['Purok 1', 'Purok 2', 'Purok 3'],
+                            default => [],
+                        };
+                        $editBirthDateValue = old('birth_date', $patient->birth_date ? \Illuminate\Support\Carbon::parse($patient->birth_date)->format('Y-m-d') : '');
+                        $editAgeValue = $editBirthDateValue ? \Illuminate\Support\Carbon::parse($editBirthDateValue)->age : ($patient->age ?? '');
+                    @endphp
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
@@ -417,7 +519,6 @@
                                     @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="text-muted">Name should not contain numbers</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -447,9 +548,9 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="edit_barangay{{ $patient->id }}" class="form-label">Barangay <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('barangay') is-invalid @enderror" id="edit_barangay{{ $patient->id }}" name="barangay" value="{{ old('barangay', $patient->barangay ?? '') }}" required>
-                                    @error('barangay')
+                                    <label for="edit_phone{{ $patient->id }}" class="form-label">Phone Number <small class="text-muted">(Optional)</small></label>
+                                    <input type="tel" class="form-control @error('phone') is-invalid @enderror" id="edit_phone{{ $patient->id }}" name="phone" value="{{ old('phone', $patient->phone ?? '') }}">
+                                    @error('phone')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -458,17 +559,56 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="edit_phone{{ $patient->id }}" class="form-label">Phone Number</label>
-                                    <input type="tel" class="form-control @error('phone') is-invalid @enderror" id="edit_phone{{ $patient->id }}" name="phone" value="{{ old('phone', $patient->phone ?? '') }}">
-                                    @error('phone')
+                                    <label for="edit_barangay{{ $patient->id }}" class="form-label">Barangay <span class="text-danger">*</span></label>
+                                    <select class="form-control @error('barangay') is-invalid @enderror" id="edit_barangay{{ $patient->id }}" name="barangay" data-role="barangay" required>
+                                        <option value="">Select Barangay</option>
+                                        <option value="Barangay 11" {{ $editBarangay === 'Barangay 11' ? 'selected' : '' }}>Barangay 11</option>
+                                        <option value="Barangay 12" {{ $editBarangay === 'Barangay 12' ? 'selected' : '' }}>Barangay 12</option>
+                                        <option value="Other" {{ $editBarangay === 'Other' ? 'selected' : '' }}>Other</option>
+                                    </select>
+                                    @error('barangay')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 {{ in_array($editBarangay, ['Barangay 11', 'Barangay 12']) ? '' : 'd-none' }}" data-role="purok-group">
+                                    <label for="edit_purok{{ $patient->id }}" class="form-label">Purok <span class="text-danger">*</span></label>
+                                    <select class="form-control @error('purok') is-invalid @enderror" id="edit_purok{{ $patient->id }}" name="purok" data-role="purok" data-selected="{{ old('purok', $patient->purok ?? '') }}">
+                                        <option value="">Select Purok</option>
+                                        @foreach ($editPurokOptions as $purok)
+                                            <option value="{{ $purok }}" {{ old('purok', $patient->purok ?? '') === $purok ? 'selected' : '' }}>{{ $purok }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('purok')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row align-items-end">
+                            <div class="col-md-6">
+                                <div class="mb-3 {{ $editBarangay === 'Other' ? '' : 'd-none' }}" data-role="barangay-other-group">
+                                    <label for="edit_barangay_other{{ $patient->id }}" class="form-label">Specify Barangay <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control @error('barangay_other') is-invalid @enderror" id="edit_barangay_other{{ $patient->id }}" name="barangay_other" value="{{ old('barangay_other', $patient->barangay_other ?? '') }}" data-role="barangay-other">
+                                    @error('barangay_other')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="edit_address{{ $patient->id }}" class="form-label">Address</label>
-                                    <input type="text" class="form-control @error('address') is-invalid @enderror" id="edit_address{{ $patient->id }}" name="address" value="{{ old('address', $patient->address ?? '') }}">
+                                    <label for="edit_birth_date{{ $patient->id }}" class="form-label">Birth Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control @error('birth_date') is-invalid @enderror" id="edit_birth_date{{ $patient->id }}" name="birth_date" value="{{ $editBirthDateValue }}" data-role="birth-date" max="{{ now()->toDateString() }}" required>
+                                    @error('birth_date')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_address{{ $patient->id }}" class="form-label">Address <small class="text-muted">(Optional)</small></label>
+                                    <textarea class="form-control @error('address') is-invalid @enderror" id="edit_address{{ $patient->id }}" name="address" rows="2" placeholder="Enter complete address (optional)">{{ old('address', $patient->address ?? '') }}</textarea>
                                     @error('address')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -483,7 +623,6 @@
                                     @error('password')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="text-muted">Must contain lowercase, uppercase, and special character (leave blank to keep current)</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -526,7 +665,7 @@
                                     <label for="appointment_patient_name{{ $patient->id }}" class="form-label">Patient Name <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="appointment_patient_name{{ $patient->id }}" name="patient_name" value="{{ $patient->name }}" required>
                                 </div>
-                            </div>
+                            </div>  
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="appointment_patient_phone{{ $patient->id }}" class="form-label">Phone Number</label>

@@ -15,8 +15,12 @@ use App\Mail\AppointmentApproved;
 use App\Models\Service;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\AppointmentRangeExport;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class AdminController extends Controller
 {
@@ -74,7 +78,7 @@ class AdminController extends Controller
 
     public function createPatient(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => [
                 'required',
                 'string',
@@ -83,8 +87,34 @@ class AdminController extends Controller
             ],
             'email' => 'required|string|email|max:255|unique:users',
             'gender' => 'required|in:male,female,other',
-            'barangay' => 'required|string|max:255',
+            'barangay' => [
+                'required',
+                Rule::in(['Barangay 11', 'Barangay 12', 'Other']),
+            ],
+            'barangay_other' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::requiredIf(fn () => $request->barangay === 'Other'),
+            ],
+            'purok' => [
+                'nullable',
+                Rule::requiredIf(fn () => in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
+                Rule::when(
+                    $request->barangay === 'Barangay 11',
+                    Rule::in(['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'])
+                ),
+                Rule::when(
+                    $request->barangay === 'Barangay 12',
+                    Rule::in(['Purok 1', 'Purok 2', 'Purok 3'])
+                ),
+            ],
             'phone' => 'nullable|string|max:20',
+            'birth_date' => [
+                'required',
+                'date',
+                'before:today',
+            ],
             'password' => [
                 'required',
                 'min:8',
@@ -95,15 +125,26 @@ class AdminController extends Controller
             'name.regex' => 'The name field should not contain numbers. Only letters, spaces, periods, hyphens, and apostrophes are allowed.',
             'password.regex' => 'The password must contain at least one lowercase letter, one uppercase letter, and one special character.',
             'gender.required' => 'Please select a gender.',
+            'barangay.in' => 'Please select Barangay 11, Barangay 12, or choose Other.',
+            'barangay_other.required' => 'Please specify the barangay.',
+            'purok.required' => 'Please select a purok for the chosen barangay.',
+            'purok.in' => 'Please choose a valid purok option.',
+            'birth_date.before' => 'Birth date must be in the past.',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'gender' => $request->gender,
-            'barangay' => $request->barangay,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
+        $age = Carbon::parse($validated['birth_date'])->age;
+
+        User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'gender' => $validated['gender'],
+            'barangay' => $validated['barangay'],
+            'barangay_other' => $validated['barangay'] === 'Other' ? $validated['barangay_other'] : null,
+            'purok' => $validated['barangay'] === 'Other' ? null : ($validated['purok'] ?? null),
+            'phone' => $validated['phone'],
+            'birth_date' => $validated['birth_date'],
+            'age' => $age,
+            'password' => Hash::make($validated['password']),
             'role' => 'user'
         ]);
 
@@ -112,7 +153,7 @@ class AdminController extends Controller
 
     public function updatePatient(Request $request, User $user)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => [
                 'required',
                 'string',
@@ -121,9 +162,35 @@ class AdminController extends Controller
             ],
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'gender' => 'required|in:male,female,other',
-            'barangay' => 'required|string|max:255',
+            'barangay' => [
+                'required',
+                Rule::in(['Barangay 11', 'Barangay 12', 'Other']),
+            ],
+            'barangay_other' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::requiredIf(fn () => $request->barangay === 'Other'),
+            ],
+            'purok' => [
+                'nullable',
+                Rule::requiredIf(fn () => in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
+                Rule::when(
+                    $request->barangay === 'Barangay 11',
+                    Rule::in(['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'])
+                ),
+                Rule::when(
+                    $request->barangay === 'Barangay 12',
+                    Rule::in(['Purok 1', 'Purok 2', 'Purok 3'])
+                ),
+            ],
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
+            'birth_date' => [
+                'required',
+                'date',
+                'before:today',
+            ],
             'password' => [
                 'nullable',
                 'min:8',
@@ -134,19 +201,28 @@ class AdminController extends Controller
             'name.regex' => 'The name field should not contain numbers. Only letters, spaces, periods, hyphens, and apostrophes are allowed.',
             'password.regex' => 'The password must contain at least one lowercase letter, one uppercase letter, and one special character.',
             'gender.required' => 'Please select a gender.',
+            'barangay.in' => 'Please select Barangay 11, Barangay 12, or choose Other.',
+            'barangay_other.required' => 'Please specify the barangay.',
+            'purok.required' => 'Please select a purok for the chosen barangay.',
+            'purok.in' => 'Please choose a valid purok option.',
+            'birth_date.before' => 'Birth date must be in the past.',
         ]);
 
         $updateData = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'gender' => $request->gender,
-            'barangay' => $request->barangay,
-            'phone' => $request->phone,
-            'address' => $request->address,
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'gender' => $validated['gender'],
+            'barangay' => $validated['barangay'],
+            'barangay_other' => $validated['barangay'] === 'Other' ? $validated['barangay_other'] : null,
+            'purok' => $validated['barangay'] === 'Other' ? null : ($validated['purok'] ?? null),
+            'phone' => $validated['phone'],
+            'address' => $validated['address'],
+            'birth_date' => $validated['birth_date'],
+            'age' => Carbon::parse($validated['birth_date'])->age,
         ];
 
-        if ($request->filled('password')) {
-            $updateData['password'] = Hash::make($request->password);
+        if (!empty($validated['password'])) {
+            $updateData['password'] = Hash::make($validated['password']);
         }
 
         $user->update($updateData);
@@ -562,7 +638,8 @@ class AdminController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        $appointments = Appointment::whereBetween('appointment_date', [
+        $appointments = Appointment::with('user')
+            ->whereBetween('appointment_date', [
                 $request->start_date,
                 $request->end_date,
             ])
@@ -573,5 +650,63 @@ class AdminController extends Controller
 
         $filename = 'appointments_' . $request->start_date . '_to_' . $request->end_date . '.xlsx';
         return Excel::download(new AppointmentRangeExport($appointments, $inventory), $filename);
+    }
+
+    public function exportAppointmentsPdf(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+        $appointments = Appointment::with('user')
+            ->whereBetween('appointment_date', [
+                $request->start_date,
+                $request->end_date,
+            ])
+            ->orderBy('appointment_date')
+            ->get();
+
+        $patients = $appointments
+            ->pluck('user')
+            ->filter()
+            ->unique(fn ($user) => $user->id ?? spl_object_id($user))
+            ->values();
+
+        $patientAppointments = $appointments
+            ->filter(fn ($appt) => $appt->user_id !== null)
+            ->values();
+        $walkInAppointments = $appointments
+            ->filter(fn ($appt) => $appt->user_id === null)
+            ->values();
+
+        $html = view('admin.reports.appointments-pdf', [
+            'startDate' => Carbon::parse($request->start_date),
+            'endDate' => Carbon::parse($request->end_date),
+            'patients' => $patients,
+            'patientAppointments' => $patientAppointments,
+            'walkInAppointments' => $walkInAppointments,
+        ])->render();
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $options->set('defaultFont', 'DejaVu Sans');
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('a4', 'landscape');
+        $dompdf->render();
+
+        $filename = 'appointments_' . $request->start_date . '_to_' . $request->end_date . '.pdf';
+
+        return response()->streamDownload(
+            function () use ($dompdf) {
+                echo $dompdf->output();
+            },
+            $filename,
+            [
+                'Content-Type' => 'application/pdf',
+            ]
+        );
     }
 }

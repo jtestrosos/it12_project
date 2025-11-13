@@ -8,12 +8,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
 use App\Models\User;
 use App\Models\Appointment;
 use App\Models\Inventory;
 use App\Models\SystemLog;
 use App\Models\Backup;
-use Carbon\Carbon;
 
 class SuperAdminController extends Controller
 {
@@ -80,7 +81,7 @@ class SuperAdminController extends Controller
 
     public function createUser(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => [
                 'required',
                 'string',
@@ -89,25 +90,86 @@ class SuperAdminController extends Controller
             ],
             'email' => 'required|string|email|max:255|unique:users',
             'gender' => 'required|in:male,female,other',
+            'role' => 'required|in:user,admin,superadmin',
+            'barangay' => [
+                Rule::requiredIf(fn () => $request->role === 'user'),
+                Rule::in(['Barangay 11', 'Barangay 12', 'Other']),
+            ],
+            'barangay_other' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::requiredIf(fn () => $request->role === 'user' && $request->barangay === 'Other'),
+            ],
+            'purok' => [
+                'nullable',
+                Rule::requiredIf(fn () => $request->role === 'user' && in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
+                Rule::when(
+                    $request->role === 'user' && $request->barangay === 'Barangay 11',
+                    Rule::in(['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'])
+                ),
+                Rule::when(
+                    $request->role === 'user' && $request->barangay === 'Barangay 12',
+                    Rule::in(['Purok 1', 'Purok 2', 'Purok 3'])
+                ),
+            ],
+            'birth_date' => [
+                Rule::requiredIf(fn () => $request->role === 'user'),
+                'nullable',
+                'date',
+                'before:today',
+            ],
+            'phone' => [
+                Rule::requiredIf(fn () => $request->role === 'user'),
+                'nullable',
+                'string',
+                'max:20',
+            ],
+            'address' => [
+                'nullable',
+                'string',
+                'max:500',
+            ],
             'password' => [
                 'required',
                 'min:8',
                 'confirmed',
                 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]).+$/',
             ],
-            'role' => 'required|in:user,admin,superadmin'
         ], [
             'name.regex' => 'The name field should not contain numbers. Only letters, spaces, periods, hyphens, and apostrophes are allowed.',
             'password.regex' => 'The password must contain at least one lowercase letter, one uppercase letter, and one special character.',
             'gender.required' => 'Please select a gender.',
+            'barangay.in' => 'Please select Barangay 11, Barangay 12, or choose Other.',
+            'barangay.required' => 'Barangay is required for patient accounts.',
+            'barangay_other.required' => 'Please specify the barangay.',
+            'purok.required' => 'Please select a purok for the chosen barangay.',
+            'purok.in' => 'Please choose a valid purok option.',
+            'birth_date.before' => 'Birth date must be in the past.',
         ]);
 
+        $age = null;
+        if ($validated['role'] === 'user' && !empty($validated['birth_date'])) {
+            $age = Carbon::parse($validated['birth_date'])->age;
+        }
+
         User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'gender' => $request->gender,
-            'password' => Hash::make($request->password),
-            'role' => $request->role
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'gender' => $validated['gender'],
+            'phone' => $validated['role'] === 'user' ? $validated['phone'] : null,
+            'address' => $validated['role'] === 'user' ? $validated['address'] : null,
+            'barangay' => $validated['role'] === 'user' ? $validated['barangay'] : null,
+            'barangay_other' => ($validated['role'] === 'user' && $validated['barangay'] === 'Other')
+                ? $validated['barangay_other']
+                : null,
+            'purok' => ($validated['role'] === 'user' && $validated['barangay'] !== 'Other')
+                ? ($validated['purok'] ?? null)
+                : null,
+            'birth_date' => $validated['role'] === 'user' ? $validated['birth_date'] : null,
+            'age' => $age,
+            'password' => Hash::make($validated['password']),
+            'role' => $validated['role']
         ]);
 
         return redirect()->back()->with('success', 'User created successfully.');
@@ -115,7 +177,7 @@ class SuperAdminController extends Controller
 
     public function updateUser(Request $request, User $user)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => [
                 'required',
                 'string',
@@ -125,6 +187,45 @@ class SuperAdminController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'gender' => 'required|in:male,female,other',
             'role' => 'required|in:user,admin,superadmin',
+            'barangay' => [
+                Rule::requiredIf(fn () => $request->role === 'user'),
+                Rule::in(['Barangay 11', 'Barangay 12', 'Other']),
+            ],
+            'barangay_other' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::requiredIf(fn () => $request->role === 'user' && $request->barangay === 'Other'),
+            ],
+            'purok' => [
+                'nullable',
+                Rule::requiredIf(fn () => $request->role === 'user' && in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
+                Rule::when(
+                    $request->role === 'user' && $request->barangay === 'Barangay 11',
+                    Rule::in(['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'])
+                ),
+                Rule::when(
+                    $request->role === 'user' && $request->barangay === 'Barangay 12',
+                    Rule::in(['Purok 1', 'Purok 2', 'Purok 3'])
+                ),
+            ],
+            'birth_date' => [
+                Rule::requiredIf(fn () => $request->role === 'user'),
+                'nullable',
+                'date',
+                'before:today',
+            ],
+            'phone' => [
+                Rule::requiredIf(fn () => $request->role === 'user'),
+                'nullable',
+                'string',
+                'max:20',
+            ],
+            'address' => [
+                'nullable',
+                'string',
+                'max:500',
+            ],
             'password' => [
                 'nullable',
                 'min:8',
@@ -135,17 +236,43 @@ class SuperAdminController extends Controller
             'name.regex' => 'The name field should not contain numbers. Only letters, spaces, periods, hyphens, and apostrophes are allowed.',
             'password.regex' => 'The password must contain at least one lowercase letter, one uppercase letter, and one special character.',
             'gender.required' => 'Please select a gender.',
+            'barangay.in' => 'Please select Barangay 11, Barangay 12, or choose Other.',
+            'barangay.required' => 'Barangay is required for patient accounts.',
+            'barangay_other.required' => 'Please specify the barangay.',
+            'purok.required' => 'Please select a purok for the chosen barangay.',
+            'purok.in' => 'Please choose a valid purok option.',
+            'birth_date.before' => 'Birth date must be in the past.',
         ]);
 
         $updateData = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'gender' => $request->gender,
-            'role' => $request->role
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'gender' => $validated['gender'],
+            'role' => $validated['role'],
         ];
 
-        if ($request->filled('password')) {
-            $updateData['password'] = Hash::make($request->password);
+        if ($validated['role'] === 'user') {
+            $updateData['phone'] = $validated['phone'];
+            $updateData['address'] = $validated['address'];
+            $updateData['barangay'] = $validated['barangay'];
+            $updateData['barangay_other'] = $validated['barangay'] === 'Other' ? $validated['barangay_other'] : null;
+            $updateData['purok'] = $validated['barangay'] === 'Other' ? null : ($validated['purok'] ?? null);
+            $updateData['birth_date'] = $validated['birth_date'];
+            $updateData['age'] = !empty($validated['birth_date'])
+                ? Carbon::parse($validated['birth_date'])->age
+                : null;
+        } else {
+            $updateData['phone'] = null;
+            $updateData['address'] = null;
+            $updateData['barangay'] = null;
+            $updateData['barangay_other'] = null;
+            $updateData['purok'] = null;
+            $updateData['birth_date'] = null;
+            $updateData['age'] = null;
+        }
+
+        if (!empty($validated['password'])) {
+            $updateData['password'] = Hash::make($validated['password']);
         }
 
         $user->update($updateData);

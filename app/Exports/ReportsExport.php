@@ -2,83 +2,264 @@
 
 namespace App\Exports;
 
-use App\Models\Appointment;
-use App\Models\Inventory;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Carbon;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use Maatwebsite\Excel\Concerns\WithTitle;
 
 class ReportsExport implements WithMultipleSheets
 {
-    protected $appointments;
-    protected $inventory;
-    public function __construct($appointments, $inventory)
+    protected Collection $appointments;
+    protected Collection $inventory;
+    protected Collection $patients;
+
+    public function __construct(Collection $appointments, Collection $inventory, Collection $patients = null)
     {
         $this->appointments = $appointments;
         $this->inventory = $inventory;
+
+        if ($this->appointments->isNotEmpty()) {
+            $this->appointments->load('user');
+        }
+
+        $this->patients = $patients ?? $this->appointments
+            ->pluck('user')
+            ->filter()
+            ->unique(fn ($user) => $user->id ?? spl_object_id($user))
+            ->values();
     }
+
     public function sheets(): array
     {
-        return [
-            new AppointmentsSheet($this->appointments),
-            new InventorySheet($this->inventory),
+        $patientAppointments = $this->appointments
+            ->filter(fn ($appt) => $appt->user_id !== null)
+            ->values();
+        $walkInAppointments = $this->appointments
+            ->filter(fn ($appt) => $appt->user_id === null)
+            ->values();
+
+        $sheets = [
+            new ReportsPatientListSheet($this->patients),
         ];
+
+        if ($patientAppointments->isNotEmpty()) {
+            $sheets[] = new ReportsPatientAppointmentSheet($patientAppointments);
+        }
+
+        if ($walkInAppointments->isNotEmpty()) {
+            $sheets[] = new ReportsWalkInAppointmentSheet($walkInAppointments);
+        }
+
+        if ($this->inventory->isNotEmpty()) {
+            $sheets[] = new ReportsInventorySheet($this->inventory);
+        }
+
+        return $sheets;
     }
 }
 
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-
-class AppointmentsSheet implements FromCollection, WithHeadings
+abstract class ReportsBaseAppointmentSheet implements FromCollection, WithHeadings, WithTitle
 {
-    protected $appointments;
-    public function __construct($appointments) { $this->appointments = $appointments; }
+    protected Collection $appointments;
+
+    public function __construct(Collection $appointments)
+    {
+        $this->appointments = $appointments;
+    }
+
     public function collection()
     {
-        return $this->appointments->map(function($appt) {
+        return $this->appointments->map(function ($appt) {
+            $user = $appt->user;
+
+            $barangay = $barangayOther = $purok = $birthDate = $age = '';
+
+            if ($user) {
+                $barangay = $user->barangay === 'Other'
+                    ? ($user->barangay_other ?: 'Other')
+                    : ($user->barangay ?? '');
+                $barangayOther = $user->barangay === 'Other'
+                    ? ($user->barangay_other ?? '')
+                    : '';
+                $purok = $user->barangay === 'Other'
+                    ? ''
+                    : ($user->purok ?? '');
+
+                if (!empty($user->birth_date)) {
+                    $birthCarbon = Carbon::parse($user->birth_date);
+                    $birthDate = $birthCarbon->format('Y-m-d');
+                    $age = $user->age ?? $birthCarbon->age;
+                } elseif (!is_null($user->age)) {
+                    $age = $user->age;
+                }
+            }
+
             return [
-                $appt->id,
-                $appt->patient_name,
-                $appt->patient_phone,
-                $appt->patient_address,
-                $appt->appointment_date,
-                $appt->appointment_time,
-                $appt->service_type,
-                $appt->status,
-                $appt->notes
+                'ID' => $appt->id,
+                'Patient Name' => $appt->patient_name,
+                'Phone' => $appt->patient_phone ?? '',
+                'Address' => $appt->patient_address ?? '',
+                'Barangay' => $barangay,
+                'Barangay Other' => $barangayOther,
+                'Purok' => $purok,
+                'Birth Date' => $birthDate,
+                'Age' => $age,
+                'Date' => optional($appt->appointment_date)->format('Y-m-d'),
+                'Time' => optional($appt->appointment_time)->format('H:i'),
+                'Service Type' => $appt->service_type ?? '',
+                'Status' => ucfirst($appt->status),
+                'Walk-in' => $appt->is_walk_in ? 'Yes' : 'No',
+                'Notes' => $appt->notes ?? '',
+                'Created At' => optional($appt->created_at)->format('Y-m-d H:i'),
             ];
         });
     }
+
     public function headings(): array
     {
         return [
-            'ID', 'Patient', 'Phone', 'Address', 'Date', 'Time', 'Service', 'Status', 'Notes'
+            'ID',
+            'Patient Name',
+            'Phone',
+            'Address',
+            'Barangay',
+            'Barangay Other',
+            'Purok',
+            'Birth Date',
+            'Age',
+            'Date',
+            'Time',
+            'Service Type',
+            'Status',
+            'Walk-in',
+            'Notes',
+            'Created At'
         ];
+    }
+
+    abstract public function title(): string;
+}
+
+class ReportsPatientAppointmentSheet extends ReportsBaseAppointmentSheet
+{
+    public function title(): string
+    {
+        return 'Patient Appointments';
     }
 }
 
-class InventorySheet implements FromCollection, WithHeadings
+class ReportsWalkInAppointmentSheet extends ReportsBaseAppointmentSheet
 {
-    protected $inventory;
-    public function __construct($inventory) { $this->inventory = $inventory; }
+    public function title(): string
+    {
+        return 'Walk-in Appointments';
+    }
+}
+
+class ReportsPatientListSheet implements FromCollection, WithHeadings, WithTitle
+{
+    protected Collection $patients;
+
+    public function __construct(Collection $patients)
+    {
+        $this->patients = $patients;
+    }
+
     public function collection()
     {
-        return $this->inventory->map(function($item) {
+        return $this->patients->map(function ($patient) {
+            $barangay = $patient->barangay === 'Other'
+                ? ($patient->barangay_other ?: 'Other')
+                : ($patient->barangay ?? '');
+
+            $birthDate = $patient->birth_date
+                ? Carbon::parse($patient->birth_date)->format('Y-m-d')
+                : '';
+
+            $age = $patient->age ?? ($patient->birth_date ? Carbon::parse($patient->birth_date)->age : '');
+
             return [
-                $item->id,
-                $item->item_name,
-                $item->description,
-                $item->category,
-                $item->current_stock,
-                $item->minimum_stock,
-                $item->unit,
-                $item->supplier,
-                $item->expiry_date
+                'Name' => $patient->name,
+                'Email' => $patient->email,
+                'Phone' => $patient->phone ?? '',
+                'Gender' => ucfirst($patient->gender ?? ''),
+                'Barangay' => $barangay,
+                'Purok' => $patient->barangay === 'Other' ? '' : ($patient->purok ?? ''),
+                'Birth Date' => $birthDate,
+                'Age' => $age,
+                'Address' => $patient->address ?? '',
+                'Registered At' => optional($patient->created_at)->format('Y-m-d H:i'),
             ];
         });
     }
+
     public function headings(): array
     {
         return [
-            'ID', 'Name', 'Description', 'Category', 'Current Stock', 'Min Stock', 'Unit', 'Supplier', 'Expiry'
+            'Name',
+            'Email',
+            'Phone',
+            'Gender',
+            'Barangay',
+            'Purok',
+            'Birth Date',
+            'Age',
+            'Address',
+            'Registered At',
         ];
+    }
+
+    public function title(): string
+    {
+        return 'Patient Directory';
+    }
+}
+
+class ReportsInventorySheet implements FromCollection, WithHeadings, WithTitle
+{
+    protected Collection $inventory;
+
+    public function __construct(Collection $inventory)
+    {
+        $this->inventory = $inventory;
+    }
+
+    public function collection()
+    {
+        return $this->inventory->map(function ($item) {
+            return [
+                'ID' => $item->id,
+                'Name' => $item->item_name,
+                'Description' => $item->description ?? '',
+                'Category' => $item->category ?? '',
+                'Current Stock' => $item->current_stock,
+                'Minimum Stock' => $item->minimum_stock,
+                'Unit' => $item->unit ?? '',
+                'Supplier' => $item->supplier ?? '',
+                'Expiry Date' => optional($item->expiry_date)->format('Y-m-d'),
+            ];
+        });
+    }
+
+    public function headings(): array
+    {
+        return [
+            'ID',
+            'Name',
+            'Description',
+            'Category',
+            'Current Stock',
+            'Minimum Stock',
+            'Unit',
+            'Supplier',
+            'Expiry Date'
+        ];
+    }
+
+    public function title(): string
+    {
+        return 'Inventory';
     }
 }

@@ -20,9 +20,13 @@ class User extends Authenticatable
         'password',
         'role', // optional: you can use this later for admin/staff/user roles
         'barangay',
+        'barangay_other',
+        'purok',
         'phone',
         'address',
         'gender',
+        'birth_date',
+        'age',
     ];
 
     /**

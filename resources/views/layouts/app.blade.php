@@ -494,15 +494,26 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="{{ route('register') }}">
+                    @php
+                        $selectedBarangayModal = old('barangay');
+                        $purokOptionsModal = match ($selectedBarangayModal) {
+                            'Barangay 11' => ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
+                            'Barangay 12' => ['Purok 1', 'Purok 2', 'Purok 3'],
+                            default => [],
+                        };
+                    @endphp
+                    <form method="POST" action="{{ route('register') }}" class="registration-form">
                         @csrf
                         <div class="mb-3">
                             <label class="form-label">Full Name <span class="text-danger">*</span></label>
                             <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>
                             @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                @if (str_contains($message, 'should not contain numbers'))
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @elseif ($message)
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @endif
                             @enderror
-                            <small class="text-muted">Name should not contain numbers</small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Gender <span class="text-danger">*</span></label>
@@ -532,22 +543,39 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Barangay <span class="text-danger">*</span></label>
-                            <select name="barangay" class="form-control @error('barangay') is-invalid @enderror" required>
+                            <select name="barangay" class="form-control @error('barangay') is-invalid @enderror" data-role="barangay" required>
                                 <option value="">Select Barangay</option>
-                                <option value="Barangay 1" {{ old('barangay') == 'Barangay 1' ? 'selected' : '' }}>Barangay 1</option>
-                                <option value="Barangay 2" {{ old('barangay') == 'Barangay 2' ? 'selected' : '' }}>Barangay 2</option>
-                                <option value="Barangay 3" {{ old('barangay') == 'Barangay 3' ? 'selected' : '' }}>Barangay 3</option>
-                                <option value="Barangay 4" {{ old('barangay') == 'Barangay 4' ? 'selected' : '' }}>Barangay 4</option>
-                                <option value="Barangay 5" {{ old('barangay') == 'Barangay 5' ? 'selected' : '' }}>Barangay 5</option>
-                                <option value="Barangay 6" {{ old('barangay') == 'Barangay 6' ? 'selected' : '' }}>Barangay 6</option>
-                                <option value="Barangay 7" {{ old('barangay') == 'Barangay 7' ? 'selected' : '' }}>Barangay 7</option>
-                                <option value="Barangay 8" {{ old('barangay') == 'Barangay 8' ? 'selected' : '' }}>Barangay 8</option>
-                                <option value="Barangay 9" {{ old('barangay') == 'Barangay 9' ? 'selected' : '' }}>Barangay 9</option>
-                                <option value="Barangay 10" {{ old('barangay') == 'Barangay 10' ? 'selected' : '' }}>Barangay 10</option>
-                                <option value="Barangay 11" {{ old('barangay') == 'Barangay 11' ? 'selected' : '' }}>Barangay 11</option>
-                                <option value="Barangay 12" {{ old('barangay') == 'Barangay 12' ? 'selected' : '' }}>Barangay 12</option>
+                                <option value="Barangay 11" {{ $selectedBarangayModal === 'Barangay 11' ? 'selected' : '' }}>Barangay 11</option>
+                                <option value="Barangay 12" {{ $selectedBarangayModal === 'Barangay 12' ? 'selected' : '' }}>Barangay 12</option>
+                                <option value="Other" {{ $selectedBarangayModal === 'Other' ? 'selected' : '' }}>Other</option>
                             </select>
                             @error('barangay')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3 {{ $selectedBarangayModal === 'Other' ? '' : 'd-none' }}" data-role="barangay-other-group">
+                            <label class="form-label">Specify Barangay <span class="text-danger">*</span></label>
+                            <input type="text" name="barangay_other" class="form-control @error('barangay_other') is-invalid @enderror" value="{{ old('barangay_other') }}" data-role="barangay-other">
+                            @error('barangay_other')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3 {{ in_array($selectedBarangayModal, ['Barangay 11', 'Barangay 12']) ? '' : 'd-none' }}" data-role="purok-group">
+                            <label class="form-label">Purok <span class="text-danger">*</span></label>
+                            <select name="purok" class="form-control @error('purok') is-invalid @enderror" data-role="purok" data-selected="{{ old('purok') }}">
+                                <option value="">Select Purok</option>
+                                @foreach ($purokOptionsModal as $purok)
+                                    <option value="{{ $purok }}" {{ old('purok') === $purok ? 'selected' : '' }}>{{ $purok }}</option>
+                                @endforeach
+                            </select>
+                            @error('purok')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Birth Date <span class="text-danger">*</span></label>
+                            <input type="date" name="birth_date" class="form-control @error('birth_date') is-invalid @enderror" value="{{ old('birth_date') }}" data-role="birth-date" max="{{ now()->toDateString() }}" required>
+                            @error('birth_date')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -555,9 +583,12 @@
                             <label class="form-label">Password <span class="text-danger">*</span></label>
                             <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" required>
                             @error('password')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                @if (str_contains($message, 'lowercase letter') || str_contains($message, 'uppercase letter') || str_contains($message, 'special character'))
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @elseif ($message)
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @endif
                             @enderror
-                            <small class="text-muted">Password must contain at least one lowercase letter, one uppercase letter, and one special character</small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
@@ -595,6 +626,86 @@
                 const feedbackModal = new bootstrap.Modal(feedbackModalEl);
                 feedbackModal.show();
             }
+
+            const barangayPurokMap = {
+                'Barangay 11': ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
+                'Barangay 12': ['Purok 1', 'Purok 2', 'Purok 3'],
+            };
+
+            const registrationForms = document.querySelectorAll('.registration-form');
+
+            registrationForms.forEach((form) => {
+                const barangaySelect = form.querySelector('[data-role="barangay"]');
+                const barangayOtherGroup = form.querySelector('[data-role="barangay-other-group"]');
+                const barangayOtherInput = form.querySelector('[data-role="barangay-other"]');
+                const purokGroup = form.querySelector('[data-role="purok-group"]');
+                const purokSelect = form.querySelector('[data-role="purok"]');
+                const birthDateInput = form.querySelector('[data-role="birth-date"]');
+
+                const updatePurokOptions = (barangay) => {
+                    if (!purokSelect) {
+                        return;
+                    }
+
+                    const previouslySelected = purokSelect.getAttribute('data-selected');
+                    purokSelect.innerHTML = '<option value="">Select Purok</option>';
+
+                    if (!barangayPurokMap[barangay]) {
+                        purokSelect.removeAttribute('required');
+                        purokSelect.setAttribute('data-selected', '');
+                        return;
+                    }
+
+                    barangayPurokMap[barangay].forEach((purok) => {
+                        const option = document.createElement('option');
+                        option.value = purok;
+                        option.textContent = purok;
+                        if (previouslySelected === purok) {
+                            option.selected = true;
+                        }
+                        purokSelect.appendChild(option);
+                    });
+                    purokSelect.setAttribute('required', 'required');
+                };
+
+                const handleBarangayChange = () => {
+                    const selectedBarangay = barangaySelect ? barangaySelect.value : '';
+
+                    if (barangayOtherGroup && barangayOtherInput) {
+                        if (selectedBarangay === 'Other') {
+                            barangayOtherGroup.classList.remove('d-none');
+                            barangayOtherInput.setAttribute('required', 'required');
+                        } else {
+                            barangayOtherGroup.classList.add('d-none');
+                            barangayOtherInput.removeAttribute('required');
+                        }
+                    }
+
+                    if (purokGroup && purokSelect) {
+                        if (barangayPurokMap[selectedBarangay]) {
+                            purokGroup.classList.remove('d-none');
+                            updatePurokOptions(selectedBarangay);
+                        } else {
+                            purokGroup.classList.add('d-none');
+                            purokSelect.removeAttribute('required');
+                            purokSelect.value = '';
+                            purokSelect.setAttribute('data-selected', '');
+                        }
+                    }
+                };
+
+                if (barangaySelect) {
+                    barangaySelect.addEventListener('change', () => {
+                        if (purokSelect) {
+                            purokSelect.setAttribute('data-selected', '');
+                        }
+                        handleBarangayChange();
+                    });
+                    handleBarangayChange();
+                }
+
+                // No additional birth date handling needed; age is calculated server-side.
+            });
         });
     </script>
     @stack('scripts')

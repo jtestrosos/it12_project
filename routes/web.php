@@ -6,6 +6,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SuperAdminController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
 
 // Homepage
 Route::get('/', function () {
@@ -62,7 +64,7 @@ Route::post('/logout', function (Request $request) {
 
 Route::get('/register', fn() => view('auth.register'))->name('register');
 Route::post('/register', function (Request $request) {
-    $request->validate([
+    $validated = $request->validate([
         'name' => [
             'required',
             'string',
@@ -73,7 +75,33 @@ Route::post('/register', function (Request $request) {
         'gender' => 'required|in:male,female,other',
         'phone' => 'nullable|string|max:20',
         'address' => 'nullable|string|max:500',
-        'barangay' => 'required|string|max:255',
+        'barangay' => [
+            'required',
+            Rule::in(['Barangay 11', 'Barangay 12', 'Other']),
+        ],
+        'barangay_other' => [
+            'nullable',
+            'string',
+            'max:255',
+            Rule::requiredIf(fn () => $request->barangay === 'Other'),
+        ],
+        'purok' => [
+            'nullable',
+            Rule::requiredIf(fn () => in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
+            Rule::when(
+                $request->barangay === 'Barangay 11',
+                Rule::in(['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'])
+            ),
+            Rule::when(
+                $request->barangay === 'Barangay 12',
+                Rule::in(['Purok 1', 'Purok 2', 'Purok 3'])
+            ),
+        ],
+        'birth_date' => [
+            'required',
+            'date',
+            'before:today',
+        ],
         'password' => [
             'required',
             'min:8',
@@ -84,16 +112,27 @@ Route::post('/register', function (Request $request) {
         'name.regex' => 'The name field should not contain numbers. Only letters, spaces, periods, hyphens, and apostrophes are allowed.',
         'password.regex' => 'The password must contain at least one lowercase letter, one uppercase letter, and one special character.',
         'gender.required' => 'Please select a gender.',
+        'barangay.in' => 'Please select Barangay 11, Barangay 12, or choose Other.',
+        'barangay_other.required' => 'Please specify your barangay.',
+        'purok.required' => 'Please select a purok for the chosen barangay.',
+        'purok.in' => 'Please choose a valid purok option.',
+        'birth_date.before' => 'Birth date must be in the past.',
     ]);
 
+    $age = Carbon::parse($validated['birth_date'])->age;
+
     $user = \App\Models\User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'gender' => $request->gender,
-        'phone' => $request->phone,
-        'address' => $request->address,
-        'barangay' => $request->barangay,
-        'password' => bcrypt($request->password),
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'gender' => $validated['gender'],
+        'phone' => $validated['phone'] ?? null,
+        'address' => $validated['address'] ?? null,
+        'barangay' => $validated['barangay'],
+        'barangay_other' => $validated['barangay'] === 'Other' ? $validated['barangay_other'] : null,
+        'purok' => $validated['barangay'] === 'Other' ? null : ($validated['purok'] ?? null),
+        'birth_date' => $validated['birth_date'],
+        'age' => $age,
+        'password' => bcrypt($validated['password']),
         'role' => 'user' // Default role for new registrations
     ]);
 
@@ -131,6 +170,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
             Route::post('/walk-in', [AdminController::class, 'addWalkIn'])->name('walk-in');
             Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
             Route::get('/reports/export/appointments', [AdminController::class, 'exportAppointmentsExcel'])->name('reports.export.appointments');
+            Route::get('/reports/export/appointments/pdf', [AdminController::class, 'exportAppointmentsPdf'])->name('reports.export.appointments.pdf');
         });
 });
 
