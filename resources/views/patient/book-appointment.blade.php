@@ -119,14 +119,6 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <div class="col-md-12 mt-3">
-                                        <label for="patient_address" class="form-label">Address *</label>
-                                        <input type="text" class="form-control @error('patient_address') is-invalid @enderror"
-                                               id="patient_address" name="patient_address" value="{{ old('patient_address', $user->address ?? $user->barangay ?? '') }}" required>
-                                        @error('patient_address')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
                                 </div>
                             </div>
 
