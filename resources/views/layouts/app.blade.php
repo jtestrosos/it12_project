@@ -396,6 +396,64 @@
         </footer>
     @endunless
 
+    @php
+        $flashType = null;
+        $flashMessage = null;
+
+        if (session('success')) {
+            $flashType = 'success';
+            $flashMessage = session('success');
+        } elseif (session('status')) {
+            $flashType = 'success';
+            $flashMessage = session('status');
+        } elseif (session('error')) {
+            $flashType = 'danger';
+            $flashMessage = session('error');
+        } elseif (session('warning')) {
+            $flashType = 'warning';
+            $flashMessage = session('warning');
+        } elseif (session('info')) {
+            $flashType = 'info';
+            $flashMessage = session('info');
+        }
+
+        $flashTitleMap = [
+            'success' => 'Success',
+            'danger' => 'Something went wrong',
+            'warning' => 'Heads up',
+            'info' => 'Notice',
+        ];
+
+        $flashIconMap = [
+            'success' => 'fa-circle-check',
+            'danger' => 'fa-triangle-exclamation',
+            'warning' => 'fa-circle-exclamation',
+            'info' => 'fa-circle-info',
+        ];
+    @endphp
+
+    @if($flashType && $flashMessage)
+        <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-{{ $flashType }} text-white">
+                        <h5 class="modal-title d-flex align-items-center gap-2" id="feedbackModalLabel">
+                            <i class="fas {{ $flashIconMap[$flashType] ?? 'fa-circle-info' }}"></i>
+                            {{ $flashTitleMap[$flashType] ?? 'Notice' }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body py-4">
+                        <p class="mb-0">{{ $flashMessage }}</p>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-{{ $flashType === 'danger' ? 'danger' : 'primary' }}" data-bs-dismiss="modal">Got it</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Login Modal -->
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -530,6 +588,14 @@
                 loginModal.show();
             @endif
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const feedbackModalEl = document.getElementById('feedbackModal');
+            if (feedbackModalEl) {
+                const feedbackModal = new bootstrap.Modal(feedbackModalEl);
+                feedbackModal.show();
+            }
+        });
     </script>
     @stack('scripts')
 </body>
