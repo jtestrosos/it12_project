@@ -215,9 +215,12 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::prefix('superadmin')->name('superadmin.')->group(function () {
         Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
         Route::get('/users', [SuperAdminController::class, 'users'])->name('users');
+        Route::get('/users/archive', [SuperAdminController::class, 'archivedUsers'])->name('users.archive');
         Route::post('/user/create', [SuperAdminController::class, 'createUser'])->name('user.create');
         Route::post('/user/{user}/update', [SuperAdminController::class, 'updateUser'])->name('user.update');
         Route::post('/user/{user}/delete', [SuperAdminController::class, 'deleteUser'])->name('user.delete');
+        Route::post('/user/{id}/restore', [SuperAdminController::class, 'restoreUser'])->name('user.restore');
+        Route::delete('/user/{id}/force-delete', [SuperAdminController::class, 'forceDeleteUser'])->name('user.force-delete');
         Route::get('/system-logs', [SuperAdminController::class, 'systemLogs'])->name('system-logs');
         Route::get('/audit-trail', [SuperAdminController::class, 'auditTrail'])->name('audit-trail');
         Route::get('/analytics', [SuperAdminController::class, 'analytics'])->name('analytics');

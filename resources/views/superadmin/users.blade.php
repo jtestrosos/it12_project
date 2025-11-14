@@ -83,14 +83,22 @@
             text-align: center;
             vertical-align: middle !important;
         }
+        .action-btn {
+            min-width: 110px;
+        }
     </style>
 @endsection
 
 @section('content')
-                        <!-- Add User Button -->
-                        <div class="d-flex justify-content-end align-items-center mb-4">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                                <i class="fas fa-plus me-2"></i> Add User
+                        <!-- Add User + Archive Buttons -->
+                        <div class="d-flex justify-content-end align-items-center mb-4 gap-2">
+                            <a href="{{ route('superadmin.users.archive') }}" class="btn btn-outline-secondary d-flex align-items-center">
+                                <i class="fas fa-archive me-2"></i>
+                                <span>Archive History</span>
+                            </a>
+                            <button class="btn btn-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                                <i class="fas fa-plus me-2"></i>
+                                <span>Add User</span>
                             </button>
                         </div>
 
@@ -113,11 +121,13 @@
                                 </select>
                             </div>
                             <div class="col-md-3 d-flex gap-2">
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="fas fa-search me-2"></i>Search
+                                <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-search me-2"></i>
+                                    <span>Search</span>
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary" id="clearFiltersBtn">
-                                    <i class="fas fa-times me-2"></i>Clear
+                                <button type="button" class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center" id="clearFiltersBtn">
+                                    <i class="fas fa-times me-2"></i>
+                                    <span>Clear</span>
                                 </button>
                             </div>
                         </form>
@@ -132,7 +142,7 @@
                                                 <tr>
                                                     <th>User</th>
                                                     <th>Email</th>
-                                                    <th>Role</th>
+                                                    <th class="text-center">Role</th>
                                                     <th>Registered</th>
                                                     <th>Actions</th>
                                                 </tr>
@@ -163,14 +173,16 @@
                                                     <td>{{ $user->created_at->format('M d, Y') }}</td>
                                                     <td>
                                                         <div class="d-flex gap-2">
-                                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">
-                                                                <i class="fas fa-edit me-1"></i> Edit
+                                                            <button class="btn btn-outline-primary btn-sm d-flex align-items-center action-btn" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">
+                                                                <i class="fas fa-edit me-1"></i>
+                                                                <span>Edit</span>
                                                             </button>
                                                             @if($user->id !== Auth::id())
-                                                            <form method="POST" action="{{ route('superadmin.user.delete', $user) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user?')">
+                                                            <form method="POST" action="{{ route('superadmin.user.delete', $user) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to archive this user?')">
                                                                 @csrf
-                                                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                                                    <i class="fas fa-trash me-1"></i> Delete
+                                                                <button type="submit" class="btn btn-outline-danger btn-sm d-flex align-items-center action-btn">
+                                                                    <i class="fas fa-archive me-1"></i>
+                                                                    <span>Archive</span>
                                                                 </button>
                                                             </form>
                                                             @endif

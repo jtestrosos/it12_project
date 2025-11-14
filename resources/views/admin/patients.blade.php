@@ -293,6 +293,8 @@
                                     @enderror
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="barangay" class="form-label">Barangay <span class="text-danger">*</span></label>
@@ -303,17 +305,6 @@
                                         <option value="Other" {{ $oldBarangay === 'Other' ? 'selected' : '' }}>Other</option>
                                     </select>
                                     @error('barangay')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row align-items-end">
-                            <div class="col-md-6">
-                                <div class="mb-3 {{ $oldBarangay === 'Other' ? '' : 'd-none' }}" data-role="barangay-other-group">
-                                    <label for="barangay_other" class="form-label">Specify Barangay <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('barangay_other') is-invalid @enderror" id="barangay_other" name="barangay_other" value="{{ old('barangay_other') }}" data-role="barangay-other">
-                                    @error('barangay_other')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -333,12 +324,21 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row align-items-end">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="birth_date" class="form-label">Birth Date <span class="text-danger">*</span></label>
                                     <input type="date" class="form-control @error('birth_date') is-invalid @enderror" id="birth_date" name="birth_date" value="{{ old('birth_date') }}" data-role="birth-date" max="{{ now()->toDateString() }}" required>
                                     @error('birth_date')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 {{ $oldBarangay === 'Other' ? '' : 'd-none' }}" data-role="barangay-other-group">
+                                    <label for="barangay_other" class="form-label">Specify Barangay <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control @error('barangay_other') is-invalid @enderror" id="barangay_other" name="barangay_other" value="{{ old('barangay_other') }}" data-role="barangay-other">
+                                    @error('barangay_other')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -588,19 +588,19 @@
                         </div>
                         <div class="row align-items-end">
                             <div class="col-md-6">
-                                <div class="mb-3 {{ $editBarangay === 'Other' ? '' : 'd-none' }}" data-role="barangay-other-group">
-                                    <label for="edit_barangay_other{{ $patient->id }}" class="form-label">Specify Barangay <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('barangay_other') is-invalid @enderror" id="edit_barangay_other{{ $patient->id }}" name="barangay_other" value="{{ old('barangay_other', $patient->barangay_other ?? '') }}" data-role="barangay-other">
-                                    @error('barangay_other')
+                                <div class="mb-3">
+                                    <label for="edit_birth_date{{ $patient->id }}" class="form-label">Birth Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control @error('birth_date') is-invalid @enderror" id="edit_birth_date{{ $patient->id }}" name="birth_date" value="{{ $editBirthDateValue }}" data-role="birth-date" max="{{ now()->toDateString() }}" required>
+                                    @error('birth_date')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="edit_birth_date{{ $patient->id }}" class="form-label">Birth Date <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control @error('birth_date') is-invalid @enderror" id="edit_birth_date{{ $patient->id }}" name="birth_date" value="{{ $editBirthDateValue }}" data-role="birth-date" max="{{ now()->toDateString() }}" required>
-                                    @error('birth_date')
+                                <div class="mb-3 {{ $editBarangay === 'Other' ? '' : 'd-none' }}" data-role="barangay-other-group">
+                                    <label for="edit_barangay_other{{ $patient->id }}" class="form-label">Specify Barangay <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control @error('barangay_other') is-invalid @enderror" id="edit_barangay_other{{ $patient->id }}" name="barangay_other" value="{{ old('barangay_other', $patient->barangay_other ?? '') }}" data-role="barangay-other">
+                                    @error('barangay_other')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>

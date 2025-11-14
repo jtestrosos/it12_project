@@ -283,11 +283,45 @@ class SuperAdminController extends Controller
     public function deleteUser(User $user)
     {
         if ($user->id === Auth::id()) {
-            return redirect()->back()->with('error', 'Cannot delete your own account.');
+            return redirect()->back()->with('error', 'Cannot archive your own account.');
+        }
+
+        if ($user->isSuperAdmin()) {
+            return redirect()->back()->with('error', 'Cannot archive a Super Admin account.');
         }
 
         $user->delete();
-        return redirect()->back()->with('success', 'User deleted successfully.');
+
+        return redirect()->back()->with('success', 'User archived successfully.');
+    }
+
+    public function archivedUsers()
+    {
+        $users = User::onlyTrashed()->latest('deleted_at')->paginate(15);
+
+        return view('superadmin.users-archive', compact('users'));
+    }
+
+    public function restoreUser(int $id)
+    {
+        $user = User::onlyTrashed()->findOrFail($id);
+
+        $user->restore();
+
+        return redirect()->route('superadmin.users.archive')->with('success', 'User restored successfully.');
+    }
+
+    public function forceDeleteUser(int $id)
+    {
+        $user = User::onlyTrashed()->findOrFail($id);
+
+        if ($user->isSuperAdmin()) {
+            return redirect()->back()->with('error', 'Cannot permanently delete a Super Admin account.');
+        }
+
+        $user->forceDelete();
+
+        return redirect()->route('superadmin.users.archive')->with('success', 'User permanently deleted.');
     }
 
     public function systemLogs(Request $request)
