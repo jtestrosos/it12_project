@@ -577,4 +577,3 @@
     @stack('scripts')
 </body>
 </html>
-test
