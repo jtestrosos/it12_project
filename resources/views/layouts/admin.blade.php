@@ -31,13 +31,15 @@
             --card-bg-light: #ffffff;
             --card-bg-dark: #1e2124;
             --border-dark: #2a2f35;
+            --primary: #0d6efd;
+            --primary-light: #6ea8fe;
         }
 
         body {
             background-color: var(--bg-light);
             color: var(--text-light);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color .3s, color .3s;
         }
         body.bg-dark { background-color: var(--bg-dark); color: var(--text-dark); }
 
@@ -57,7 +59,6 @@
         }
         .sidebar.collapsed { width: var(--sidebar-collapsed); }
 
-        /* Header — fixed height */
         .sidebar-header {
             position: relative;
             height: 72px;
@@ -67,7 +68,6 @@
             justify-content: center;
         }
 
-        /* BURGER — UNTOUCHED, EXACTLY AS YOU PROVIDED */
         .burger-menu-btn {
             position: absolute;
             left: 14px;
@@ -91,14 +91,13 @@
         }
         .burger-menu-btn:hover {
             background: #f2f2f2;
-            color: #0d6efd;
+            color: var(--primary);
         }
         .burger-menu-btn:active {
             background: #e0e0e0 !important;
             transform: none !important;
         }
 
-        /* NAV — CENTER ALL MENU ITEMS */
         .sidebar .nav {
             padding: 0.5rem 0.5rem 0;
             margin-top: 60px;
@@ -107,7 +106,6 @@
             align-items: center;
         }
 
-        /* MENU ITEMS — 44x44 CORE, CENTERED ICON */
         .sidebar .nav-link {
             width: 44px;
             height: 44px;
@@ -141,28 +139,35 @@
             margin-left: 12px;
         }
 
-        .sidebar .nav-link:hover { background: #f2f2f2; }
+        /* Hover State */
+        .sidebar .nav-link:hover {
+            background: rgba(13, 110, 253, 0.08);
+        }
+
+        /* Active State - FIXED & IMPROVED */
         .sidebar .nav-link.active {
-            background: #f0f0f0;
+            background: rgba(13, 110, 253, 0.1);
+            color: var(--primary) !important;
             font-weight: 500;
+        }
+        .sidebar .nav-link.active i {
+            color: var(--primary);
         }
         .sidebar .nav-link.active::before {
             content: '';
             position: absolute;
             left: 0; top: 50%; transform: translateY(-50%);
             width: 3px; height: 24px;
-            background: #ff0000;
+            background: var(--primary);
             border-radius: 0 2px 2px 0;
         }
 
-        /* EXPANDED: Full width, left-aligned text */
         .sidebar:not(.collapsed) .nav-link {
             width: calc(100% - 16px);
             justify-content: flex-start;
             padding: 0 14px;
         }
 
-        /* COLLAPSED: Icon-only, perfectly centered */
         .sidebar.collapsed .nav-link {
             width: 44px;
             padding: 0;
@@ -183,7 +188,6 @@
             z-index: 1001; pointer-events: none;
         }
 
-        /* Mobile close button — same position */
         .close-sidebar-btn {
             display: none;
             position: absolute;
@@ -234,32 +238,99 @@
         .btn i { margin-right: .35rem; }
         .btn-sm { padding: .375rem .75rem; font-size: .875rem; }
 
-        /* ---------- Dark Mode ---------- */
-        body.bg-dark .sidebar { background: var(--sidebar-bg-dark); border-color: var(--border-dark); }
-        body.bg-dark .header { background: var(--header-bg-dark); border-color: var(--border-dark); }
-        body.bg-dark .main-content { background: var(--bg-dark); }
+        /* ---------- Dark Mode – General ---------- */
+        body.bg-dark .sidebar { 
+            background: var(--sidebar-bg-dark); 
+            border-color: var(--border-dark); 
+        }
+        body.bg-dark .header { 
+            background: var(--header-bg-dark); 
+            border-color: var(--border-dark); 
+        }
+        body.bg-dark .main-content { 
+            background: var(--bg-dark); 
+        }
+
         body.bg-dark .card-surface,
         body.bg-dark .filter-card,
         body.bg-dark .chart-container,
         body.bg-dark .modal-content {
-            background: var(--card-bg-dark); color: var(--text-dark);
-            border-color: var(--border-dark); box-shadow: 0 2px 8px rgba(0,0,0,.3);
+            background: var(--card-bg-dark);
+            color: var(--text-dark);
+            border-color: var(--border-dark);
+            box-shadow: 0 2px 8px rgba(0,0,0,.3);
         }
-        body.bg-dark .table { color: #d6d6d6; }
-        body.bg-dark .table thead { background: #1a1f24 !important; color: #e6e6e6; }
+
         body.bg-dark .form-control,
-        body.bg-dark .form-select { background: #0f1316; color: #e6e6e6; border-color: var(--border-dark); }
+        body.bg-dark .form-select {
+            background: #0f1316;
+            color: #e6e6e6;
+            border-color: var(--border-dark);
+        }
         body.bg-dark .form-control::placeholder { color: #9aa4ad; }
         body.bg-dark .text-muted { color: #b0b0b0 !important; }
+
         body.bg-dark .burger-menu-btn { color: #cbd3da; }
-        body.bg-dark .burger-menu-btn:hover { background: #303030; color: #6ea8fe; }
+        body.bg-dark .burger-menu-btn:hover { 
+            background: #303030; 
+            color: var(--primary-light); 
+        }
+
         body.bg-dark .sidebar .nav-link { color: #f1f1f1; }
-        body.bg-dark .sidebar .nav-link:hover { background: #303030; color: #fff; }
-        body.bg-dark .sidebar .nav-link.active { background: #303030; color: #fff; }
+        body.bg-dark .sidebar .nav-link:hover { 
+            background: rgba(13, 110, 253, 0.15); 
+        }
+
+        /* Dark Mode Active State */
+        body.bg-dark .sidebar .nav-link.active {
+            background: rgba(13, 110, 253, 0.2);
+            color: var(--primary-light) !important;
+        }
+        body.bg-dark .sidebar .nav-link.active i {
+            color: var(--primary-light);
+        }
+        body.bg-dark .sidebar .nav-link.active::before {
+            background: var(--primary-light);
+        }
+
+        /* ---------- Dark Mode – Tables ---------- */
+        body.bg-dark .table {
+            --bs-table-bg: #1e2124;
+            --bs-table-striped-bg: #232629;
+            --bs-table-active-bg: #2a2f35;
+            --bs-table-hover-bg: #2a2f35;
+            color: #d6d6d6;
+            border-color: var(--border-dark);
+        }
+        body.bg-dark .table thead th {
+            background: #1a1f24 !important;
+            color: #e6e6e6;
+            border-color: var(--border-dark);
+        }
+        body.bg-dark .table tbody td {
+            border-color: var(--border-dark);
+        }
+        body.bg-dark .table-striped > tbody > tr:nth-of-type(odd) > * {
+            --bs-table-accent-bg: var(--bs-table-striped-bg);
+        }
+        body.bg-dark .table-hover > tbody > tr:hover > * {
+            --bs-table-accent-bg: var(--bs-table-hover-bg);
+        }
+
+        .table-dark {
+            --bs-table-bg: #1e2124;
+            --bs-table-striped-bg: #232629;
+            --bs-table-active-bg: #2a2f35;
+            --bs-table-hover-bg: #2a2f35;
+            color: #d6d6d6;
+        }
 
         /* ---------- Responsive ---------- */
         @media (max-width: 991px) {
-            .sidebar { transform: translateX(-100%); width: var(--sidebar-width); }
+            .sidebar { 
+                transform: translateX(-100%); 
+                width: var(--sidebar-width); 
+            }
             .sidebar.show { transform: translateX(0); }
             .main-content { margin-left: 0 !important; }
             .header { padding: 1rem; }
@@ -280,11 +351,9 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <!-- Burger (Desktop) — UNCHANGED -->
             <button class="burger-menu-btn" id="toggleSidebarBtn" aria-label="Toggle sidebar">
                 <i class="fas fa-bars"></i>
             </button>
-            <!-- Close (Mobile) — UNCHANGED -->
             <button class="burger-menu-btn close-sidebar-btn" id="closeSidebarBtn" aria-label="Close sidebar">
                 <i class="fas fa-times"></i>
             </button>
@@ -431,10 +500,26 @@
                 rt = setTimeout(init, 250);
             });
 
-            if (localStorage.getItem(themeKey) === 'dark') document.body.classList.add('bg-dark');
+            /* ---------- Theme toggle + table-dark sync ---------- */
+            const syncTableDark = (isDark) => {
+                document.querySelectorAll('table').forEach(t => {
+                    t.classList.toggle('table-dark', isDark);
+                });
+            };
+
+            const applySavedTheme = () => {
+                const saved = localStorage.getItem(themeKey);
+                const isDark = saved === 'dark';
+                document.body.classList.toggle('bg-dark', isDark);
+                syncTableDark(isDark);
+            };
+
+            applySavedTheme();
+
             themeToggle?.addEventListener('click', () => {
-                const dark = document.body.classList.toggle('bg-dark');
-                localStorage.setItem(themeKey, dark ? 'dark' : 'light');
+                const isDark = document.body.classList.toggle('bg-dark');
+                localStorage.setItem(themeKey, isDark ? 'dark' : 'light');
+                syncTableDark(isDark);
             });
 
             const modalEl = document.getElementById('feedbackModal');
