@@ -265,7 +265,7 @@
             <div class="admin-sidebar">
                 <div class="sidebar-header">
                     <div class="d-flex align-items-center">
-                        <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="MALASAKIT Logo" style="width: 90px; height: 90px; margin-right: 0.5rem;">
+                        <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="MALASAKIT Logo" style="width: 40px; height: 40px; margin-right: 0.5rem;">
                         <div><h4>MALASAKIT</h4></div>
                     </div>
                 </div>
@@ -463,17 +463,42 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="{{ route('login') }}">
+                    <form method="POST" action="{{ route('login') }}" id="loginForm">
                         @csrf
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email address</label>
-                            <input type="email" name="email" class="form-control" required autofocus>
+                            <label for="login-email" class="form-label">Email address</label>
+                            <input 
+                                id="login-email"
+                                type="email" 
+                                name="email" 
+                                class="form-control @error('email') is-invalid @enderror" 
+                                value="{{ old('email') }}" 
+                                required 
+                                autofocus
+                            >
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" name="password" class="form-control" required>
+                            <label for="login-password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <input 
+                                    id="login-password"
+                                    type="password" 
+                                    name="password" 
+                                    class="form-control @error('password') is-invalid @enderror" 
+                                    required
+                                >
+                                <button class="btn btn-outline-secondary" type="button" id="login-show-password-btn">
+                                    <i id="login-show-password-icon" class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                            @error('password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <button type="submit" class="btn btn-info w-100 text-white">Login</button>
+                        <button type="submit" class="btn btn-info w-100 text-white" id="loginSubmitBtn">Login</button>
                     </form>
                     <div class="text-center mt-3">
                         <small>Don't have an account? 
@@ -581,7 +606,12 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Password <span class="text-danger">*</span></label>
-                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" required>
+                            <div class="input-group">
+                                <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" required data-role="register-password-input">
+                                <button class="btn btn-outline-secondary @error('password') d-none @enderror" type="button" data-role="register-password-toggle-btn">
+                                    <i class="fa-solid fa-eye" data-role="register-password-toggle-icon"></i>
+                                </button>
+                            </div>
                             @error('password')
                                 @if (str_contains($message, 'lowercase letter') || str_contains($message, 'uppercase letter') || str_contains($message, 'special character'))
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -627,6 +657,119 @@
                 feedbackModal.show();
             }
 
+            // Show login modal automatically if there are login validation errors from the server
+            @if($errors->has('email') || $errors->has('password'))
+                const loginModalEl = document.getElementById('loginModal');
+                if (loginModalEl) {
+                    const loginModal = new bootstrap.Modal(loginModalEl);
+                    loginModal.show();
+                }
+            @endif
+
+            // Login form: show/hide password and handle AJAX submission
+            const loginForm = document.getElementById('loginForm');
+            const loginPasswordInput = document.getElementById('login-password');
+            const loginShowPasswordBtn = document.getElementById('login-show-password-btn');
+            const loginShowPasswordIcon = document.getElementById('login-show-password-icon');
+            const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+
+            if (loginShowPasswordBtn && loginPasswordInput) {
+                loginShowPasswordBtn.addEventListener('click', function () {
+                    const showing = loginPasswordInput.type === 'text';
+                    const show = !showing;
+                    loginPasswordInput.type = show ? 'text' : 'password';
+
+                    if (loginShowPasswordIcon) {
+                        if (show) {
+                            loginShowPasswordIcon.classList.remove('fa-eye');
+                            loginShowPasswordIcon.classList.add('fa-eye-slash');
+                        } else {
+                            loginShowPasswordIcon.classList.remove('fa-eye-slash');
+                            loginShowPasswordIcon.classList.add('fa-eye');
+                        }
+                    }
+                });
+            }
+
+            if (loginForm) {
+                loginForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    // Clear previous client-side error state
+                    const emailInput = document.getElementById('login-email');
+                    const passwordInput = document.getElementById('login-password');
+                    const existingInvalidFeedbacks = loginForm.querySelectorAll('.invalid-feedback.js-login-error');
+
+                    [emailInput, passwordInput].forEach((input) => {
+                        if (input) {
+                            input.classList.remove('is-invalid');
+                        }
+                    });
+                    existingInvalidFeedbacks.forEach((el) => el.remove());
+
+                    if (loginSubmitBtn) {
+                        loginSubmitBtn.disabled = true;
+                    }
+
+                    const formData = new FormData(loginForm);
+
+                    fetch(loginForm.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        },
+                        body: formData,
+                    })
+                        .then(async (response) => {
+                            if (response.ok) {
+                                const data = await response.json().catch(() => null);
+                                if (data && data.redirect) {
+                                    window.location.href = data.redirect;
+                                } else {
+                                    window.location.reload();
+                                }
+                                return;
+                            }
+
+                            // Handle validation / auth errors
+                            let data = null;
+                            try {
+                                data = await response.json();
+                            } catch (_) {}
+
+                            if (data && data.errors) {
+                                const errors = data.errors;
+                                if (errors.email && emailInput) {
+                                    emailInput.classList.add('is-invalid');
+                                    const div = document.createElement('div');
+                                    div.className = 'invalid-feedback js-login-error';
+                                    div.textContent = Array.isArray(errors.email) ? errors.email[0] : errors.email;
+                                    emailInput.insertAdjacentElement('afterend', div);
+                                }
+                                if (errors.password && passwordInput) {
+                                    passwordInput.classList.add('is-invalid');
+                                    const div = document.createElement('div');
+                                    div.className = 'invalid-feedback js-login-error';
+                                    div.textContent = Array.isArray(errors.password) ? errors.password[0] : errors.password;
+                                    passwordInput.insertAdjacentElement('afterend', div);
+                                }
+                            } else {
+                                // Fallback: reload page to let Laravel show errors normally
+                                window.location.reload();
+                            }
+                        })
+                        .catch(() => {
+                            window.location.reload();
+                        })
+                        .finally(() => {
+                            if (loginSubmitBtn) {
+                                loginSubmitBtn.disabled = false;
+                            }
+                        });
+                });
+            }
+
             const barangayPurokMap = {
                 'Barangay 11': ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
                 'Barangay 12': ['Purok 1', 'Purok 2', 'Purok 3'],
@@ -641,6 +784,12 @@
                 const purokGroup = form.querySelector('[data-role="purok-group"]');
                 const purokSelect = form.querySelector('[data-role="purok"]');
                 const birthDateInput = form.querySelector('[data-role="birth-date"]');
+                const nameInput = form.querySelector('input[name="name"]');
+                const phoneInput = form.querySelector('input[name="phone"]');
+                const passwordInput = form.querySelector('input[name="password"]');
+                const passwordConfirmInput = form.querySelector('input[name="password_confirmation"]');
+                const registerPasswordToggleBtn = form.querySelector('[data-role="register-password-toggle-btn"]');
+                const registerPasswordToggleIcon = form.querySelector('[data-role="register-password-toggle-icon"]');
 
                 const updatePurokOptions = (barangay) => {
                     if (!purokSelect) {
@@ -702,6 +851,143 @@
                         handleBarangayChange();
                     });
                     handleBarangayChange();
+                }
+                const clearClientErrors = () => {
+                    const clientErrors = form.querySelectorAll('.invalid-feedback.js-register-error');
+                    clientErrors.forEach((el) => el.remove());
+                    if (nameInput) {
+                        nameInput.classList.remove('is-invalid');
+                    }
+                    if (phoneInput) {
+                        phoneInput.classList.remove('is-invalid');
+                    }
+                    if (passwordInput) {
+                        passwordInput.classList.remove('is-invalid');
+                    }
+                    if (passwordConfirmInput) {
+                        passwordConfirmInput.classList.remove('is-invalid');
+                    }
+                };
+
+                const appendError = (input, message) => {
+                    if (!input) {
+                        return;
+                    }
+                    input.classList.add('is-invalid');
+                    const div = document.createElement('div');
+                    div.className = 'invalid-feedback js-register-error';
+                    div.textContent = message;
+                    input.insertAdjacentElement('afterend', div);
+                };
+
+                const validateNameAndPhone = () => {
+                    clearClientErrors();
+                    let valid = true;
+                    let passwordHasError = false;
+
+                    if (nameInput) {
+                        const value = nameInput.value.trim();
+                        const nameRegex = /^[a-zA-Z\s.\-']+$/;
+                        if (!value) {
+                            appendError(nameInput, 'Full name is required.');
+                            valid = false;
+                        } else if (!nameRegex.test(value)) {
+                            appendError(nameInput, 'The name field should not contain numbers. Only letters, spaces, periods, hyphens, and apostrophes are allowed.');
+                            valid = false;
+                        }
+                    }
+
+                    if (phoneInput) {
+                        const value = phoneInput.value.trim();
+                        if (value && !/^\d{11}$/.test(value)) {
+                            appendError(phoneInput, 'Phone number must be exactly 11 digits (e.g. 09123456789).');
+                            valid = false;
+                        }
+                    }
+
+                    if (passwordInput) {
+                        const value = passwordInput.value;
+                        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{}|,.<>\/?]).{8,}$/;
+                        if (!value) {
+                            appendError(passwordInput, 'Password is required.');
+                            valid = false;
+                            passwordHasError = true;
+                        } else if (!passwordRegex.test(value)) {
+                            appendError(passwordInput, 'Password must be at least 8 characters and include one uppercase letter, one lowercase letter, one number, and one special character.');
+                            valid = false;
+                            passwordHasError = true;
+                        }
+                    }
+
+                    if (passwordInput && passwordConfirmInput) {
+                        const value = passwordInput.value;
+                        const confirmValue = passwordConfirmInput.value;
+                        if (confirmValue && value !== confirmValue) {
+                            appendError(passwordConfirmInput, 'Password and confirm password must match.');
+                            valid = false;
+                        }
+                    }
+
+                    // Show eye icon only when password currently has no client-side error
+                    if (registerPasswordToggleBtn) {
+                        if (passwordHasError) {
+                            registerPasswordToggleBtn.classList.add('d-none');
+                        } else {
+                            registerPasswordToggleBtn.classList.remove('d-none');
+                        }
+                    }
+
+                    return valid;
+                };
+
+                if (form) {
+                    // Live validation: show errors as the user types or leaves the field
+                    if (nameInput) {
+                        nameInput.addEventListener('input', validateNameAndPhone);
+                        nameInput.addEventListener('blur', validateNameAndPhone);
+                    }
+                    if (phoneInput) {
+                        phoneInput.addEventListener('input', validateNameAndPhone);
+                        phoneInput.addEventListener('blur', validateNameAndPhone);
+                    }
+                    if (passwordInput) {
+                        passwordInput.addEventListener('input', validateNameAndPhone);
+                        passwordInput.addEventListener('blur', validateNameAndPhone);
+                    }
+                    if (passwordConfirmInput) {
+                        passwordConfirmInput.addEventListener('input', validateNameAndPhone);
+                        passwordConfirmInput.addEventListener('blur', validateNameAndPhone);
+                    }
+
+                    if (registerPasswordToggleBtn && passwordInput) {
+                        registerPasswordToggleBtn.addEventListener('click', function () {
+                            const showing = passwordInput.type === 'text';
+                            const show = !showing;
+
+                            // Toggle both password and confirm password inputs
+                            passwordInput.type = show ? 'text' : 'password';
+                            if (passwordConfirmInput) {
+                                passwordConfirmInput.type = show ? 'text' : 'password';
+                            }
+
+                            if (registerPasswordToggleIcon) {
+                                if (show) {
+                                    registerPasswordToggleIcon.classList.remove('fa-eye');
+                                    registerPasswordToggleIcon.classList.add('fa-eye-slash');
+                                } else {
+                                    registerPasswordToggleIcon.classList.remove('fa-eye-slash');
+                                    registerPasswordToggleIcon.classList.add('fa-eye');
+                                }
+                            }
+                        });
+                    }
+
+                    // Final check on submit
+                    form.addEventListener('submit', function (e) {
+                        if (!validateNameAndPhone()) {
+                            e.preventDefault();
+                        }
+                    });
                 }
 
                 // No additional birth date handling needed; age is calculated server-side.

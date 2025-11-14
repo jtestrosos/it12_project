@@ -38,21 +38,51 @@ Route::get('/booking', function () {
 // Authentication Routes
 Route::get('/login', fn() => view('auth.login'))->name('login');
 Route::post('/login', function (Request $request) {
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|string',
+    ]);
+
+    $user = \App\Models\User::where('email', $request->input('email'))->first();
+
+    if (!$user) {
+        $errors = ['email' => 'Invalid Credentials.'];
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['errors' => $errors], 422);
+        }
+
+        return back()->withErrors($errors)->withInput($request->only('email'));
+    }
+
     $credentials = $request->only('email', 'password');
+
     if (Auth::attempt($credentials)) {
         $request->session()->regenerate();
         $user = Auth::user();
-        
+
         // Redirect based on user role
+        $redirectUrl = route('patient.dashboard');
         if ($user->isSuperAdmin()) {
-            return redirect()->route('superadmin.dashboard');
+            $redirectUrl = route('superadmin.dashboard');
         } elseif ($user->isAdmin()) {
-            return redirect()->route('admin.dashboard');
-        } else {
-            return redirect()->route('patient.dashboard');
+            $redirectUrl = route('admin.dashboard');
         }
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['redirect' => $redirectUrl]);
+        }
+
+        return redirect()->to($redirectUrl);
     }
-    return back()->withErrors(['email' => 'Invalid credentials, please try again.']);
+
+    $errors = ['password' => 'Incorrect password. Please try again.'];
+
+    if ($request->expectsJson() || $request->ajax()) {
+        return response()->json(['errors' => $errors], 422);
+    }
+
+    return back()->withErrors($errors)->withInput($request->only('email'));
 });
 
 Route::post('/logout', function (Request $request) {
@@ -73,7 +103,10 @@ Route::post('/register', function (Request $request) {
         ],
         'email' => 'required|email|unique:users,email',
         'gender' => 'required|in:male,female,other',
-        'phone' => 'nullable|string|max:20',
+        'phone' => [
+            'nullable',
+            'digits:11',
+        ],
         'address' => 'nullable|string|max:500',
         'barangay' => [
             'required',
@@ -106,17 +139,20 @@ Route::post('/register', function (Request $request) {
             'required',
             'min:8',
             'confirmed',
-            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]).+$/',
+            // At least one lowercase, one uppercase, and one special character (subset without quotes to keep regex simple)
+            'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{}|,.<>\/?]).+$/',
         ],
     ], [
         'name.regex' => 'The name field should not contain numbers. Only letters, spaces, periods, hyphens, and apostrophes are allowed.',
         'password.regex' => 'The password must contain at least one lowercase letter, one uppercase letter, and one special character.',
+        'phone.digits' => 'Phone number must be exactly 11 digits (e.g. 09123456789).',
         'gender.required' => 'Please select a gender.',
         'barangay.in' => 'Please select Barangay 11, Barangay 12, or choose Other.',
         'barangay_other.required' => 'Please specify your barangay.',
         'purok.required' => 'Please select a purok for the chosen barangay.',
         'purok.in' => 'Please choose a valid purok option.',
         'birth_date.before' => 'Birth date must be in the past.',
+        'password.confirmed' => 'Password and confirm password must match.',
     ]);
 
     $age = Carbon::parse($validated['birth_date'])->age;
