@@ -5,322 +5,316 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin Panel - Barangay Health Center')</title>
+
+    <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     @stack('styles')
+
     <style>
-        /* Global text colors */
-        body { color: #111; }
-        body.bg-dark { color: #fff; }
+        :root {
+            --sidebar-width: 240px;
+            --sidebar-collapsed: 72px;
+            --header-height: 64px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --border-color: #e9ecef;
+            --bg-light: #f8f9fa;
+            --bg-dark: #151718;
+            --text-light: #111;
+            --text-dark: #e6e6e6;
+            --sidebar-bg-light: #ffffff;
+            --sidebar-bg-dark: #212121;
+            --header-bg-light: #ffffff;
+            --header-bg-dark: #1b1e20;
+            --card-bg-light: #ffffff;
+            --card-bg-dark: #1e2124;
+            --border-dark: #2a2f35;
+        }
+
         body {
-            background-color: #f8f9fa;
+            background-color: var(--bg-light);
+            color: var(--text-light);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
         }
+        body.bg-dark { background-color: var(--bg-dark); color: var(--text-dark); }
+
+        /* ---------- Sidebar ---------- */
         .sidebar {
-            background: white;
-            min-height: 100vh;
-            border-right: 1px solid #e9ecef;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 240px;
-            z-index: 1000;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-            overflow-y: auto;
+            top: 0; left: 0;
+            width: var(--sidebar-width);
             height: 100vh;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.05);
-        }
-        .sidebar.no-transition {
-            transition: none !important;
-        }
-        .sidebar.no-transition ~ .main-content {
-            transition: none !important;
-        }
-        .sidebar.collapsed {
-            width: 72px;
-        }
-        .sidebar.collapsed .sidebar-content {
-            opacity: 0;
-            pointer-events: none;
-            width: 0;
+            background: var(--sidebar-bg-light);
+            border-right: 1px solid var(--border-color);
+            z-index: 1000;
+            transition: width var(--transition), transform var(--transition);
             overflow: hidden;
+            box-shadow: 2px 0 8px rgba(0,0,0,.05);
+            contain: layout style;
         }
-        .sidebar.collapsed .nav-link {
-            justify-content: center;
-            padding: 12px 0;
-            margin: 2px 8px;
-            min-height: 40px;
-        }
-        .sidebar.collapsed .nav-link i {
-            margin-right: 0;
-            margin-left: 0;
-        }
-        .sidebar.collapsed .nav-link span {
-            display: none;
-        }
-        .nav-link span {
-            transition: opacity 0.2s ease;
-        }
-        @media (min-width: 992px) {
-            .sidebar:not(.collapsed) {
-                width: 240px;
-            }
-        }
-        @media (max-width: 991px) {
-            .sidebar {
-                width: 240px;
-                transform: translateX(-100%);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-            .sidebar.show {
-                transform: translateX(0);
-            }
-            .sidebar.collapsed {
-                width: 240px;
-            }
-        }
-        .sidebar-content {
-            transition: opacity 0.2s ease;
-        }
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            transition: opacity 0.3s ease;
-        }
-        .sidebar-overlay.show {
-            display: block;
-        }
-        .sidebar .nav {
-            padding-top: 32px;
-            margin-top: 0;
-        }
-        @media (min-width: 992px) {
-            .sidebar .nav {
-                padding-top: 80px;
-                margin-top: 0;
-            }
-        }
-        .sidebar .nav-link {
-            color: #0f0f0f;
-            padding: 12px 16px;
-            border-radius: 10px;
-            margin: 2px 8px;
-            transition: all 0.2s ease;
+        .sidebar.collapsed { width: var(--sidebar-collapsed); }
+
+        /* Header — fixed height */
+        .sidebar-header {
+            position: relative;
+            height: 72px;
+            padding: 0;
             display: flex;
             align-items: center;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 400;
-            position: relative;
+            justify-content: center;
         }
+
+        /* BURGER — UNTOUCHED, EXACTLY AS YOU PROVIDED */
+        .burger-menu-btn {
+            position: absolute;
+            left: 14px;
+            top: 14px;
+            width: 44px;
+            height: 44px;
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: #495057;
+            cursor: pointer;
+            padding: 0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            outline: none !important;
+            box-shadow: none !important;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+        .burger-menu-btn:hover {
+            background: #f2f2f2;
+            color: #0d6efd;
+        }
+        .burger-menu-btn:active {
+            background: #e0e0e0 !important;
+            transform: none !important;
+        }
+
+        /* NAV — CENTER ALL MENU ITEMS */
+        .sidebar .nav {
+            padding: 0.5rem 0.5rem 0;
+            margin-top: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* MENU ITEMS — 44x44 CORE, CENTERED ICON */
+        .sidebar .nav-link {
+            width: 44px;
+            height: 44px;
+            min-height: 44px;
+            padding: 0 14px;
+            margin: 2px 0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all .2s ease;
+            position: relative;
+            box-sizing: border-box;
+            color: #0f0f0f;
+            font-weight: 400;
+        }
+
         .sidebar .nav-link i {
-            margin-right: 16px;
             font-size: 20px;
             width: 24px;
             text-align: center;
-            transition: margin 0.3s ease;
+            margin: 0;
         }
-        .sidebar .nav-link:hover {
-            background-color: #f2f2f2;
-            color: #0f0f0f;
+
+        .sidebar .nav-link span {
+            opacity: 1;
+            transition: opacity .2s ease;
+            white-space: nowrap;
+            margin-left: 12px;
         }
+
+        .sidebar .nav-link:hover { background: #f2f2f2; }
         .sidebar .nav-link.active {
-            background-color: #f0f0f0;
-            color: #0f0f0f;
+            background: #f0f0f0;
             font-weight: 500;
         }
         .sidebar .nav-link.active::before {
             content: '';
             position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 3px;
-            height: 24px;
-            background-color: #ff0000;
+            left: 0; top: 50%; transform: translateY(-50%);
+            width: 3px; height: 24px;
+            background: #ff0000;
             border-radius: 0 2px 2px 0;
         }
+
+        /* EXPANDED: Full width, left-aligned text */
+        .sidebar:not(.collapsed) .nav-link {
+            width: calc(100% - 16px);
+            justify-content: flex-start;
+            padding: 0 14px;
+        }
+
+        /* COLLAPSED: Icon-only, perfectly centered */
         .sidebar.collapsed .nav-link {
-            position: relative;
+            width: 44px;
+            padding: 0;
+            justify-content: center;
+        }
+        .sidebar.collapsed .nav-link span {
+            opacity: 0;
+            pointer-events: none;
+            width: 0;
+            overflow: hidden;
+            margin: 0;
         }
         .sidebar.collapsed .nav-link:hover::after {
             content: attr(data-tooltip);
+            position: absolute; left: 100%; margin-left: 12px;
+            background: rgba(0,0,0,.8); color: #fff; padding: 8px 12px;
+            border-radius: 4px; font-size: 12px; white-space: nowrap;
+            z-index: 1001; pointer-events: none;
+        }
+
+        /* Mobile close button — same position */
+        .close-sidebar-btn {
+            display: none;
             position: absolute;
-            left: 100%;
-            margin-left: 12px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-            white-space: nowrap;
+            left: 14px;
+            top: 14px;
+            width: 44px;
+            height: 44px;
             z-index: 1001;
-            font-size: 12px;
-            pointer-events: none;
-        }
-        .burger-menu-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #495057;
-            cursor: pointer;
-            padding: 0.5rem;
-            margin-right: 1rem;
-            transition: color 0.3s ease;
-        }
-        .burger-menu-btn:hover {
-            color: #0d6efd;
-        }
-        .main-content {
-            background-color: #f9f9f9;
-            min-height: 100vh;
-            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            margin-left: 0;
-        }
-        .main-content.no-transition {
-            transition: none !important;
-        }
-        @media (min-width: 992px) {
-            .main-content {
-                margin-left: 240px;
-            }
-            .main-content.sidebar-closed {
-                margin-left: 72px;
-            }
         }
         @media (max-width: 991px) {
-            .main-content {
-                margin-left: 0;
-            }
+            .close-sidebar-btn { display: flex; }
+            .burger-menu-btn:not(.close-sidebar-btn) { display: none; }
         }
+
+        /* ---------- Header ---------- */
         .header {
-            background: white;
-            border-bottom: 1px solid #e9ecef;
+            position: sticky; top: 0; z-index: 100;
+            background: var(--header-bg-light);
+            border-bottom: 1px solid var(--border-color);
+            min-height: var(--header-height);
             padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            min-height: 64px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 1px 2px rgba(0,0,0,.05);
         }
-        .header h4 {
-            font-size: 1.25rem;
-            font-weight: 500;
+        .header h4 { font-size: 1.25rem; font-weight: 500; margin: 0; }
+        .header .text-muted { font-size: .875rem; margin: 0; }
+
+        /* ---------- Main Content ---------- */
+        .main-content {
+            min-height: 100vh;
+            margin-left: var(--sidebar-width);
+            background: #f9f9f9;
+            transition: margin-left var(--transition);
         }
-        .header .text-muted {
-            font-size: 0.875rem;
+        .main-content.sidebar-closed { margin-left: var(--sidebar-collapsed); }
+
+        /* ---------- Cards ---------- */
+        .card-surface {
+            background: var(--card-bg-light); border-radius: 12px;
+            padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,.15);
+            transition: transform .2s ease;
         }
-        .header img {
-            flex-shrink: 0;
+        .card-surface:hover { transform: translateY(-2px); }
+        .filter-card { padding: 1rem; margin-bottom: 1rem; }
+        .chart-container { padding: 1.75rem 1.5rem 1.5rem; margin-bottom: 1.5rem; }
+
+        .btn { border-radius: 8px; font-weight: 600; }
+        .btn i { margin-right: .35rem; }
+        .btn-sm { padding: .375rem .75rem; font-size: .875rem; }
+
+        /* ---------- Dark Mode ---------- */
+        body.bg-dark .sidebar { background: var(--sidebar-bg-dark); border-color: var(--border-dark); }
+        body.bg-dark .header { background: var(--header-bg-dark); border-color: var(--border-dark); }
+        body.bg-dark .main-content { background: var(--bg-dark); }
+        body.bg-dark .card-surface,
+        body.bg-dark .filter-card,
+        body.bg-dark .chart-container,
+        body.bg-dark .modal-content {
+            background: var(--card-bg-dark); color: var(--text-dark);
+            border-color: var(--border-dark); box-shadow: 0 2px 8px rgba(0,0,0,.3);
+        }
+        body.bg-dark .table { color: #d6d6d6; }
+        body.bg-dark .table thead { background: #1a1f24 !important; color: #e6e6e6; }
+        body.bg-dark .form-control,
+        body.bg-dark .form-select { background: #0f1316; color: #e6e6e6; border-color: var(--border-dark); }
+        body.bg-dark .form-control::placeholder { color: #9aa4ad; }
+        body.bg-dark .text-muted { color: #b0b0b0 !important; }
+        body.bg-dark .burger-menu-btn { color: #cbd3da; }
+        body.bg-dark .burger-menu-btn:hover { background: #303030; color: #6ea8fe; }
+        body.bg-dark .sidebar .nav-link { color: #f1f1f1; }
+        body.bg-dark .sidebar .nav-link:hover { background: #303030; color: #fff; }
+        body.bg-dark .sidebar .nav-link.active { background: #303030; color: #fff; }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 991px) {
+            .sidebar { transform: translateX(-100%); width: var(--sidebar-width); }
+            .sidebar.show { transform: translateX(0); }
+            .main-content { margin-left: 0 !important; }
+            .header { padding: 1rem; }
+            .header h4 { font-size: 1.1rem; }
+            .header .text-muted { font-size: .85rem; }
         }
         @media (max-width: 576px) {
-            .header {
-                padding: 1rem;
-            }
-            .header h4 {
-                font-size: 1.1rem;
-            }
-            .header .text-muted {
-                font-size: 0.85rem;
-            }
-            .header img {
-                width: 32px !important;
-                height: 32px !important;
-                margin-right: 8px !important;
-            }
+            .header img { width: 32px !important; height: 32px !important; margin-right: 8px !important; }
         }
-        .filter-card {
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 1rem;
-        }
-        .table-card {
-            background: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-        .metric-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            border: none;
-            transition: transform 0.2s ease;
-        }
-        .metric-card:hover {
-            transform: translateY(-2px);
-        }
-        .chart-container {
-            background: white;
-            border-radius: 12px;
-            padding: 1.75rem 1.5rem 1.5rem 1.5rem; /* extra top padding */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
-        }
-        /* Button consistency */
-        .btn { border-radius: 8px; font-weight: 600; }
-        .btn i { margin-right: 0.35rem; }
-        .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.875rem; }
-        .btn-outline-primary, .btn-primary, .btn-outline-danger, .btn-danger, .btn-outline-secondary {
-            display: inline-flex; align-items: center; gap: 0.35rem;
-        }
-        .table .btn { height: 34px; }
+
         @yield('page-styles')
     </style>
 </head>
 <body>
-    <!-- Sidebar Overlay (for mobile) -->
+    <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="p-3">
-            <div class="d-flex align-items-center justify-content-end mb-3 d-lg-none" style="padding: 8px 4px;">
-                <button class="burger-menu-btn" id="closeSidebarBtn" aria-label="Close sidebar" style="margin: 0;">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <nav class="nav flex-column">
-                @yield('sidebar-menu')
-            </nav>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <!-- Burger (Desktop) — UNCHANGED -->
+            <button class="burger-menu-btn" id="toggleSidebarBtn" aria-label="Toggle sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <!-- Close (Mobile) — UNCHANGED -->
+            <button class="burger-menu-btn close-sidebar-btn" id="closeSidebarBtn" aria-label="Close sidebar">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-    </div>
+
+        <nav class="nav flex-column">
+            @yield('sidebar-menu')
+        </nav>
+    </aside>
 
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <!-- Header -->
-        <div class="header d-flex justify-content-between align-items-center">
+        <header class="header">
             <div class="d-flex align-items-center">
-                <button class="burger-menu-btn" id="toggleSidebarBtn" aria-label="Toggle sidebar">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="d-flex align-items-center ms-3">
-                    <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo" style="width: 40px; height: 40px; margin-right: 12px;">
-                    <div>
-                        <h4 class="mb-0">@yield('page-title', 'Dashboard')</h4>
-                        <p class="text-muted mb-0">@yield('page-description', 'Welcome!')</p>
-                    </div>
+                <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo"
+                     style="width:40px;height:40px;margin-right:12px;">
+                <div>
+                    <h4 class="mb-0">@yield('page-title', 'Dashboard')</h4>
+                    <p class="text-muted mb-0">@yield('page-description', 'Welcome!')</p>
                 </div>
             </div>
+
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-link text-decoration-none text-muted" title="Notifications" aria-label="Notifications">
-                    <i class="fas fa-bell"></i>
-                </button>
-                <button class="btn btn-link text-decoration-none text-muted" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
-                    <i class="fas fa-moon"></i>
-                </button>
+                <button class="btn btn-link text-muted" title="Notifications"><i class="fas fa-bell"></i></button>
+                <button class="btn btn-link text-muted" id="themeToggle" title="Toggle theme"><i class="fas fa-moon"></i></button>
+
                 <div class="d-flex align-items-center">
-                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                         style="width:40px;height:40px;">
                         @yield('user-initials', 'A')
                     </div>
                     <div>
@@ -328,384 +322,173 @@
                         <small class="text-muted">@yield('user-role', 'Administrator')</small>
                     </div>
                 </div>
-                <a href="{{ route('logout') }}" class="btn btn-outline-secondary ms-3" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+
+                <a href="{{ route('logout') }}"
+                   class="btn btn-outline-secondary"
+                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <i class="fas fa-sign-out-alt"></i>
                 </a>
             </div>
-        </div>
+        </header>
 
-        <!-- Content -->
-        <div class="p-4">
+        <!-- Page Content -->
+        <main class="p-4">
             @yield('content')
-        </div>
+        </main>
     </div>
 
+    <!-- Flash Modal -->
     @php
-        $flashType = null;
-        $flashMessage = null;
-
-        if (session('success')) {
-            $flashType = 'success';
-            $flashMessage = session('success');
-        } elseif (session('status')) {
-            $flashType = 'success';
-            $flashMessage = session('status');
-        } elseif (session('error')) {
-            $flashType = 'danger';
-            $flashMessage = session('error');
-        } elseif (session('warning')) {
-            $flashType = 'warning';
-            $flashMessage = session('warning');
-        } elseif (session('info')) {
-            $flashType = 'info';
-            $flashMessage = session('info');
-        }
-
-        $flashTitleMap = [
-            'success' => 'Success',
-            'danger' => 'Something went wrong',
-            'warning' => 'Heads up',
-            'info' => 'Notice',
-        ];
-
-        $flashIconMap = [
-            'success' => 'fa-circle-check',
-            'danger' => 'fa-triangle-exclamation',
-            'warning' => 'fa-circle-exclamation',
-            'info' => 'fa-circle-info',
-        ];
+        $flashType = $flashMessage = null;
+        $map = ['success'=>'success','status'=>'success','error'=>'danger','warning'=>'warning','info'=>'info'];
+        foreach($map as $k=>$v){ if(session($k)){ $flashType=$v; $flashMessage=session($k); break; } }
+        $titles = ['success'=>'Success','danger'=>'Error','warning'=>'Warning','info'=>'Notice'];
+        $icons  = ['success'=>'fa-circle-check','danger'=>'fa-triangle-exclamation','warning'=>'fa-circle-exclamation','info'=>'fa-circle-info'];
     @endphp
 
     @if($flashType && $flashMessage)
-        <div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal fade" id="feedbackModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow">
+                <div class="modal-content border-0 shadow card-surface">
                     <div class="modal-header bg-{{ $flashType }} text-white">
-                        <h5 class="modal-title d-flex align-items-center gap-2" id="feedbackModalLabel">
-                            <i class="fas {{ $flashIconMap[$flashType] ?? 'fa-circle-info' }}"></i>
-                            {{ $flashTitleMap[$flashType] ?? 'Notice' }}
+                        <h5 class="modal-title d-flex align-items-center gap-2">
+                            <i class="fas {{ $icons[$flashType] }}"></i>
+                            {{ $titles[$flashType] }}
                         </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body py-4">
-                        <p class="mb-0">{{ $flashMessage }}</p>
-                    </div>
+                    <div class="modal-body py-4"><p class="mb-0">{{ $flashMessage }}</p></div>
                     <div class="modal-footer border-0">
-                        <button type="button" class="btn btn-{{ $flashType === 'danger' ? 'danger' : 'primary' }}" data-bs-dismiss="modal">Got it</button>
+                        <button type="button" class="btn btn-{{ $flashType==='danger'?'danger':'primary' }}" data-bs-dismiss="modal">Got it</button>
                     </div>
                 </div>
             </div>
         </div>
     @endif
 
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-        @csrf
-    </form>
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Sidebar toggle functionality
-        (function() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            const toggleBtn = document.getElementById('toggleSidebarBtn');
-            const closeBtn = document.getElementById('closeSidebarBtn');
-            const overlay = document.getElementById('sidebarOverlay');
-            const sidebarKey = 'sidebar-collapsed';
-            
-            // Check if sidebar should be open by default (desktop) or closed (mobile)
-            function isDesktop() {
-                return window.innerWidth >= 992;
-            }
-            
-            // Initialize sidebar state
-function initSidebar() {
-    // Disable transitions during initialization
-    sidebar.classList.add('no-transition');
-    mainContent.classList.add('no-transition');
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar      = document.getElementById('sidebar');
+            const mainContent  = document.getElementById('mainContent');
+            const toggleBtn    = document.getElementById('toggleSidebarBtn');
+            const closeBtn     = document.getElementById('closeSidebarBtn');
+            const overlay      = document.getElementById('sidebarOverlay');
+            const themeToggle  = document.getElementById('themeToggle');
+            const sidebarKey   = 'sidebar-collapsed';
+            const themeKey     = 'app-theme';
 
-    if (isDesktop()) {
-        // Desktop: DEFAULT TO COLLAPSED (unless user previously expanded it)
-        const saved = localStorage.getItem(sidebarKey);
-        const shouldCollapse = saved === null || saved === 'true'; // null = first visit → collapse
+            const isDesktop = () => window.innerWidth >= 992;
 
-        if (shouldCollapse) {
-            sidebar.classList.add('collapsed');
-            mainContent.classList.add('sidebar-closed');
-            localStorage.setItem(sidebarKey, 'true'); // save default
-        } else {
-            sidebar.classList.remove('collapsed');
-            mainContent.classList.remove('sidebar-closed');
-        }
-        sidebar.classList.add('show');
-    } else {
-        // Mobile: always start hidden
-        sidebar.classList.remove('collapsed');
-        sidebar.classList.remove('show');
-        overlay.classList.remove('show');
-    }
+            const init = () => {
+                sidebar.classList.add('no-transition');
+                mainContent.classList.add('no-transition');
 
-    // Re-enable transitions
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            sidebar.classList.remove('no-transition');
-            mainContent.classList.remove('no-transition');
-        });
-    });
-}
-            
-            function toggleCollapse() {
-                if (!isDesktop()) return;
-                
-                const isCollapsed = sidebar.classList.contains('collapsed');
-                if (isCollapsed) {
-                    sidebar.classList.remove('collapsed');
-                    mainContent.classList.remove('sidebar-closed');
-                    localStorage.setItem(sidebarKey, 'false');
-                } else {
-                    sidebar.classList.add('collapsed');
-                    mainContent.classList.add('sidebar-closed');
-                    localStorage.setItem(sidebarKey, 'true');
-                }
-            }
-            
-            function openSidebar() {
-                sidebar.classList.add('show');
-                if (!isDesktop()) {
-                    overlay.classList.add('show');
-                }
-            }
-            
-            function closeSidebar() {
                 if (isDesktop()) {
-                    // On desktop, just collapse it
-                    toggleCollapse();
+                    const collapsed = localStorage.getItem(sidebarKey) !== 'false';
+                    sidebar.classList.toggle('collapsed', collapsed);
+                    mainContent.classList.toggle('sidebar-closed', collapsed);
+                    sidebar.classList.add('show');
                 } else {
-                    // On mobile, hide it
-                    sidebar.classList.remove('show');
+                    sidebar.classList.remove('collapsed', 'show');
                     overlay.classList.remove('show');
                 }
-            }
-            
-            function toggleSidebar() {
+
+                requestAnimationFrame(() => {
+                    sidebar.classList.remove('no-transition');
+                    mainContent.classList.remove('no-transition');
+                });
+            };
+
+            const toggleSidebar = () => {
                 if (isDesktop()) {
-                    toggleCollapse();
+                    const willCollapse = !sidebar.classList.contains('collapsed');
+                    sidebar.classList.toggle('collapsed', willCollapse);
+                    mainContent.classList.toggle('sidebar-closed', willCollapse);
+                    localStorage.setItem(sidebarKey, willCollapse);
                 } else {
-                    const isShowing = sidebar.classList.contains('show');
-                    if (isShowing) {
-                        closeSidebar();
-                    } else {
-                        openSidebar();
-                    }
+                    sidebar.classList.toggle('show');
+                    overlay.classList.toggle('show');
                 }
-            }
-            
-            // Event listeners
-            if (toggleBtn) {
-                toggleBtn.addEventListener('click', toggleSidebar);
-            }
-            
-            if (closeBtn) {
-                closeBtn.addEventListener('click', function() {
-                    sidebar.classList.remove('show');
-                    overlay.classList.remove('show');
-                });
-            }
-            
-            if (overlay) {
-                overlay.addEventListener('click', function() {
-                    sidebar.classList.remove('show');
-                    overlay.classList.remove('show');
-                });
-            }
-            
-            // Handle window resize
-            let resizeTimer;
-            window.addEventListener('resize', function() {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(function() {
-                    if (isDesktop()) {
-                        // Desktop: restore collapsed state
-                        const isCollapsed = localStorage.getItem(sidebarKey) === 'true';
-                        if (isCollapsed) {
-                            sidebar.classList.add('collapsed');
-                            mainContent.classList.add('sidebar-closed');
-                        } else {
-                            sidebar.classList.remove('collapsed');
-                            mainContent.classList.remove('sidebar-closed');
-                        }
-                        sidebar.classList.add('show');
-                        overlay.classList.remove('show');
-                    } else {
-                        // Mobile: always hide on resize to mobile
-                        sidebar.classList.remove('collapsed');
-                        sidebar.classList.remove('show');
-                        overlay.classList.remove('show');
-                        mainContent.classList.remove('sidebar-closed');
-                    }
-                }, 250);
+            };
+
+            toggleBtn?.addEventListener('click', toggleSidebar);
+            closeBtn?.addEventListener('click', () => {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
             });
-            
-            // Initialize on page load
-            initSidebar();
-        })();
-        
-        // Theme persistence + toggle
-        (function() {
-            const body = document.body;
-            const key = 'app-theme';
-            const saved = localStorage.getItem(key);
-            if (saved === 'dark') {
-                body.classList.add('bg-dark','text-white');
-            }
-            const toggle = document.getElementById('themeToggle');
-            if (toggle) {
-                toggle.addEventListener('click', function () {
-                    const isDark = body.classList.toggle('bg-dark');
-                    body.classList.toggle('text-white', isDark);
-                    localStorage.setItem(key, isDark ? 'dark' : 'light');
-                });
-            }
-        })();
+            overlay?.addEventListener('click', () => {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+            });
 
-        const barangayPurokMap = {
-            'Barangay 11': ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
-            'Barangay 12': ['Purok 1', 'Purok 2', 'Purok 3'],
-        };
+            let rt;
+            window.addEventListener('resize', () => {
+                clearTimeout(rt);
+                rt = setTimeout(init, 250);
+            });
 
-        function initPatientRegistrationForms() {
-            const forms = document.querySelectorAll('.patient-registration-form');
+            if (localStorage.getItem(themeKey) === 'dark') document.body.classList.add('bg-dark');
+            themeToggle?.addEventListener('click', () => {
+                const dark = document.body.classList.toggle('bg-dark');
+                localStorage.setItem(themeKey, dark ? 'dark' : 'light');
+            });
 
-            forms.forEach((form) => {
-                const barangaySelect = form.querySelector('[data-role="barangay"]');
-                const barangayOtherGroup = form.querySelector('[data-role="barangay-other-group"]');
-                const barangayOtherInput = form.querySelector('[data-role="barangay-other"]');
-                const purokGroup = form.querySelector('[data-role="purok-group"]');
-                const purokSelect = form.querySelector('[data-role="purok"]');
-                const birthDateInput = form.querySelector('[data-role="birth-date"]');
+            const modalEl = document.getElementById('feedbackModal');
+            if (modalEl) new bootstrap.Modal(modalEl).show();
 
-                const updatePurokOptions = (barangay) => {
-                    if (!purokSelect) {
-                        return;
-                    }
-
-                    const previouslySelected = purokSelect.getAttribute('data-selected');
-                    purokSelect.innerHTML = '<option value="">Select Purok</option>';
-
-                    if (!barangayPurokMap[barangay]) {
-                        purokSelect.removeAttribute('required');
-                        purokSelect.setAttribute('data-selected', '');
-                        return;
-                    }
-
-                    barangayPurokMap[barangay].forEach((purok) => {
-                        const option = document.createElement('option');
-                        option.value = purok;
-                        option.textContent = purok;
-                        if (previouslySelected === purok) {
-                            option.selected = true;
-                        }
-                        purokSelect.appendChild(option);
-                    });
-                    purokSelect.setAttribute('required', 'required');
+            window.initPatientRegistrationForms = () => {
+                const map = {
+                    'Barangay 11': ['Purok 1','Purok 2','Purok 3','Purok 4','Purok 5'],
+                    'Barangay 12': ['Purok 1','Purok 2','Purok 3']
                 };
+                document.querySelectorAll('.patient-registration-form').forEach(form => {
+                    const barangay = form.querySelector('[data-role="barangay"]');
+                    const otherGroup = form.querySelector('[data-role="barangay-other-group"]');
+                    const otherInput = form.querySelector('[data-role="barangay-other"]');
+                    const purokGroup = form.querySelector('[data-role="purok-group"]');
+                    const purok = form.querySelector('[data-role="purok"]');
 
-                const handleBarangayChange = () => {
-                    const selectedBarangay = barangaySelect ? barangaySelect.value : '';
-
-                    if (barangayOtherGroup && barangayOtherInput) {
-                        if (selectedBarangay === 'Other') {
-                            barangayOtherGroup.classList.remove('d-none');
-                            barangayOtherInput.setAttribute('required', 'required');
-                        } else {
-                            barangayOtherGroup.classList.add('d-none');
-                            barangayOtherInput.removeAttribute('required');
-                            barangayOtherInput.value = '';
-                        }
-                    }
-
-                    if (purokGroup && purokSelect) {
-                        if (barangayPurokMap[selectedBarangay]) {
+                    const updatePurok = val => {
+                        if (!purok) return;
+                        const prev = purok.dataset.selected || '';
+                        purok.innerHTML = '<option value="">Select Purok</option>';
+                        if (map[val]) {
+                            map[val].forEach(p => {
+                                const opt = new Option(p, p, false, prev === p);
+                                purok.appendChild(opt);
+                            });
+                            purok.required = true;
                             purokGroup.classList.remove('d-none');
-                            updatePurokOptions(selectedBarangay);
                         } else {
+                            purok.required = false;
                             purokGroup.classList.add('d-none');
-                            purokSelect.removeAttribute('required');
-                            purokSelect.value = '';
-                            purokSelect.setAttribute('data-selected', '');
                         }
-                    }
-                };
+                    };
 
-                if (barangaySelect) {
-                    barangaySelect.addEventListener('change', () => {
-                        if (purokSelect) {
-                            purokSelect.setAttribute('data-selected', '');
+                    barangay?.addEventListener('change', () => {
+                        const v = barangay.value;
+                        if (v === 'Other') {
+                            otherGroup?.classList.remove('d-none');
+                            otherInput?.setAttribute('required', '');
+                        } else {
+                            otherGroup?.classList.add('d-none');
+                            otherInput?.removeAttribute('required');
+                            otherInput.value = '';
                         }
-                        handleBarangayChange();
+                        updatePurok(v);
                     });
-                    handleBarangayChange();
-                }
-
-                if (birthDateInput) {
-                    birthDateInput.addEventListener('change', () => {});
-                    birthDateInput.addEventListener('keyup', () => {});
-                }
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const feedbackModalEl = document.getElementById('feedbackModal');
-            if (feedbackModalEl) {
-                const feedbackModal = new bootstrap.Modal(feedbackModalEl);
-                feedbackModal.show();
-            }
-
+                    barangay && updatePurok(barangay.value);
+                });
+            };
             initPatientRegistrationForms();
+            init();
         });
     </script>
-    <style>
-        /* Dark mode surfaces */
-        /* Surface shades for hierarchy */
-        body.bg-dark .main-content { background-color: #151718; }
-        body.bg-dark .sidebar { background: #212121; border-right-color: #303030; }
-        body.bg-dark .header { background: #1b1e20; border-bottom-color: #2a2f35; }
-        body.bg-dark .sidebar-overlay { background: rgba(0, 0, 0, 0.7); }
-        body.bg-dark .burger-menu-btn { color: #cbd3da; }
-        body.bg-dark .burger-menu-btn:hover { color: #6ea8fe; }
-        body.bg-dark .filter-card,
-        body.bg-dark .table-card,
-        body.bg-dark .metric-card,
-        body.bg-dark .chart-container,
-        body.bg-dark .card,
-        body.bg-dark .modal-content { background: #1e2124; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border-color: #2a2f35; color: #e6e6e6; }
-        body.bg-dark .table thead, body.bg-dark .table-light { background: #1a1f24 !important; color: #e6e6e6; }
-        body.bg-dark .table { color: #d6d6d6; }
-        body.bg-dark .table tr { border-color: #2a2f35; }
-        body.bg-dark .input-group-text { background: #1a1f24; color: #cbd3da; border-color: #2a2f35; }
-        body.bg-dark .form-control, body.bg-dark .form-select, body.bg-dark textarea.form-control {
-            background-color: #0f1316; color: #e6e6e6; border-color: #2a2f35;
-        }
-        body.bg-dark .form-control::placeholder { color: #9aa4ad; }
-        body.bg-dark .text-muted, body.bg-dark small, body.bg-dark .metric-change { color: #b0b0b0 !important; }
-        /* Avatar ring */
-        body.bg-dark .header .bg-primary { outline: 2px solid rgba(255,255,255,0.08); outline-offset: 2px; }
-        body.bg-dark .btn-outline-primary { color: #6ea8fe; border-color: #6ea8fe; }
-        body.bg-dark .btn-outline-primary:hover { background: rgba(13,110,253,0.15); color: #9ec5fe; }
-        body.bg-dark .btn-outline-danger { color: #ff8787; border-color: #ff8787; }
-        body.bg-dark .btn-outline-danger:hover { background: rgba(220,53,69,0.15); color: #ffc2c2; }
-        body.bg-dark .sidebar .nav-link { color: #f1f1f1; }
-        body.bg-dark .sidebar .nav-link:hover { background: #303030; color: #fff; }
-        body.bg-dark .sidebar .nav-link.active { background-color: #303030; color: #fff; }
-        body.bg-dark .sidebar .nav-link.active::before { background-color: #ff0000; }
-        /* Keep badges readable in dark */
-        body.bg-dark .status-user { background-color: rgba(13,110,253,0.2); color: #9ec5fe; }
-        body.bg-dark .status-admin { background-color: rgba(255,193,7,0.2); color: #ffe08a; }
-        body.bg-dark .status-superadmin { background-color: rgba(220,53,69,0.2); color: #f5a3ab; }
-        /* Headings and key numbers inherit theme color */
-        .metric-number, .stat-number, h1, h2, h3, h4, h5, h6 { color: inherit; }
-    </style>
+
     @stack('scripts')
 </body>
 </html>
-
