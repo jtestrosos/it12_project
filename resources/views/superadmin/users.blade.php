@@ -185,19 +185,17 @@
                                                     </td>
                                                     <td>{{ $user->created_at->format('M d, Y') }}</td>
                                                     <td>
-                                                        <div class="d-flex gap-2">
-                                                            <button class="btn btn-outline-primary btn-sm d-flex align-items-center action-btn" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">
-                                                                <i class="fas fa-edit me-1"></i>
-                                                                <span>Edit</span>
+                                                        <div class="btn-group" role="group">
+                                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewUserModal{{ $user->id }}">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                            <button class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">
+                                                                <i class="fas fa-edit"></i>
                                                             </button>
                                                             @if($user->id !== Auth::id())
-                                                            <form method="POST" action="{{ route('superadmin.user.delete', $user) }}" class="d-inline">
-                                                                @csrf
-                                                                <button type="button" class="btn btn-outline-danger btn-sm d-flex align-items-center action-btn" data-confirm data-confirm-title="Archive User" data-confirm-message="Are you sure you want to archive this user?">
-                                                                    <i class="fas fa-archive me-1"></i>
-                                                                    <span>Archive</span>
-                                                                </button>
-                                                            </form>
+                                                            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#archiveUserModal{{ $user->id }}">
+                                                                <i class="fas fa-archive"></i>
+                                                            </button>
                                                             @endif
                                                         </div>
                                                     </td>
@@ -547,6 +545,110 @@
             </div>
         </div>
     </div>
+    @endforeach
+
+    <!-- View User Modals -->
+    @foreach($users as $user)
+    <div class="modal fade" id="viewUserModal{{ $user->id }}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">User Details - {{ $user->name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Name:</strong> {{ $user->name }}</p>
+                            <p><strong>Email:</strong> {{ $user->email }}</p>
+                            <p><strong>Role:</strong> 
+                                <span class="status-badge 
+                                    @if($user->role == 'superadmin') status-superadmin
+                                    @elseif($user->role == 'admin') status-admin
+                                    @else status-user
+                                    @endif">
+                                    {{ ucfirst($user->role === 'user' ? 'patient' : $user->role) }}
+                                </span>
+                            </p>
+                            @if($user->gender)
+                            <p><strong>Gender:</strong> {{ ucfirst($user->gender) }}</p>
+                            @endif
+                        </div>
+                        <div class="col-md-6">
+                            @if($user->phone)
+                            <p><strong>Phone:</strong> {{ $user->phone }}</p>
+                            @endif
+                            @if($user->barangay)
+                            <p><strong>Barangay:</strong> 
+                                @if($user->barangay === 'Other')
+                                    {{ $user->barangay_other ?? 'Other' }}
+                                @else
+                                    {{ $user->barangay }}
+                                @endif
+                            </p>
+                            @endif
+                            @if($user->purok)
+                            <p><strong>Purok:</strong> {{ $user->purok }}</p>
+                            @endif
+                            @if($user->birth_date)
+                            <p><strong>Birth Date:</strong> {{ \Illuminate\Support\Carbon::parse($user->birth_date)->format('M d, Y') }}</p>
+                            @endif
+                        </div>
+                    </div>
+                    @if($user->address)
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <p><strong>Address:</strong> {{ $user->address }}</p>
+                        </div>
+                    </div>
+                    @endif
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <p><strong>Registered:</strong> {{ $user->created_at->format('M d, Y') }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Last Updated:</strong> {{ $user->updated_at->format('M d, Y') }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}" data-bs-dismiss="modal">
+                        <i class="fas fa-edit me-1"></i> Edit User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
+
+    <!-- Archive User Modals -->
+    @foreach($users as $user)
+    @if($user->id !== Auth::id())
+    <div class="modal fade" id="archiveUserModal{{ $user->id }}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Archive User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to archive <strong>{{ $user->name }}</strong>?</p>
+                    <p class="text-muted">This action will remove the user from the active list but preserve their data.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="POST" action="{{ route('superadmin.user.delete', $user) }}" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-archive me-1"></i> Archive User
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
     @endforeach
 
 @push('scripts')
