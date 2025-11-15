@@ -146,55 +146,59 @@
                         </form>
 
                         <!-- Users Table -->
-                        <div class="card">
+                        <div class="card shadow-sm border-0 bg-dark">
                             <div class="card-body p-0">
                                 @if($users->count() > 0)
                                     <div class="table-responsive">
-                                        <table class="table table-hover mb-0">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>User</th>
-                                                    <th>Email</th>
-                                                    <th class="text-center">Role</th>
-                                                    <th>Registered</th>
-                                                    <th>Actions</th>
+                                        <table class="table table-hover align-middle mb-0 text-white" style="border-collapse: separate; border-spacing: 0; background: #212529;">
+                                            <thead>
+                                                <tr style="background: #343a40;">
+                                                    <th class="border-0 text-light fw-semibold ps-4" style="border-bottom: 2px solid #495057 !important; background: transparent;">User</th>
+                                                    <th class="border-0 text-light fw-semibold" style="border-bottom: 2px solid #495057 !important; background: transparent;">Email</th>
+                                                    <th class="border-0 text-light fw-semibold text-center" style="border-bottom: 2px solid #495057 !important; background: transparent;">Role</th>
+                                                    <th class="border-0 text-light fw-semibold" style="border-bottom: 2px solid #495057 !important; background: transparent;">Registered</th>
+                                                    <th class="border-0 text-light fw-semibold text-center pe-4" style="border-bottom: 2px solid #495057 !important; background: transparent;">Actions</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody style="background: #212529;">
                                                 @foreach($users as $user)
-                                                <tr>
-                                                    <td>
+                                                <tr class="border-bottom" style="border-bottom: 1px solid #343a40 !important; background: #212529;" onmouseover="this.style.background='#343a40'" onmouseout="this.style.background='#212529'">
+                                                    <td class="ps-4" style="background: transparent;">
                                                         <div class="d-flex align-items-center">
-                                                            <div class="patient-avatar me-3" style="width: 40px; height: 40px; font-size: 0.9rem;">
+                                                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-size: 0.9rem; font-weight: 600;">
                                                                 {{ substr($user->name, 0, 2) }}
                                                             </div>
                                                             <div>
-                                                                <div class="fw-bold">{{ $user->name }}</div>
+                                                                <div class="fw-bold text-white">{{ $user->name }}</div>
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td>{{ $user->email }}</td>
-                                                    <td class="role-cell">
-                                                        <span class="status-badge 
-                                                            @if($user->role == 'superadmin') status-superadmin
-                                                            @elseif($user->role == 'admin') status-admin
-                                                            @else status-user
-                                                            @endif">
+                                                    <td style="background: transparent;">
+                                                        <span class="text-light">{{ $user->email }}</span>
+                                                    </td>
+                                                    <td class="text-center" style="background: transparent;">
+                                                        <span class="badge rounded-pill 
+                                                            @if($user->role == 'superadmin') bg-danger
+                                                            @elseif($user->role == 'admin') bg-warning
+                                                            @else bg-primary
+                                                            @endif" style="font-size: 0.75rem; padding: 0.5rem 1rem;">
                                                             {{ ucfirst($user->role === 'user' ? 'patient' : $user->role) }}
                                                         </span>
                                                     </td>
-                                                    <td>{{ $user->created_at->format('M d, Y') }}</td>
-                                                    <td>
+<td style="background: transparent;">
+                                                        <span class="text-light small">{{ $user->created_at->format('M d, Y') }}</span>
+                                                    </td>
+                                                    <td class="text-center pe-4" style="background: transparent;">
                                                         <div class="btn-group" role="group">
-                                                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewUserModal{{ $user->id }}">
-                                                                <i class="fas fa-eye"></i>
+                                                            <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#viewUserModal{{ $user->id }}" title="View User">
+                                                                <i class="fas fa-eye text-info"></i>
                                                             </button>
-                                                            <button class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">
-                                                                <i class="fas fa-edit"></i>
+                                                            <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}" title="Edit User">
+                                                                <i class="fas fa-edit text-warning"></i>
                                                             </button>
                                                             @if($user->id !== Auth::id())
-                                                            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#archiveUserModal{{ $user->id }}">
-                                                                <i class="fas fa-archive"></i>
+                                                            <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#archiveUserModal{{ $user->id }}" title="Archive User">
+                                                                <i class="fas fa-archive text-danger"></i>
                                                             </button>
                                                             @endif
                                                         </div>
