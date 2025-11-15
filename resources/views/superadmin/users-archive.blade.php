@@ -42,15 +42,15 @@
                                                         <div class="d-flex gap-2">
                                                             <form method="POST" action="{{ route('superadmin.user.restore', $user->id) }}">
                                                                 @csrf
-                                                                <button type="submit" class="btn btn-outline-success btn-sm d-flex align-items-center action-btn">
+                                                                <button type="button" class="btn btn-outline-success btn-sm d-flex align-items-center action-btn" data-confirm data-confirm-title="Restore User" data-confirm-message="Are you sure you want to restore this user?">
                                                                     <i class="fas fa-undo me-1"></i>
                                                                     <span>Restore</span>
                                                                 </button>
                                                             </form>
-                                                            <form method="POST" action="{{ route('superadmin.user.force-delete', $user->id) }}" onsubmit="return confirm('Permanently delete this user? This cannot be undone.')">
+                                                            <form method="POST" action="{{ route('superadmin.user.force-delete', $user->id) }}">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button type="submit" class="btn btn-outline-danger btn-sm d-flex align-items-center action-btn">
+                                                                <button type="button" class="btn btn-outline-danger btn-sm d-flex align-items-center action-btn" data-confirm data-confirm-title="Delete User" data-confirm-message="Permanently delete this user? This cannot be undone.">
                                                                     <i class="fas fa-trash me-1"></i>
                                                                     <span>Delete</span>
                                                                 </button>
@@ -80,4 +80,68 @@
                                 @endif
                             </div>
                         </div>
+
+                        <!-- Confirm Action Modal -->
+                        <div class="modal fade" id="confirmActionModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="confirmActionTitle">Confirm Action</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body" id="confirmActionMessage">
+                                        Are you sure?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-primary" id="confirmActionBtn">Confirm</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 @endsection
+
+@push('scripts')
+    <script>
+        (function() {
+            const modalEl = document.getElementById('confirmActionModal');
+            if (!modalEl || typeof bootstrap === 'undefined') {
+                return;
+            }
+
+            const modal = new bootstrap.Modal(modalEl);
+            const titleEl = document.getElementById('confirmActionTitle');
+            const messageEl = document.getElementById('confirmActionMessage');
+            const confirmBtn = document.getElementById('confirmActionBtn');
+
+            let pendingForm = null;
+
+            document.querySelectorAll('[data-confirm]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const form = btn.closest('form');
+                    if (!form) return;
+                    pendingForm = form;
+
+                    if (titleEl) {
+                        titleEl.textContent = btn.getAttribute('data-confirm-title') || 'Confirm Action';
+                    }
+                    if (messageEl) {
+                        messageEl.textContent = btn.getAttribute('data-confirm-message') || 'Are you sure you want to proceed?';
+                    }
+
+                    modal.show();
+                });
+            });
+
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => {
+                    if (pendingForm) {
+                        pendingForm.submit();
+                        pendingForm = null;
+                    }
+                    modal.hide();
+                });
+            }
+        })();
+    </script>
+@endpush

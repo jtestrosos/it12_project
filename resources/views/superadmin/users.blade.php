@@ -178,9 +178,9 @@
                                                                 <span>Edit</span>
                                                             </button>
                                                             @if($user->id !== Auth::id())
-                                                            <form method="POST" action="{{ route('superadmin.user.delete', $user) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to archive this user?')">
+                                                            <form method="POST" action="{{ route('superadmin.user.delete', $user) }}" class="d-inline">
                                                                 @csrf
-                                                                <button type="submit" class="btn btn-outline-danger btn-sm d-flex align-items-center action-btn">
+                                                                <button type="button" class="btn btn-outline-danger btn-sm d-flex align-items-center action-btn" data-confirm data-confirm-title="Archive User" data-confirm-message="Are you sure you want to archive this user?">
                                                                     <i class="fas fa-archive me-1"></i>
                                                                     <span>Archive</span>
                                                                 </button>
@@ -210,6 +210,25 @@
                                         <p class="text-muted">There are no registered users at the moment.</p>
                                     </div>
                                 @endif
+                            </div>
+                        </div>
+
+                        <!-- Confirm Action Modal -->
+                        <div class="modal fade" id="confirmActionModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="confirmActionTitle">Confirm Action</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body" id="confirmActionMessage">
+                                        Are you sure?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-primary" id="confirmActionBtn">Confirm</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 @endsection
@@ -517,6 +536,48 @@
                     if (searchInput) searchInput.value = '';
                     if (roleFilter) roleFilter.value = '';
                     form.requestSubmit();
+                });
+            }
+        })();
+
+        // Generic confirmation modal for destructive actions
+        (function() {
+            const modalEl = document.getElementById('confirmActionModal');
+            if (!modalEl || typeof bootstrap === 'undefined') {
+                return;
+            }
+
+            const modal = new bootstrap.Modal(modalEl);
+            const titleEl = document.getElementById('confirmActionTitle');
+            const messageEl = document.getElementById('confirmActionMessage');
+            const confirmBtn = document.getElementById('confirmActionBtn');
+
+            let pendingForm = null;
+
+            document.querySelectorAll('[data-confirm]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const form = btn.closest('form');
+                    if (!form) return;
+                    pendingForm = form;
+
+                    if (titleEl) {
+                        titleEl.textContent = btn.getAttribute('data-confirm-title') || 'Confirm Action';
+                    }
+                    if (messageEl) {
+                        messageEl.textContent = btn.getAttribute('data-confirm-message') || 'Are you sure you want to proceed?';
+                    }
+
+                    modal.show();
+                });
+            });
+
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => {
+                    if (pendingForm) {
+                        pendingForm.submit();
+                        pendingForm = null;
+                    }
+                    modal.hide();
                 });
             }
         })();

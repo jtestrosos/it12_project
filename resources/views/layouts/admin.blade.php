@@ -230,6 +230,11 @@
             padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,.15);
             transition: transform .2s ease;
         }
+
+        /* Feedback modal should have full-width colored header (no inner padding) */
+        #feedbackModal .modal-content.card-surface {
+            padding: 0;
+        }
         .card-surface:hover { transform: translateY(-2px); }
         .filter-card { padding: 1rem; margin-bottom: 1rem; }
         .chart-container { padding: 1.75rem 1.5rem 1.5rem; margin-bottom: 1.5rem; }

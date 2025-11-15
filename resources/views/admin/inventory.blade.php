@@ -451,6 +451,7 @@
                                 <option value="boxes">Boxes</option>
                                 <option value="bottles">Bottles</option>
                                 <option value="vials">Vials</option>
+                                <option value="tablet">Tablet</option>
                                 <option value="units">Units</option>
                             </select>
                         </div>
