@@ -8,16 +8,18 @@
 <style>
         body { color: inherit; }
         .inventory-card {
-            background: white;
-            border-radius: 12px;
+            background: #ffffff;
+            border-radius: 14px;
             padding: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
             margin-bottom: 1rem;
-            border: none;
-            transition: transform 0.2s ease;
+            border: 1px solid #edf1f7;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
         }
         .inventory-card:hover {
             transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.10);
+            border-color: #d0e2ff;
         }
         .stock-indicator {
             width: 12px;
@@ -51,6 +53,7 @@
         .inventory-card { color: inherit; }
         /* Dark mode surfaces */
         body.bg-dark .main-content { background-color: #151718; }
+        /* Inventory uses a slightly darker sidebar in dark mode */
         body.bg-dark .sidebar { background: #131516; border-right-color: #2a2f35; }
         body.bg-dark .header { background: #1b1e20; border-bottom-color: #2a2f35; }
         body.bg-dark .inventory-card { background: #1e2124; color: #e6e6e6; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
@@ -71,11 +74,14 @@
             border-spacing: 0;
         }
         .table-modern thead th {
-            background-color: #f8f9fa;
+            background-color: #f9fafb;
             border: none;
             font-weight: 600;
-            color: #495057;
+            color: #4b5563;
             padding: 0.85rem 1rem;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: .04em;
         }
         .table-modern tbody td {
             border: none;

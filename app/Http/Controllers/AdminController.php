@@ -27,9 +27,45 @@ class AdminController extends Controller
     public function dashboard()
     {
         $totalPatients = User::where('role', 'user')->count();
+
+        // Today metrics
         $todayAppointments = Appointment::whereDate('appointment_date', today())->count();
+        $todayCompleted = Appointment::whereDate('appointment_date', today())
+            ->where('status', 'completed')
+            ->count();
+        $todayPending = Appointment::whereDate('appointment_date', today())
+            ->where('status', 'pending')
+            ->count();
+
+        // Inventory metrics
         $lowStockItems = Inventory::whereColumn('current_stock', '<=', 'minimum_stock')->count();
-        $monthlyServices = Appointment::whereMonth('created_at', now()->month)->count();
+
+        // Monthly services metrics
+        $now = now();
+        $lastMonth = $now->copy()->subMonth();
+
+        $monthlyServices = Appointment::whereMonth('created_at', $now->month)
+            ->whereYear('created_at', $now->year)
+            ->count();
+        $lastMonthServices = Appointment::whereMonth('created_at', $lastMonth->month)
+            ->whereYear('created_at', $lastMonth->year)
+            ->count();
+        $servicesChange = $lastMonthServices > 0
+            ? round((($monthlyServices - $lastMonthServices) / $lastMonthServices) * 100)
+            : null;
+
+        // Monthly patient growth metrics
+        $patientsThisMonth = User::where('role', 'user')
+            ->whereMonth('created_at', $now->month)
+            ->whereYear('created_at', $now->year)
+            ->count();
+        $patientsLastMonth = User::where('role', 'user')
+            ->whereMonth('created_at', $lastMonth->month)
+            ->whereYear('created_at', $lastMonth->year)
+            ->count();
+        $patientsChange = $patientsLastMonth > 0
+            ? round((($patientsThisMonth - $patientsLastMonth) / $patientsLastMonth) * 100)
+            : null;
 
         $recentAppointments = Appointment::with('user')->latest()->limit(5)->get();
         $lowStockInventory = Inventory::whereColumn('current_stock', '<=', 'minimum_stock')->limit(5)->get();
@@ -56,8 +92,12 @@ class AdminController extends Controller
         return view('admin.dashboard', compact(
             'totalPatients',
             'todayAppointments',
+            'todayCompleted',
+            'todayPending',
             'lowStockItems',
             'monthlyServices',
+            'servicesChange',
+            'patientsChange',
             'recentAppointments',
             'lowStockInventory',
             'patientsByBarangay',
@@ -74,6 +114,47 @@ class AdminController extends Controller
             ->paginate(10);
 
         return view('admin.patients', compact('patients'));
+    }
+
+    public function archivePatient(User $user)
+    {
+        if ($user->role !== 'user') {
+            return redirect()->back()->with('error', 'Only patient accounts can be archived from this page.');
+        }
+
+        if ($user->id === Auth::id()) {
+            return redirect()->back()->with('error', 'You cannot archive your own account.');
+        }
+
+        $user->delete();
+
+        return redirect()->back()->with('success', 'Patient archived successfully.');
+    }
+
+    public function archivedPatients()
+    {
+        $patients = User::onlyTrashed()
+            ->where('role', 'user')
+            ->orderByDesc('deleted_at')
+            ->paginate(10);
+
+        return view('admin.patients-archive', compact('patients'));
+    }
+
+    public function restorePatient($id)
+    {
+        $patient = User::onlyTrashed()->where('role', 'user')->findOrFail($id);
+        $patient->restore();
+
+        return redirect()->route('admin.patients.archive')->with('success', 'Patient restored successfully.');
+    }
+
+    public function forceDeletePatient($id)
+    {
+        $patient = User::onlyTrashed()->where('role', 'user')->findOrFail($id);
+        $patient->forceDelete();
+
+        return redirect()->route('admin.patients.archive')->with('success', 'Patient permanently deleted.');
     }
 
     public function createPatient(Request $request)

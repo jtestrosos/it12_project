@@ -8,16 +8,18 @@
 <style>
         body { color: inherit; }
         .patient-card {
-            background: white;
-            border-radius: 12px;
+            background: #ffffff;
+            border-radius: 14px;
             padding: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
             margin-bottom: 1rem;
-            border: none;
-            transition: transform 0.2s ease;
+            border: 1px solid #edf1f7;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
         }
         .patient-card:hover {
             transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.10);
+            border-color: #d0e2ff;
         }
         .status-badge {
             padding: 0.5rem 1rem;
@@ -99,13 +101,16 @@
 
                     <div class="p-0 p-md-4">
                         <!-- Top actions -->
-                        <div class="d-flex flex-wrap justify-content-end align-items-center mb-3 ">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                            <div></div>
                             <div class="d-flex align-items-center gap-2">
+                                <a href="{{ route('admin.patients.archive') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-archive me-2"></i> View Archived Patients
+                                </a>
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPatientModal">
                                     <i class="fas fa-plus me-2"></i> Add New Patient
                                 </button>
                             </div>
-                            <div></div>
                         </div>
 
                         <!-- Search and Filter -->
@@ -204,6 +209,9 @@
                                                         </button>
                                                         <button class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editPatientModal{{ $patient->id }}">
                                                             <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#archivePatientModal{{ $patient->id }}">
+                                                            <i class="fas fa-archive"></i>
                                                         </button>
                                                     </div>
                                                 </td>
@@ -482,6 +490,32 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
+
+    <!-- Archive Patient Modal -->
+    @foreach($patients as $patient)
+    <div class="modal fade" id="archivePatientModal{{ $patient->id }}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Archive Patient</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-2">Are you sure you want to archive this patient?</p>
+                    <p class="fw-bold mb-0">{{ $patient->name }}</p>
+                    <small class="text-muted">{{ $patient->email }}</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="POST" action="{{ route('admin.patient.archive', $patient->id) }}" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-danger">Archive</button>
+                    </form>
                 </div>
             </div>
         </div>

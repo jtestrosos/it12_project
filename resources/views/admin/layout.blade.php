@@ -4,7 +4,7 @@
 <a class="nav-link @if(request()->routeIs('admin.dashboard')) active @endif" href="{{ route('admin.dashboard') }}" data-tooltip="Dashboard">
     <i class="fas fa-th-large"></i> <span class="sidebar-content">Dashboard</span>
 </a>
-<a class="nav-link @if(request()->routeIs('admin.patients')) active @endif" href="{{ route('admin.patients') }}" data-tooltip="Patient Management">
+<a class="nav-link @if(request()->routeIs('admin.patients') || request()->routeIs('admin.patients.archive')) active @endif" href="{{ route('admin.patients') }}" data-tooltip="Patient Management">
     <i class="fas fa-user"></i> <span class="sidebar-content">Patient Management</span>
 </a>
 <a class="nav-link @if(request()->routeIs('admin.appointments')) active @endif" href="{{ route('admin.appointments') }}" data-tooltip="Appointments">

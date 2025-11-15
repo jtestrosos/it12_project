@@ -7,12 +7,18 @@
 @section('page-styles')
 <style>
         .appointment-card {
-            background: white;
-            border-radius: 12px;
+            background: #ffffff;
+            border-radius: 14px;
             padding: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
             margin-bottom: 1rem;
-            border: none;
+            border: 1px solid #edf1f7;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+        .appointment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.10);
+            border-color: #d0e2ff;
         }
         .status-badge {
             padding: 0.5rem 1rem;
@@ -41,16 +47,19 @@
             border-spacing: 0;
         }
         .table-modern thead th {
-            background-color: #f8f9fa;
+            background-color: #f9fafb;
             border: none;
             font-weight: 600;
-            color: #495057;
-            padding: 1rem;
+            color: #4b5563;
+            padding: 0.9rem 1rem;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: .04em;
         }
         .table-modern tbody td {
             border: none;
-            padding: 1rem;
-            border-bottom: 1px solid #f1f3f4;
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid #edf2f7;
         }
         .table-modern tbody tr:hover {
             background-color: #f8f9fa;
@@ -76,6 +85,9 @@
         body.bg-dark .table-modern thead th { background-color: #1a1f24; color: #e6e6e6; }
         body.bg-dark .table-modern tbody td { border-bottom-color: #2a2f35; color: #d6d6d6; }
         body.bg-dark .table-modern tbody tr:hover { background-color: #2a2f35; }
+
+        /* Match Inventory's darker sidebar color in dark mode */
+        body.bg-dark .sidebar { background: #131516; border-right-color: #2a2f35; }
     </style>
 @endsection
 

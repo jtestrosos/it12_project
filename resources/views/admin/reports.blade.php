@@ -8,16 +8,18 @@
 <style>
         body { color: inherit; }
         .stats-card {
-            background: white;
-            border-radius: 6px;
-            padding: 0.75rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 0.5rem;
-            border: none;
-            transition: transform 0.2s ease;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 0.85rem;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+            margin-bottom: 0.75rem;
+            border: 1px solid #edf1f7;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
         }
         .stats-card:hover {
             transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.10);
+            border-color: #d0e2ff;
         }
         .stat-number {
             font-size: 1.3rem;
@@ -30,12 +32,13 @@
             margin-bottom: 0;
         }
         .chart-container {
-            background: white;
-            border-radius: 8px;
-            padding: 0.75rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 0.5rem;
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 1rem;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+            margin-bottom: 0.75rem;
             height: 500px;
+            border: 1px solid #edf1f7;
         }
         .chart-container canvas {
             max-height: 460px !important;
