@@ -1,44 +1,85 @@
 @extends('superadmin.layout')
 
 @section('title', 'Dashboard - Barangay Health Center')
-@section('page-title', 'Dashboard Overview')
-
+@section('page-title', 'Dashboard')
+@section('page-description', 'System overview and analytics')
 
 @section('page-styles')
 <style>
+        html body.bg-dark [class*="admin-sidebar"], html body.bg-dark [class*="sidebar"] { background: #131516 !important; border-right-color: #2a2f35 !important; }
         .metric-card {
             background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             border: none;
-            transition: transform 0.2s ease;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
         }
         .metric-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
         }
         .metric-number {
-            font-size: 2.5rem;
-            font-weight: 700;
+            font-size: 2.75rem;
+            font-weight: 800;
             color: inherit;
+            line-height: 1;
+            margin-bottom: 0.5rem;
         }
         .metric-label {
             color: #6c757d;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
         }
         .metric-change {
-            font-size: 0.8rem;
-            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            margin-top: 0.75rem;
+            font-weight: 500;
+        }
+        .metric-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
         }
         .chart-container {
             background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             margin-bottom: 1.5rem;
             height: 450px;
             position: relative;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .chart-container h6 {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .chart-container canvas {
             max-height: 350px !important;
@@ -49,34 +90,58 @@
         .activity-item {
             display: flex;
             align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #f1f3f4;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            background: #f8f9fa;
+            transition: all 0.2s ease;
+        }
+        .activity-item:hover {
+            background: #e9ecef;
+            transform: translateX(4px);
         }
         .activity-item:last-child {
-            border-bottom: none;
+            margin-bottom: 0;
         }
         .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 1rem;
+            font-weight: 600;
+            flex-shrink: 0;
         }
         .status-completed {
-            background-color: #d4edda;
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
             color: #155724;
         }
         .status-pending {
-            background-color: #fff3cd;
+            background: linear-gradient(135deg, #fff3cd, #ffeeba);
             color: #856404;
         }
         .status-progress {
-            background-color: #d1ecf1;
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
             color: #0c5460;
         }
-        .activity-scroll { max-height: 320px; overflow-y: auto; }
+        .activity-scroll { 
+            max-height: 320px; 
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+        .activity-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .activity-scroll::-webkit-scrollbar-track {
+            background: #f1f3f4;
+            border-radius: 3px;
+        }
+        .activity-scroll::-webkit-scrollbar-thumb {
+            background: #c1c8cd;
+            border-radius: 3px;
+        }
     </style>
 @endsection
 
@@ -84,57 +149,52 @@
                         <!-- Metrics Cards -->
                         <div class="row mb-4">
                             <div class="col-md-3 mb-3">
-                                <div class="metric-card">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <div class="metric-label">Total Patients</div>
-                                            <div class="metric-number">{{ $totalUsers ?? 0 }}</div>
-                                            <div class="metric-change text-success">+12% from last month</div>
-                                        </div>
-                                        <div class="text-primary">
-                                            <i class="fas fa-users fa-2x"></i>
-                                        </div>
+                                <div class="metric-card" style="--accent: #0d6efd; --accent-light: #4d94ff;">
+                                    <div class="metric-icon" style="background: linear-gradient(135deg, #0d6efd, #4d94ff);">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="metric-label">Total Patients</div>
+                                    <div class="metric-number text-primary">{{ $totalUsers ?? 0 }}</div>
+                                    <div class="metric-change text-success">
+                                        <i class="fas fa-arrow-up me-1"></i> +12% from last month
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-3 mb-3">
-                                <div class="metric-card">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <div class="metric-label">Today's Appointments</div>
-                                            <div class="metric-number">{{ ($todayCompleted ?? 0) + ($todayPending ?? 0) }}</div>
-                                            <div class="metric-change text-info">{{ $todayCompleted ?? 0 }} completed, {{ $todayPending ?? 0 }} pending</div>
-                                        </div>
-                                        <div class="text-warning">
-                                            <i class="fas fa-calendar-check fa-2x"></i>
-                                        </div>
+                                <div class="metric-card" style="--accent: #ffc107; --accent-light: #ffda6a;">
+                                    <div class="metric-icon" style="background: linear-gradient(135deg, #ffc107, #ffda6a);">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <div class="metric-label">Today's Appointments</div>
+                                    <div class="metric-number text-warning">{{ ($todayCompleted ?? 0) + ($todayPending ?? 0) }}</div>
+                                    <div class="metric-change text-info">
+                                        <i class="fas fa-check-circle me-1"></i> {{ $todayCompleted ?? 0 }} completed
+                                        <span class="mx-1">·</span>
+                                        <i class="fas fa-clock me-1"></i> {{ $todayPending ?? 0 }} pending
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-3 mb-3">
-                                <div class="metric-card">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <div class="metric-label">Low Stock Items</div>
-                                            <div class="metric-number">{{ $totalInventory ?? 0 }}</div>
-                                        </div>
-                                        <div class="text-danger">
-                                            <i class="fas fa-boxes fa-2x"></i>
-                                        </div>
+                                <div class="metric-card" style="--accent: #dc3545; --accent-light: #f86c6b;">
+                                    <div class="metric-icon" style="background: linear-gradient(135deg, #dc3545, #f86c6b);">
+                                        <i class="fas fa-boxes"></i>
+                                    </div>
+                                    <div class="metric-label">Inventory Items</div>
+                                    <div class="metric-number text-danger">{{ $totalInventory ?? 0 }}</div>
+                                    <div class="metric-change text-muted">
+                                        <i class="fas fa-box me-1"></i> Total items in inventory
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-3 mb-3">
-                                <div class="metric-card">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <div class="metric-label">Total Appointments</div>
-                                            <div class="metric-number">{{ $totalAppointments ?? 0 }}</div>
-                                            <div class="metric-change text-success">{{ $pendingAppointments ?? 0 }} pending</div>
-                                        </div>
-                                        <div class="text-success">
-                                            <i class="fas fa-heartbeat fa-2x"></i>
-                                        </div>
+                                <div class="metric-card" style="--accent: #28a745; --accent-light: #5fcf80;">
+                                    <div class="metric-icon" style="background: linear-gradient(135deg, #28a745, #5fcf80);">
+                                        <i class="fas fa-heartbeat"></i>
+                                    </div>
+                                    <div class="metric-label">Total Appointments</div>
+                                    <div class="metric-number text-success">{{ $totalAppointments ?? 0 }}</div>
+                                    <div class="metric-change text-info">
+                                        <i class="fas fa-hourglass-half me-1"></i> {{ $pendingAppointments ?? 0 }} pending
                                     </div>
                                 </div>
                             </div>
@@ -191,8 +251,8 @@
                                                 @endif
                                             </div>
                                             <div class="flex-grow-1">
-                                                <div class="fw-bold">{{ $log->user ? $log->user->name : 'System' }}</div>
-                                                <div class="text-muted">{{ $log->action }}</div>
+                                                <div class="fw-bold text-dark">{{ $log->user ? $log->user->name : 'System' }}</div>
+                                                <div class="text-muted small">{{ $log->action }}</div>
                                                 <small class="text-muted">{{ $log->created_at->format('h:i A') }}</small>
                                             </div>
                                         </div>

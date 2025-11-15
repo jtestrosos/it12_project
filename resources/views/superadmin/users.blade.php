@@ -6,6 +6,7 @@
 
 @section('page-styles')
 <style>
+        html body.bg-dark [class*="admin-sidebar"], html body.bg-dark [class*="sidebar"] { background: #131516 !important; border-right-color: #2a2f35 !important; }
         .patient-card {
             background: white;
             border-radius: 12px;

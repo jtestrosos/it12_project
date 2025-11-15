@@ -2,10 +2,11 @@
 
 @section('title', 'Analytics - Barangay Health Center')
 @section('page-title', 'Analytics')
-@section('page-description', 'Analytics and reporting dashboard')
+@section('page-description', 'System usage and performance metrics')
 
 @section('page-styles')
 <style>
+        html body.bg-dark [class*="admin-sidebar"], html body.bg-dark [class*="sidebar"] { background: #131516 !important; border-right-color: #2a2f35 !important; }
         .stats-card {
             background: white;
             border-radius: 6px;

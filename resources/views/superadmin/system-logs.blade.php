@@ -2,10 +2,11 @@
 
 @section('title', 'System Logs - Barangay Health Center')
 @section('page-title', 'System Logs')
-@section('page-description', 'View and manage system activity logs')
+@section('page-description', 'View system activity and audit logs')
 
 @section('page-styles')
 <style>
+    html body.bg-dark [class*="admin-sidebar"], html body.bg-dark [class*="sidebar"] { background: #131516 !important; border-right-color: #2a2f35 !important; }
     .pagination {
         margin-bottom: 0;
     }

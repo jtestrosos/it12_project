@@ -1,11 +1,12 @@
 @extends('superadmin.layout')
 
-@section('title', 'System Backup - Barangay Health Center')
-@section('page-title', 'System Backup')
-@section('page-description', 'Manage system backups and data protection')
+@section('title', 'Backup - Barangay Health Center')
+@section('page-title', 'Backup & Restore')
+@section('page-description', 'Manage system backups and data restoration')
 
 @section('page-styles')
 <style>
+        html body.bg-dark [class*="admin-sidebar"], html body.bg-dark [class*="sidebar"] { background: #131516 !important; border-right-color: #2a2f35 !important; }
         .backup-card {
             background: white;
             border-radius: 12px;
@@ -14,6 +15,11 @@
             margin-bottom: 1rem;
             border: none;
             transition: transform 0.2s ease;
+        }
+        body.bg-dark .backup-card {
+            background: #1b1e20;
+            border: 1px solid #2a2f35;
+            color: #e6e6e6;
         }
         .backup-card:hover {
             transform: translateY(-2px);
@@ -32,17 +38,33 @@
             background-color: #d4edda;
             color: #155724;
         }
+        body.bg-dark .backup-success {
+            background-color: #1e3a28;
+            color: #4ade80;
+        }
         .backup-warning {
             background-color: #fff3cd;
             color: #856404;
+        }
+        body.bg-dark .backup-warning {
+            background-color: #3a3a28;
+            color: #fbbf24;
         }
         .backup-danger {
             background-color: #f8d7da;
             color: #721c24;
         }
+        body.bg-dark .backup-danger {
+            background-color: #3a2828;
+            color: #f87171;
+        }
         .backup-info {
             background-color: #d1ecf1;
             color: #0c5460;
+        }
+        body.bg-dark .backup-info {
+            background-color: #283a3a;
+            color: #67e8f9;
         }
         .progress-bar {
             height: 8px;

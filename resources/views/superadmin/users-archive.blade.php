@@ -4,6 +4,12 @@
 @section('page-title', 'Archived Users')
 @section('page-description', 'View and manage archived user accounts')
 
+@section('page-styles')
+<style>
+        html body.bg-dark [class*="admin-sidebar"], html body.bg-dark [class*="sidebar"] { background: #131516 !important; border-right-color: #2a2f35 !important; }
+</style>
+@endsection
+
 @section('content')
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <div>
