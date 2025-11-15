@@ -6,7 +6,15 @@
 
 @section('page-styles')
 <style>
-        html body.bg-dark [class*="admin-sidebar"], html body.bg-dark [class*="sidebar"] { background: #131516 !important; border-right-color: #2a2f35 !important; }
+        /* Theme-aware text */
+        body { color: #111; }
+        body.bg-dark { color: #fff; }
+        
+        /* Dark mode styles for stats cards */
+        body.bg-dark .stats-card { background: #1e2124; color: #e6e6e6; }
+        body.bg-dark .stats-card:hover { background: #2a2f35; }
+        body.bg-dark .chart-container { background: #1e2124; color: #e6e6e6; }
+        body.bg-dark .stat-label { color: #cbd3da; }
         .stats-card {
             background: white;
             border-radius: 6px;
@@ -42,6 +50,16 @@
         }
     </style>
 @endsection
+
+@push('styles')
+<style>
+    /* Sidebar dark mode override - loaded AFTER layout styles */
+    body.bg-dark .sidebar { 
+        background: #131516 !important; 
+        border-right-color: #2a2f35 !important; 
+    }
+</style>
+@endpush
 
 @section('content')
                         <!-- Statistics Row -->

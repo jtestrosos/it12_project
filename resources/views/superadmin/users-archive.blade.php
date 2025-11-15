@@ -6,9 +6,18 @@
 
 @section('page-styles')
 <style>
-        html body.bg-dark [class*="admin-sidebar"], html body.bg-dark [class*="sidebar"] { background: #131516 !important; border-right-color: #2a2f35 !important; }
 </style>
 @endsection
+
+@push('styles')
+<style>
+    /* Sidebar dark mode override - loaded AFTER layout styles */
+    body.bg-dark .sidebar { 
+        background: #131516 !important; 
+        border-right-color: #2a2f35 !important; 
+    }
+</style>
+@endpush
 
 @section('content')
                         <div class="d-flex justify-content-between align-items-center mb-4">
