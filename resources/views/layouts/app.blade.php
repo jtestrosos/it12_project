@@ -463,7 +463,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="{{ route('login') }}" id="loginForm">
+                    <form method="POST" action="{{ route('login') }}" >
                         @csrf
                         <div class="mb-3">
                             <label for="login-email" class="form-label">Email address</label>
@@ -667,7 +667,7 @@
             @endif
 
             // Login form: show/hide password and handle AJAX submission
-            const loginForm = document.getElementById('loginForm');
+            
             const loginPasswordInput = document.getElementById('login-password');
             const loginShowPasswordBtn = document.getElementById('login-show-password-btn');
             const loginShowPasswordIcon = document.getElementById('login-show-password-icon');
@@ -691,85 +691,7 @@
                 });
             }
 
-            if (loginForm) {
-                loginForm.addEventListener('submit', function (e) {
-                    e.preventDefault();
-
-                    // Clear previous client-side error state
-                    const emailInput = document.getElementById('login-email');
-                    const passwordInput = document.getElementById('login-password');
-                    const existingInvalidFeedbacks = loginForm.querySelectorAll('.invalid-feedback.js-login-error');
-
-                    [emailInput, passwordInput].forEach((input) => {
-                        if (input) {
-                            input.classList.remove('is-invalid');
-                        }
-                    });
-                    existingInvalidFeedbacks.forEach((el) => el.remove());
-
-                    if (loginSubmitBtn) {
-                        loginSubmitBtn.disabled = true;
-                    }
-
-                    const formData = new FormData(loginForm);
-
-                    fetch(loginForm.action, {
-                        method: 'POST',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
-                        },
-                        body: formData,
-                    })
-                        .then(async (response) => {
-                            if (response.ok) {
-                                const data = await response.json().catch(() => null);
-                                if (data && data.redirect) {
-                                    window.location.href = data.redirect;
-                                } else {
-                                    window.location.reload();
-                                }
-                                return;
-                            }
-
-                            // Handle validation / auth errors
-                            let data = null;
-                            try {
-                                data = await response.json();
-                            } catch (_) {}
-
-                            if (data && data.errors) {
-                                const errors = data.errors;
-                                if (errors.email && emailInput) {
-                                    emailInput.classList.add('is-invalid');
-                                    const div = document.createElement('div');
-                                    div.className = 'invalid-feedback js-login-error';
-                                    div.textContent = Array.isArray(errors.email) ? errors.email[0] : errors.email;
-                                    emailInput.insertAdjacentElement('afterend', div);
-                                }
-                                if (errors.password && passwordInput) {
-                                    passwordInput.classList.add('is-invalid');
-                                    const div = document.createElement('div');
-                                    div.className = 'invalid-feedback js-login-error';
-                                    div.textContent = Array.isArray(errors.password) ? errors.password[0] : errors.password;
-                                    passwordInput.insertAdjacentElement('afterend', div);
-                                }
-                            } else {
-                                // Fallback: reload page to let Laravel show errors normally
-                                window.location.reload();
-                            }
-                        })
-                        .catch(() => {
-                            window.location.reload();
-                        })
-                        .finally(() => {
-                            if (loginSubmitBtn) {
-                                loginSubmitBtn.disabled = false;
-                            }
-                        });
-                });
-            }
-
+                                            
             const barangayPurokMap = {
                 'Barangay 11': ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
                 'Barangay 12': ['Purok 1', 'Purok 2', 'Purok 3'],
