@@ -15,7 +15,7 @@
                     <h2 class="fw-bold mb-4">Contact Us</h2>
                     <div class="mb-3">
                         <h6>Email</h6>
-                        <a href="mailto:barangay.clinic@example.com">barangay.clinic@example.com</a>
+                        <a href="mailto:barangay.clinic@example.com">barangay12@malasakit.com</a>
                     </div>
                     <div class="mb-3">
                         <h6>Phone</h6>
@@ -23,7 +23,7 @@
                     </div>
                     <div class="mb-3">
                         <h6>Location</h6>
-                        <div>Barangay Health Clinic<br>123 Main St., Barangay</div>
+                        <div>Barangay Health Clinic<br>V. Mapa St Brgy 12, Davao City</div>
                     </div>
                     <div class="mb-3">
                         <h6>Clinic Hours</h6>

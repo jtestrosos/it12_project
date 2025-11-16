@@ -135,12 +135,14 @@
                                     <div class="h5 mb-0">{{ $stats['total_items'] ?? 0 }}</div>
                                 </div>
                             </div>
+                            
                             <div class="col-md-3">
                                 <div class="inventory-card py-3">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="small text-muted">Low Stock</div>
                                         <i class="fas fa-cubes-stacked text-warning"></i>
                                     </div>
+
                                     <div class="h5 mb-0">{{ $stats['low_stock'] ?? 0 }}</div>
                                 </div>
                             </div>
