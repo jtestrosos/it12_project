@@ -273,7 +273,18 @@
                                                                 </div>
                                                                 <div class="col-md-6">
                                                                     <label class="form-label">New Time</label>
-                                                                    <input type="time" name="new_time" class="form-control" required>
+                                                                    <input type="time" name="new_time" class="form-control" step="1800" required>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row g-3 mt-3">
+                                                                <div class="col-md-6">
+                                                                    <label class="form-label">New Duration</label>
+                                                                    <select class="form-select" name="new_duration" required>
+                                                                        <option value="" disabled selected>Select Duration</option>
+                                                                        @for ($i = 30; $i <= 60; $i++)
+                                                                            <option value="{{ $i }}">{{ $i }} minutes</option>
+                                                                        @endfor
+                                                                    </select>
                                                                 </div>
                                                             </div>
                                                             <div class="mt-3">
@@ -366,7 +377,7 @@
                                 <div class="mb-3">
                                     <label for="service_type" class="form-label">Service Type <span class="text-danger">*</span></label>
                                     <select class="form-select" id="service_type" name="service_type" required>
-                                        <option value="">Select Service</option>
+                                        <option value="" disabled selected>Select Service</option>
                                         <option value="General Checkup">General Checkup</option>
                                         <option value="Prenatal">Prenatal</option>
                                         <option value="Immunization">Immunization</option>
@@ -385,7 +396,20 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="appointment_time" class="form-label">Appointment Time <span class="text-danger">*</span></label>
-                                    <input type="time" class="form-control" id="appointment_time" name="appointment_time" required>
+                                    <input type="time" class="form-control" id="appointment_time" name="appointment_time" step="1800" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="duration" class="form-label">Duration <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="duration" name="duration" required>
+                                        <option value="" disabled selected>Select Duration</option>
+                                        @for ($i = 30; $i <= 60; $i++)
+                                            <option value="{{ $i }}">{{ $i }} minutes</option>
+                                        @endfor
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -608,6 +632,18 @@
                 });
             });
         }
+
+        // Restrict date inputs to today up to 1 month from now
+        const today = new Date();
+        const minDate = today.toISOString().split('T')[0];
+        const oneMonthFromNow = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+        const maxDate = oneMonthFromNow.toISOString().split('T')[0];
+
+        const dateInputs = document.querySelectorAll('input[type="date"]');
+        dateInputs.forEach(input => {
+            input.min = minDate;
+            input.max = maxDate;
+        });
     });
 </script>
 @endpush
