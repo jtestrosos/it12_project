@@ -248,14 +248,6 @@
                 </div>
                 <form action="{{ route('admin.patient.create') }}" method="POST" class="patient-registration-form">
                     @csrf
-                    @php
-                        $oldBarangay = old('barangay');
-                        $purokOptions = match ($oldBarangay) {
-                            'Barangay 11' => ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
-                            'Barangay 12' => ['Purok 1', 'Purok 2', 'Purok 3'],
-                            default => [],
-                        };
-                    @endphp
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
@@ -271,7 +263,7 @@
                                 <div class="mb-3">
                                     <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
                                     <select class="form-control @error('gender') is-invalid @enderror" id="gender" name="gender" required>
-                                        <option value="">Select Gender</option>
+                                        <option value="" disabled selected>Select Gender</option>
                                         <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
                                         <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
                                         <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Other</option>
@@ -307,10 +299,10 @@
                                 <div class="mb-3">
                                     <label for="barangay" class="form-label">Barangay <span class="text-danger">*</span></label>
                                     <select class="form-control @error('barangay') is-invalid @enderror" id="barangay" name="barangay" data-role="barangay" required>
-                                        <option value="">Select Barangay</option>
-                                        <option value="Barangay 11" {{ $oldBarangay === 'Barangay 11' ? 'selected' : '' }}>Barangay 11</option>
-                                        <option value="Barangay 12" {{ $oldBarangay === 'Barangay 12' ? 'selected' : '' }}>Barangay 12</option>
-                                        <option value="Other" {{ $oldBarangay === 'Other' ? 'selected' : '' }}>Other</option>
+                                        <option value="" disabled selected>Select Barangay</option>
+                                        <option value="Barangay 11" {{ old('barangay') === 'Barangay 11' ? 'selected' : '' }}>Barangay 11</option>
+                                        <option value="Barangay 12" {{ old('barangay') === 'Barangay 12' ? 'selected' : '' }}>Barangay 12</option>
+                                        <option value="Other" {{ old('barangay') === 'Other' ? 'selected' : '' }}>Other</option>
                                     </select>
                                     @error('barangay')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -318,35 +310,30 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="mb-3 {{ in_array($oldBarangay, ['Barangay 11', 'Barangay 12']) ? '' : 'd-none' }}" data-role="purok-group">
+                                <div class="mb-3 {{ old('barangay') && in_array(old('barangay'), ['Barangay 11', 'Barangay 12']) ? '' : 'd-none' }}" data-role="purok-group">
                                     <label for="purok" class="form-label">Purok <span class="text-danger">*</span></label>
                                     <select class="form-control @error('purok') is-invalid @enderror" id="purok" name="purok" data-role="purok" data-selected="{{ old('purok') }}">
-                                        <option value="">Select Purok</option>
-                                        @foreach ($purokOptions as $purok)
-                                            <option value="{{ $purok }}" {{ old('purok') === $purok ? 'selected' : '' }}>{{ $purok }}</option>
-                                        @endforeach
+                                        <option value="" disabled selected>Select Purok</option>
                                     </select>
                                     @error('purok')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+                                <div class="mb-3 {{ old('barangay') === 'Other' ? '' : 'd-none' }}" data-role="barangay-other-group">
+                                    <label for="barangay_other" class="form-label">Specify Barangay <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control @error('barangay_other') is-invalid @enderror" id="barangay_other" name="barangay_other" value="{{ old('barangay_other') }}" data-role="barangay-other">
+                                    @error('barangay_other')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
-                        <div class="row align-items-end">
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="birth_date" class="form-label">Birth Date <span class="text-danger">*</span></label>
                                     <input type="date" class="form-control @error('birth_date') is-invalid @enderror" id="birth_date" name="birth_date" value="{{ old('birth_date') }}" data-role="birth-date" max="{{ now()->toDateString() }}" required>
                                     @error('birth_date')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3 {{ $oldBarangay === 'Other' ? '' : 'd-none' }}" data-role="barangay-other-group">
-                                    <label for="barangay_other" class="form-label">Specify Barangay <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('barangay_other') is-invalid @enderror" id="barangay_other" name="barangay_other" value="{{ old('barangay_other') }}" data-role="barangay-other">
-                                    @error('barangay_other')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -536,13 +523,6 @@
                     @method('PUT')
                     @php
                         $editBarangay = old('barangay', $patient->barangay);
-                        $editPurokOptions = match ($editBarangay) {
-                            'Barangay 11' => ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
-                            'Barangay 12' => ['Purok 1', 'Purok 2', 'Purok 3'],
-                            default => [],
-                        };
-                        $editBirthDateValue = old('birth_date', $patient->birth_date ? \Illuminate\Support\Carbon::parse($patient->birth_date)->format('Y-m-d') : '');
-                        $editAgeValue = $editBirthDateValue ? \Illuminate\Support\Carbon::parse($editBirthDateValue)->age : ($patient->age ?? '');
                     @endphp
                     <div class="modal-body">
                         <div class="row">
@@ -559,7 +539,7 @@
                                 <div class="mb-3">
                                     <label for="edit_gender{{ $patient->id }}" class="form-label">Gender <span class="text-danger">*</span></label>
                                     <select class="form-control @error('gender') is-invalid @enderror" id="edit_gender{{ $patient->id }}" name="gender" required>
-                                        <option value="">Select Gender</option>
+                                        <option value="" disabled selected>Select Gender</option>
                                         <option value="male" {{ old('gender', $patient->gender) == 'male' ? 'selected' : '' }}>Male</option>
                                         <option value="female" {{ old('gender', $patient->gender) == 'female' ? 'selected' : '' }}>Female</option>
                                         <option value="other" {{ old('gender', $patient->gender) == 'other' ? 'selected' : '' }}>Other</option>
@@ -595,7 +575,7 @@
                                 <div class="mb-3">
                                     <label for="edit_barangay{{ $patient->id }}" class="form-label">Barangay <span class="text-danger">*</span></label>
                                     <select class="form-control @error('barangay') is-invalid @enderror" id="edit_barangay{{ $patient->id }}" name="barangay" data-role="barangay" required>
-                                        <option value="">Select Barangay</option>
+                                        <option value="" disabled selected>Select Barangay</option>
                                         <option value="Barangay 11" {{ $editBarangay === 'Barangay 11' ? 'selected' : '' }}>Barangay 11</option>
                                         <option value="Barangay 12" {{ $editBarangay === 'Barangay 12' ? 'selected' : '' }}>Barangay 12</option>
                                         <option value="Other" {{ $editBarangay === 'Other' ? 'selected' : '' }}>Other</option>
@@ -606,15 +586,19 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="mb-3 {{ in_array($editBarangay, ['Barangay 11', 'Barangay 12']) ? '' : 'd-none' }}" data-role="purok-group">
+                                <div class="mb-3 {{ $editBarangay && in_array($editBarangay, ['Barangay 11', 'Barangay 12']) ? '' : 'd-none' }}" data-role="purok-group">
                                     <label for="edit_purok{{ $patient->id }}" class="form-label">Purok <span class="text-danger">*</span></label>
                                     <select class="form-control @error('purok') is-invalid @enderror" id="edit_purok{{ $patient->id }}" name="purok" data-role="purok" data-selected="{{ old('purok', $patient->purok ?? '') }}">
-                                        <option value="">Select Purok</option>
-                                        @foreach ($editPurokOptions as $purok)
-                                            <option value="{{ $purok }}" {{ old('purok', $patient->purok ?? '') === $purok ? 'selected' : '' }}>{{ $purok }}</option>
-                                        @endforeach
+                                        <option value="" disabled selected>Select Purok</option>
                                     </select>
                                     @error('purok')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="mb-3 {{ $editBarangay === 'Other' ? '' : 'd-none' }}" data-role="barangay-other-group">
+                                    <label for="edit_barangay_other{{ $patient->id }}" class="form-label">Specify Barangay <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control @error('barangay_other') is-invalid @enderror" id="edit_barangay_other{{ $patient->id }}" name="barangay_other" value="{{ old('barangay_other', $patient->barangay_other ?? '') }}" data-role="barangay-other">
+                                    @error('barangay_other')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -624,17 +608,8 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="edit_birth_date{{ $patient->id }}" class="form-label">Birth Date <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control @error('birth_date') is-invalid @enderror" id="edit_birth_date{{ $patient->id }}" name="birth_date" value="{{ $editBirthDateValue }}" data-role="birth-date" max="{{ now()->toDateString() }}" required>
+                                    <input type="date" class="form-control @error('birth_date') is-invalid @enderror" id="edit_birth_date{{ $patient->id }}" name="birth_date" value="{{ old('birth_date', $patient->birth_date ? \Illuminate\Support\Carbon::parse($patient->birth_date)->format('Y-m-d') : '') }}" data-role="birth-date" max="{{ now()->toDateString() }}" required>
                                     @error('birth_date')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3 {{ $editBarangay === 'Other' ? '' : 'd-none' }}" data-role="barangay-other-group">
-                                    <label for="edit_barangay_other{{ $patient->id }}" class="form-label">Specify Barangay <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('barangay_other') is-invalid @enderror" id="edit_barangay_other{{ $patient->id }}" name="barangay_other" value="{{ old('barangay_other', $patient->barangay_other ?? '') }}" data-role="barangay-other">
-                                    @error('barangay_other')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -813,6 +788,52 @@
             statusFilter.addEventListener('change', filterTable);
             appointmentFilter.addEventListener('change', filterTable);
             barangayFilter.addEventListener('input', filterTable);
+
+            // Barangay change handler for purok and other fields
+            document.querySelectorAll('select[data-role="barangay"]').forEach(select => {
+                select.addEventListener('change', function() {
+                    const form = this.closest('form');
+                    const purokGroup = form.querySelector('[data-role="purok-group"]');
+                    const otherGroup = form.querySelector('[data-role="barangay-other-group"]');
+                    const purokSelect = form.querySelector('[data-role="purok"]');
+                    const value = this.value;
+
+                    if (value === 'Barangay 11' || value === 'Barangay 12') {
+                        purokGroup.classList.remove('d-none');
+                        otherGroup.classList.add('d-none');
+
+                        // Populate purok options
+                        purokSelect.innerHTML = '<option value="" disabled selected>Select Purok</option>';
+                        let options = [];
+                        if (value === 'Barangay 11') {
+                            options = ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'];
+                        } else if (value === 'Barangay 12') {
+                            options = ['Purok 1', 'Purok 2', 'Purok 3'];
+                        }
+                        options.forEach(opt => {
+                            const option = document.createElement('option');
+                            option.value = opt;
+                            option.text = opt;
+                            purokSelect.add(option);
+                        });
+
+                        // Restore selected value if available
+                        const selected = purokSelect.dataset.selected;
+                        if (selected && options.includes(selected)) {
+                            purokSelect.value = selected;
+                        }
+                    } else if (value === 'Other') {
+                        purokGroup.classList.add('d-none');
+                        otherGroup.classList.remove('d-none');
+                    } else {
+                        purokGroup.classList.add('d-none');
+                        otherGroup.classList.add('d-none');
+                    }
+                });
+
+                // Trigger initial state on load
+                select.dispatchEvent(new Event('change'));
+            });
             
         });
     </script>
