@@ -188,19 +188,44 @@
         }
 
         /* Public Layout */
+        header .navbar {
+            background: #17a2b8 !important;
+            min-height: 80px;
+        }
+
         .public-layout .navbar {
             background: #17a2b8;
             min-height: 80px;
         }
 
+        .navbar-brand img {
+            height: 65px;
+            width: auto;
+            margin-right: 1rem;
+            object-fit: contain;
+        }
+
         .public-layout .navbar-brand img {
-            height: 40px;
+            height: 65px;
             margin-right: 1rem;
         }
 
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .navbar-brand span {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: white;
+            line-height: 1.2;
+        }
+
         .public-layout .navbar-brand span {
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 1.75rem;
+            font-weight: 700;
             color: white;
         }
 

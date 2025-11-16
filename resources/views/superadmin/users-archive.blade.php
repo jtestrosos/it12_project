@@ -6,7 +6,76 @@
 
 @section('page-styles')
 <style>
-</style>
+        /* Card container - responds to dark mode */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+        }
+        body.bg-dark .card {
+            background: #1e2124;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            border-color: #2a2f35;
+            color: #e6e6e6;
+        }
+
+        /* Table styles - clean and theme-aware */
+        .table {
+            margin-bottom: 0;
+        }
+        .table thead th {
+            border-bottom: 2px solid #e9ecef;
+            font-weight: 600;
+            padding: 1rem;
+            background: transparent;
+        }
+        .table.table-dark thead th,
+        body.bg-dark .table thead th {
+            border-bottom-color: #2a2f35;
+            color: #e6e6e6;
+            background: transparent !important;
+        }
+        .table tbody tr {
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.2s ease;
+        }
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .table.table-dark tbody tr,
+        body.bg-dark .table tbody tr {
+            border-bottom-color: #2a2f35;
+        }
+        .table.table-dark tbody tr:hover,
+        body.bg-dark .table tbody tr:hover {
+            background-color: #2a2f35;
+        }
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+        .table.table-dark tbody td,
+        body.bg-dark .table tbody td {
+            color: #e6e6e6;
+        }
+
+        /* Pagination */
+        .border-top {
+            border-top: 1px solid #e9ecef !important;
+        }
+        body.bg-dark .border-top {
+            border-top-color: #2a2f35 !important;
+        }
+
+        /* Empty state */
+        body.bg-dark .text-muted {
+            color: #b0b0b0 !important;
+        }
+        body.bg-dark .card-body {
+            color: #e6e6e6;
+        }
+    </style>
 @endsection
 
 @push('styles')
@@ -37,7 +106,7 @@
                                 @if($users->count() > 0)
                                     <div class="table-responsive">
                                         <table class="table table-hover mb-0">
-                                            <thead class="table-light">
+                                            <thead>
                                                 <tr>
                                                     <th>User</th>
                                                     <th>Email</th>
@@ -118,6 +187,29 @@
 
 @push('scripts')
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Sync table with dark mode on page load
+            const syncTableDark = () => {
+                const isDark = document.body.classList.contains('bg-dark');
+                const table = document.querySelector('.table');
+                if (table) {
+                    table.classList.toggle('table-dark', isDark);
+                }
+            };
+            
+            // Sync on load
+            syncTableDark();
+            
+            // Watch for theme changes
+            const observer = new MutationObserver(() => {
+                syncTableDark();
+            });
+            observer.observe(document.body, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        });
+
         (function() {
             const modalEl = document.getElementById('confirmActionModal');
             if (!modalEl || typeof bootstrap === 'undefined') {

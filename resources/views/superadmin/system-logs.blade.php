@@ -6,21 +6,87 @@
 
 @section('page-styles')
 <style>
-    .pagination {
+    /* Filter card and table card - dark mode */
+    .filter-card, .table-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        border: 1px solid #e9ecef;
+    }
+    body.bg-dark .filter-card,
+    body.bg-dark .table-card {
+        background: #1e2124;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        border-color: #2a2f35;
+        color: #e6e6e6;
+    }
+
+    /* Table styles - clean and theme-aware */
+    .table {
         margin-bottom: 0;
     }
-    .pagination .page-link {
-        padding: 0.375rem 0.75rem;
-        font-size: 0.875rem;
+    .table thead th {
+        border-bottom: 2px solid #e9ecef;
+        font-weight: 600;
+        padding: 1rem;
+        background: transparent;
     }
-    .pagination .page-item.active .page-link {
-        background-color: #007bff;
-        border-color: #007bff;
+    .table.table-dark thead th,
+    body.bg-dark .table thead th {
+        border-bottom-color: #2a2f35;
+        color: #e6e6e6;
+        background: transparent !important;
     }
-    /* Hide Prev/Next buttons (keep only page numbers) */
-    .pagination .page-item:first-child,
-    .pagination .page-item:last-child {
-        display: none !important;
+    .table tbody tr {
+        border-bottom: 1px solid #e9ecef;
+        transition: background-color 0.2s ease;
+    }
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    .table.table-dark tbody tr,
+    body.bg-dark .table tbody tr {
+        border-bottom-color: #2a2f35;
+    }
+    .table.table-dark tbody tr:hover,
+    body.bg-dark .table tbody tr:hover {
+        background-color: #2a2f35;
+    }
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+    .table.table-dark tbody td,
+    body.bg-dark .table tbody td {
+        color: #e6e6e6;
+    }
+
+    /* Empty state */
+    body.bg-dark .text-muted {
+        color: #b0b0b0 !important;
+    }
+
+    /* Modal dark mode */
+    body.bg-dark .modal-content {
+        background: #1e2124;
+        color: #e6e6e6;
+        border-color: #2a2f35;
+    }
+    body.bg-dark .modal-header {
+        border-bottom-color: #2a2f35;
+    }
+    body.bg-dark .modal-footer {
+        border-top-color: #2a2f35;
+    }
+    body.bg-dark .modal-body pre {
+        background: #0f1316 !important;
+        color: #e6e6e6 !important;
+        border-color: #2a2f35 !important;
+    }
+    body.bg-dark .modal-body strong {
+        color: #e6e6e6;
     }
 </style>
 @endsection
@@ -82,7 +148,7 @@
     @if($logs->count() > 0)
     <div class="table-responsive">
         <table class="table table-hover">
-            <thead class="table-light">
+            <thead>
                 <tr>
                     <th>User ID</th>
                     <th>User</th>
@@ -172,11 +238,6 @@
             </tbody>
         </table>
     </div>
-    
-    <!-- Pagination -->
-    <div class="mt-3 d-flex justify-content-center">
-        {{ $logs->withQueryString()->links() }}
-    </div>
     @else
     <div class="text-center py-5">
         <i class="fas fa-list fa-3x text-muted mb-3"></i>
@@ -250,6 +311,29 @@
 
 @push('scripts')
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Sync table with dark mode on page load
+            const syncTableDark = () => {
+                const isDark = document.body.classList.contains('bg-dark');
+                const table = document.querySelector('.table');
+                if (table) {
+                    table.classList.toggle('table-dark', isDark);
+                }
+            };
+            
+            // Sync on load
+            syncTableDark();
+            
+            // Watch for theme changes
+            const observer = new MutationObserver(() => {
+                syncTableDark();
+            });
+            observer.observe(document.body, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        });
+
         document.addEventListener('show.bs.modal', function (event) {
             const modal = document.getElementById('logDetailsModal');
             if (!modal || event.target !== modal) return;

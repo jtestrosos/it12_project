@@ -15,6 +15,11 @@
             margin-bottom: 0.75rem;
             border: 1px solid #edf1f7;
             transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+            min-width: 70px;
+            min-height: 80px;
+        }
+        .d-flex .stats-card {
+            margin-bottom: 0;
         }
         .stats-card:hover {
             transform: translateY(-2px);
@@ -87,36 +92,26 @@
                             <div class="col-md-6">
                                 <div class="chart-container" style="height: 150px; padding: 0.75rem;">
                                     <h6 class="mb-2" style="font-size: 1rem;">Appointment Statistics</h6>
-                                    <div class="row justify-content-center">
-                                        <div class="col-2">
-                                            <div class="stats-card text-center">
-                                                <div class="stat-number text-primary">{{ $appointmentStats['total'] ?? 0 }}</div>
-                                                <div class="stat-label">Total</div>
-                                            </div>
+                                    <div class="d-flex justify-content-center align-items-stretch gap-2 flex-wrap">
+                                        <div class="stats-card text-center d-flex flex-column justify-content-center" style="flex: 1 1 auto; min-width: 70px; max-width: 100px;">
+                                            <div class="stat-number text-primary">{{ $appointmentStats['total'] ?? 0 }}</div>
+                                            <div class="stat-label">Total</div>
                                         </div>
-                                        <div class="col-2">
-                                            <div class="stats-card text-center">
-                                                <div class="stat-number text-warning">{{ $appointmentStats['pending'] ?? 0 }}</div>
-                                                <div class="stat-label">Pending</div>
-                                            </div>
+                                        <div class="stats-card text-center d-flex flex-column justify-content-center" style="flex: 1 1 auto; min-width: 70px; max-width: 100px;">
+                                            <div class="stat-number text-warning">{{ $appointmentStats['pending'] ?? 0 }}</div>
+                                            <div class="stat-label">Pending</div>
                                         </div>
-                                        <div class="col-2">
-                                            <div class="stats-card text-center">
-                                                <div class="stat-number text-success">{{ $appointmentStats['approved'] ?? 0 }}</div>
-                                                <div class="stat-label">Approved</div>
-                                            </div>
+                                        <div class="stats-card text-center d-flex flex-column justify-content-center" style="flex: 1 1 auto; min-width: 70px; max-width: 100px;">
+                                            <div class="stat-number text-success">{{ $appointmentStats['approved'] ?? 0 }}</div>
+                                            <div class="stat-label">Approved</div>
                                         </div>
-                                        <div class="col-2">
-                                            <div class="stats-card text-center">
-                                                <div class="stat-number text-info">{{ $appointmentStats['completed'] ?? 0 }}</div>
-                                                <div class="stat-label">Completed</div>
-                                            </div>
+                                        <div class="stats-card text-center d-flex flex-column justify-content-center" style="flex: 1 1 auto; min-width: 70px; max-width: 100px;">
+                                            <div class="stat-number text-info">{{ $appointmentStats['completed'] ?? 0 }}</div>
+                                            <div class="stat-label">Completed</div>
                                         </div>
-                                        <div class="col-2">
-                                            <div class="stats-card text-center">
-                                                <div class="stat-number text-danger">{{ $appointmentStats['cancelled'] ?? 0 }}</div>
-                                                <div class="stat-label">Cancelled</div>
-                                            </div>
+                                        <div class="stats-card text-center d-flex flex-column justify-content-center" style="flex: 1 1 auto; min-width: 70px; max-width: 100px;">
+                                            <div class="stat-number text-danger">{{ $appointmentStats['cancelled'] ?? 0 }}</div>
+                                            <div class="stat-label">Cancelled</div>
                                         </div>
                                     </div>
                                 </div>

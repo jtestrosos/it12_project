@@ -6,9 +6,7 @@
 
 @section('page-styles')
 <style>
-        /* Dark mode styles for user cards */
-        body.bg-dark .patient-card { background: #1e2124; color: #e6e6e6; }
-        body.bg-dark .patient-card:hover { background: #2a2f35; }
+        /* User cards */
         .patient-card {
             background: white;
             border-radius: 12px;
@@ -21,12 +19,27 @@
         .patient-card:hover {
             transform: translateY(-2px);
         }
+        body.bg-dark .patient-card {
+            background: #1e2124;
+            color: #e6e6e6;
+        }
+        body.bg-dark .patient-card:hover {
+            background: #2a2f35;
+        }
+
+        /* Status badges */
         .status-badge {
             padding: 0.5rem 1rem;
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
             color: #000 !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            min-width: 90px;
+            line-height: 1;
         }
         .status-active {
             background-color: #d4edda;
@@ -48,6 +61,8 @@
             background-color: #f8d7da;
             color: #000;
         }
+
+        /* Patient avatar */
         .patient-avatar {
             width: 50px;
             height: 50px;
@@ -60,10 +75,14 @@
             font-weight: bold;
             font-size: 1.2rem;
         }
+
+        /* Modal */
         .modal-content {
             border-radius: 12px;
             border: none;
         }
+
+        /* Form controls */
         .form-control, .form-select {
             border-radius: 8px;
             border: 1px solid #e9ecef;
@@ -72,22 +91,95 @@
             border-color: #007bff;
             box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         }
-        /* Center role badges nicely */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 999px;
-            min-width: 90px;
-            line-height: 1;
-        }
-        /* Ensure role cell centers the pill perfectly without affecting row layout */
+
+        /* Role cell alignment */
         .role-cell {
             text-align: center;
             vertical-align: middle !important;
         }
+
+        /* Action buttons */
         .action-btn {
             min-width: 110px;
+        }
+
+        /* Table container - responds to dark mode */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        body.bg-dark .table-container {
+            background: #1e2124;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        /* Table styles - clean and theme-aware */
+        .users-table {
+            margin-bottom: 0;
+        }
+        .users-table thead th {
+            border-bottom: 2px solid #e9ecef;
+            font-weight: 600;
+            padding: 1rem;
+            background: transparent;
+        }
+        .users-table.table-dark thead th,
+        body.bg-dark .users-table thead th {
+            border-bottom-color: #2a2f35;
+            color: #e6e6e6;
+        }
+        .users-table tbody tr {
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.2s ease;
+        }
+        .users-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .users-table.table-dark tbody tr,
+        body.bg-dark .users-table tbody tr {
+            border-bottom-color: #2a2f35;
+        }
+        .users-table.table-dark tbody tr:hover,
+        body.bg-dark .users-table tbody tr:hover {
+            background-color: #2a2f35;
+        }
+        .users-table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+        .users-table.table-dark tbody td,
+        body.bg-dark .users-table tbody td {
+            color: #e6e6e6;
+        }
+
+        /* Pagination */
+        .pagination-container {
+            border-top: 1px solid #e9ecef;
+            padding: 1rem;
+        }
+        body.bg-dark .pagination-container {
+            border-top-color: #2a2f35;
+        }
+
+        /* Action buttons */
+        .users-table .btn-outline-secondary {
+            border-color: #dee2e6;
+            color: #6c757d;
+        }
+        .users-table .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            border-color: #adb5bd;
+        }
+        body.bg-dark .users-table .btn-outline-secondary {
+            border-color: #2a2f35;
+            color: #adb5bd;
+        }
+        body.bg-dark .users-table .btn-outline-secondary:hover {
+            background-color: #2a2f35;
+            border-color: #495057;
+            color: #e6e6e6;
         }
     </style>
 @endsection
@@ -134,7 +226,7 @@
                                 </select>
                             </div>
                             <div class="col-md-3 d-flex gap-2">
-                                <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center">
+                                <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center" id="searchBtn">
                                     <i class="fas fa-search me-2"></i>
                                     <span>Search</span>
                                 </button>
@@ -146,86 +238,84 @@
                         </form>
 
                         <!-- Users Table -->
-                        <div class="card shadow-sm border-0 bg-dark">
-                            <div class="card-body p-0">
-                                @if($users->count() > 0)
-                                    <div class="table-responsive">
-                                        <table class="table table-hover align-middle mb-0 text-white" style="border-collapse: separate; border-spacing: 0; background: #212529;">
-                                            <thead>
-                                                <tr style="background: #343a40;">
-                                                    <th class="border-0 text-light fw-semibold ps-4" style="border-bottom: 2px solid #495057 !important; background: transparent;">User</th>
-                                                    <th class="border-0 text-light fw-semibold" style="border-bottom: 2px solid #495057 !important; background: transparent;">Email</th>
-                                                    <th class="border-0 text-light fw-semibold text-center" style="border-bottom: 2px solid #495057 !important; background: transparent;">Role</th>
-                                                    <th class="border-0 text-light fw-semibold" style="border-bottom: 2px solid #495057 !important; background: transparent;">Registered</th>
-                                                    <th class="border-0 text-light fw-semibold text-center pe-4" style="border-bottom: 2px solid #495057 !important; background: transparent;">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody style="background: #212529;">
-                                                @foreach($users as $user)
-                                                <tr class="border-bottom" style="border-bottom: 1px solid #343a40 !important; background: #212529;" onmouseover="this.style.background='#343a40'" onmouseout="this.style.background='#212529'">
-                                                    <td class="ps-4" style="background: transparent;">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; font-size: 0.9rem; font-weight: 600;">
-                                                                {{ substr($user->name, 0, 2) }}
-                                                            </div>
-                                                            <div>
-                                                                <div class="fw-bold text-white">{{ $user->name }}</div>
-                                                            </div>
+                        <div class="table-container">
+                            @if($users->count() > 0)
+                                <div class="table-responsive">
+                                    <table class="table users-table table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="ps-4">User</th>
+                                                <th>Email</th>
+                                                <th class="text-center">Role</th>
+                                                <th>Registered</th>
+                                                <th class="text-center pe-4">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($users as $user)
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-3 text-white" style="width: 40px; height: 40px; font-size: 0.9rem; font-weight: 600;">
+                                                            {{ substr($user->name, 0, 2) }}
                                                         </div>
-                                                    </td>
-                                                    <td style="background: transparent;">
-                                                        <span class="text-light">{{ $user->email }}</span>
-                                                    </td>
-                                                    <td class="text-center" style="background: transparent;">
-                                                        <span class="badge rounded-pill 
-                                                            @if($user->role == 'superadmin') bg-danger
-                                                            @elseif($user->role == 'admin') bg-warning
-                                                            @else bg-primary
-                                                            @endif" style="font-size: 0.75rem; padding: 0.5rem 1rem;">
-                                                            {{ ucfirst($user->role === 'user' ? 'patient' : $user->role) }}
-                                                        </span>
-                                                    </td>
-<td style="background: transparent;">
-                                                        <span class="text-light small">{{ $user->created_at->format('M d, Y') }}</span>
-                                                    </td>
-                                                    <td class="text-center pe-4" style="background: transparent;">
-                                                        <div class="btn-group" role="group">
-                                                            <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#viewUserModal{{ $user->id }}" title="View User">
-                                                                <i class="fas fa-eye text-info"></i>
-                                                            </button>
-                                                            <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}" title="Edit User">
-                                                                <i class="fas fa-edit text-warning"></i>
-                                                            </button>
-                                                            @if($user->id !== Auth::id())
-                                                            <button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#archiveUserModal{{ $user->id }}" title="Archive User">
-                                                                <i class="fas fa-archive text-danger"></i>
-                                                            </button>
-                                                            @endif
+                                                        <div>
+                                                            <div class="fw-bold">{{ $user->name }}</div>
                                                         </div>
-                                                    </td>
-                                                </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span>{{ $user->email }}</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge rounded-pill 
+                                                        @if($user->role == 'superadmin') bg-danger
+                                                        @elseif($user->role == 'admin') bg-warning
+                                                        @else bg-primary
+                                                        @endif" style="font-size: 0.75rem; padding: 0.5rem 1rem;">
+                                                        {{ ucfirst($user->role === 'user' ? 'patient' : $user->role) }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="small">{{ $user->created_at->format('M d, Y') }}</span>
+                                                </td>
+                                                <td class="text-center pe-4">
+                                                    <div class="btn-group" role="group">
+                                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#viewUserModal{{ $user->id }}" title="View User">
+                                                            <i class="fas fa-eye text-info"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}" title="Edit User">
+                                                            <i class="fas fa-edit text-warning"></i>
+                                                        </button>
+                                                        @if($user->id !== Auth::id())
+                                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#archiveUserModal{{ $user->id }}" title="Archive User">
+                                                            <i class="fas fa-archive text-danger"></i>
+                                                        </button>
+                                                        @endif
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <!-- Pagination -->
+                                <div class="pagination-container d-flex justify-content-between align-items-center">
+                                    <div class="text-muted">
+                                        Showing {{ $users->firstItem() }} to {{ $users->lastItem() }} of {{ $users->total() }} users
                                     </div>
-                                    
-                                    <!-- Pagination -->
-                                    <div class="d-flex justify-content-between align-items-center p-3 border-top">
-                                        <div class="text-muted">
-                                            Showing {{ $users->firstItem() }} to {{ $users->lastItem() }} of {{ $users->total() }} users
-                                        </div>
-                                        <div>
-                                            {{ $users->withQueryString()->links() }}
-                                        </div>
+                                    <div>
+                                        {{ $users->withQueryString()->links() }}
                                     </div>
-                                @else
-                                    <div class="text-center py-5">
-                                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
-                                        <h5 class="text-muted">No users found</h5>
-                                        <p class="text-muted">There are no registered users at the moment.</p>
-                                    </div>
-                                @endif
-                            </div>
+                                </div>
+                            @else
+                                <div class="text-center py-5">
+                                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No users found</h5>
+                                    <p class="text-muted">There are no registered users at the moment.</p>
+                                </div>
+                            @endif
                         </div>
 
                         <!-- Confirm Action Modal -->
@@ -663,23 +753,86 @@
             const roleFilter = document.getElementById('roleFilter');
             const clearBtn = document.getElementById('clearFiltersBtn');
 
+            if (!form) {
+                console.error('User filter form not found');
+                return;
+            }
+
             let debounceTimer;
             const submitDebounced = () => {
                 clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(() => form.requestSubmit(), 400);
+                debounceTimer = setTimeout(() => {
+                    if (form) {
+                        form.requestSubmit();
+                    }
+                }, 400);
             };
 
+            // Search input - debounced auto-submit
             if (searchInput) {
-                searchInput.addEventListener('input', submitDebounced);
+                searchInput.addEventListener('input', function() {
+                    submitDebounced();
+                });
+                
+                // Also allow Enter key to submit immediately
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        clearTimeout(debounceTimer);
+                        if (form) {
+                            form.requestSubmit();
+                        }
+                    }
+                });
             }
+
+            // Role filter - immediate submit on change
             if (roleFilter) {
-                roleFilter.addEventListener('change', () => form.requestSubmit());
+                roleFilter.addEventListener('change', function() {
+                    clearTimeout(debounceTimer);
+                    if (form) {
+                        form.requestSubmit();
+                    }
+                });
             }
+
+            // Clear button - reset all filters and submit
             if (clearBtn) {
-                clearBtn.addEventListener('click', () => {
-                    if (searchInput) searchInput.value = '';
-                    if (roleFilter) roleFilter.value = '';
-                    form.requestSubmit();
+                clearBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    clearTimeout(debounceTimer);
+                    
+                    // Clear search input
+                    if (searchInput) {
+                        searchInput.value = '';
+                    }
+                    
+                    // Reset role filter to "All Roles"
+                    if (roleFilter) {
+                        roleFilter.value = '';
+                    }
+                    
+                    // Submit form to reset URL and reload
+                    if (form) {
+                        form.requestSubmit();
+                    }
+                });
+            }
+
+            // Prevent double submission and add loading state
+            const searchBtn = document.getElementById('searchBtn');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    // Disable buttons during submission to prevent double clicks
+                    if (searchBtn) {
+                        searchBtn.disabled = true;
+                        const originalHTML = searchBtn.innerHTML;
+                        searchBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Searching...';
+                    }
+                    if (clearBtn) {
+                        clearBtn.disabled = true;
+                    }
+                    // Form will submit and page will reload, so no need to re-enable
                 });
             }
         })();
@@ -1038,6 +1191,27 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initSuperadminUserForms();
+            
+            // Sync table with dark mode on page load
+            const syncTableDark = () => {
+                const isDark = document.body.classList.contains('bg-dark');
+                const table = document.querySelector('.users-table');
+                if (table) {
+                    table.classList.toggle('table-dark', isDark);
+                }
+            };
+            
+            // Sync on load
+            syncTableDark();
+            
+            // Watch for theme changes
+            const observer = new MutationObserver(() => {
+                syncTableDark();
+            });
+            observer.observe(document.body, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
         });
     </script>
 @endpush

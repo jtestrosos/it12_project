@@ -1,70 +1,98 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('content')
-@php
-    $adminLayout = true;
-@endphp
+@section('title', 'Dashboard - Patient Portal')
+@section('page-title', 'Dashboard')
+ 
+
+@section('sidebar-menu')
+<a class="nav-link @if(request()->routeIs('patient.dashboard')) active @endif" href="{{ route('patient.dashboard') }}" data-tooltip="Dashboard">
+    <i class="fas fa-th-large"></i> <span class="sidebar-content">Dashboard</span>
+</a>
+<a class="nav-link @if(request()->routeIs('patient.appointments') || request()->routeIs('patient.appointment.show')) active @endif" href="{{ route('patient.appointments') }}" data-tooltip="My Appointments">
+    <i class="fas fa-calendar"></i> <span class="sidebar-content">My Appointments</span>
+</a>
+<a class="nav-link @if(request()->routeIs('patient.book-appointment')) active @endif" href="{{ route('patient.book-appointment') }}" data-tooltip="Book Appointment">
+    <i class="fas fa-plus"></i> <span class="sidebar-content">Book Appointment</span>
+</a>
+@endsection
+
+@section('user-initials')
+{{ substr(Auth::user()->name, 0, 2) }}
+@endsection
+
+@section('user-name')
+{{ Auth::user()->name }}
+@endsection
+
+@section('user-role')
+Patient
+@endsection
+
+@section('page-styles')
 <style>
     body {
-        background-color: #f8f9fa;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    .patient-dashboard-container {
-        background-color: #f0f0f0;
-        min-height: 100vh;
-        padding: 0;
-        width: 100%;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-    }
-    .main-content {
-        background-color: #f0f0f0;
-        min-height: 100vh;
-        padding-bottom: 2rem;
-        width: 100%;
-        margin: 0;
-        flex: 1;
-    }
     .dashboard-card {
-        background: white;
+        background: #fafafa;
         border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        border: 1px solid #e9ecef;
         transition: transform 0.2s ease;
     }
     .dashboard-card:hover {
         transform: translateY(-2px);
     }
+    body.bg-dark .dashboard-card {
+        background: #1e2124;
+        border-color: #2a2f35;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
     .dashboard-header {
-        background: white;
+        background: #fafafa;
         border-bottom: 1px solid #e9ecef;
         padding: 1rem 2rem;
         margin-bottom: 0;
+        border-radius: 12px 12px 0 0;
+    }
+    body.bg-dark .dashboard-header {
+        background: #1e2124;
+        border-color: #2a2f35;
     }
     .dashboard-body {
         padding: 1.5rem;
     }
     .metric-card {
-        background: white;
+        background: #fafafa;
         border-radius: 12px;
         padding: 1.5rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        border: 1px solid #e9ecef;
         transition: transform 0.2s ease;
     }
     .metric-card:hover {
         transform: translateY(-2px);
+    }
+    body.bg-dark .metric-card {
+        background: #1e2124;
+        border-color: #2a2f35;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
     .metric-number {
         font-size: 2.5rem;
         font-weight: 700;
         color: #2c3e50;
     }
+    body.bg-dark .metric-number {
+        color: #e6e6e6;
+    }
     .metric-label {
         color: #6c757d;
         font-size: 0.9rem;
         margin-bottom: 0.5rem;
+    }
+    body.bg-dark .metric-label {
+        color: #b0b0b0;
     }
     .metric-change {
         font-size: 0.8rem;
@@ -99,38 +127,42 @@
         border-spacing: 0;
     }
     .table-modern thead th {
-        background-color: #f8f9fa;
+        background-color: #f5f5f5;
         border: none;
         font-weight: 600;
         color: #495057;
         padding: 1rem;
+    }
+    body.bg-dark .table-modern thead th {
+        background-color: #1a1f24;
+        color: #e6e6e6;
     }
     .table-modern tbody td {
         border: none;
         padding: 1rem;
         border-bottom: 1px solid #f1f3f4;
     }
+    body.bg-dark .table-modern tbody td {
+        border-bottom-color: #2a2f35;
+        color: #e6e6e6;
+    }
     .table-modern tbody tr:hover {
         background-color: #f8f9fa;
     }
+    body.bg-dark .table-modern tbody tr:hover {
+        background-color: #2a2f35;
+    }
+    body.bg-dark .fw-bold.text-dark {
+        color: #e6e6e6 !important;
+    }
 </style>
+@endsection
 
-<div class="patient-dashboard-container">
-    <!-- Header -->
-    <div class="dashboard-header d-flex justify-content-between align-items-center">
-        <div>
-            <h4 class="mb-0">Dashboard Overview</h4>
-            <p class="text-muted mb-0">Welcome back! Here's what's happening today.</p>
-        </div>
-    </div>
-
-    <!-- Content -->
-    <div class="main-content">
-        <div class="p-4">
-                <!-- Quick Stats -->
-                <div class="row mb-4 g-3">
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="metric-card">
+@section('content')
+    <!-- Quick Stats -->
+    <div class="row mb-4 g-3">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="metric-card">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
                                     <div class="metric-label">Total Appointments</div>
@@ -289,5 +321,31 @@
             </div>
         </div>
     </div>
-</div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Sync table with dark mode on page load
+        const syncTableDark = () => {
+            const isDark = document.body.classList.contains('bg-dark');
+            const table = document.querySelector('.table-modern');
+            if (table) {
+                table.classList.toggle('table-dark', isDark);
+            }
+        };
+        
+        // Sync on load
+        syncTableDark();
+        
+        // Watch for theme changes
+        const observer = new MutationObserver(() => {
+            syncTableDark();
+        });
+        observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+    });
+</script>
+@endpush

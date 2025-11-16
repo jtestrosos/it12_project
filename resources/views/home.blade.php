@@ -16,6 +16,8 @@
                 <h1 class="fw-bold mb-3">Easy Online Booking for Your Healthcare Needs</h1>
                 <p class="lead mb-4">Skip the long queues and book your appointment online. Access quality healthcare services right in your barangay with just a few clicks.</p>
 
+
+                
                 <!--  Button triggers login modal if not logged in -->
                 @auth
                     @if(Auth::user()->isPatient())
