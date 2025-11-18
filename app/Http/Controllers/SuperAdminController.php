@@ -73,9 +73,9 @@ class SuperAdminController extends Controller
         ));
     }
 
-    public function users()
+    public function users(Request $request)
     {
-        $users = User::latest()->paginate(15);
+        $users = User::orderBy('created_at', 'desc')->paginate(15);
         return view('superadmin.users', compact('users'));
     }
 

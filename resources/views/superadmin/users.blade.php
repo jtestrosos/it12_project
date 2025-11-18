@@ -207,35 +207,31 @@
                             </button>
                         </div>
 
-                        <!-- Search and Filter (server-side) -->
-                        <form method="GET" action="{{ route('superadmin.users') }}" class="row mb-4" id="userFilterForm">
+                        <!-- Search and Filter (client-side) -->
+                        <div class="row mb-4">
                             <div class="col-md-6">
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="fas fa-search"></i>
                                     </span>
-                                    <input type="text" class="form-control" name="search" id="searchInput" value="{{ request('search') }}" placeholder="Search users by name or email...">
+                                    <input type="text" class="form-control" id="searchInput" placeholder="Search users by name or email...">
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <select class="form-select" name="role" id="roleFilter">
+                                <select class="form-select" id="roleFilter">
                                     <option value="">All Roles</option>
-                                    <option value="superadmin" {{ request('role') == 'superadmin' ? 'selected' : '' }}>Super Admin</option>
-                                    <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                                    <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>User</option>
+                                    <option value="superadmin">Super Admin</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="user">User</option>
                                 </select>
                             </div>
-                            <div class="col-md-3 d-flex gap-2">
-                                <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center" id="searchBtn">
-                                    <i class="fas fa-search me-2"></i>
-                                    <span>Search</span>
-                                </button>
+                            <div class="col-md-3">
                                 <button type="button" class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center" id="clearFiltersBtn">
                                     <i class="fas fa-times me-2"></i>
                                     <span>Clear</span>
                                 </button>
                             </div>
-                        </form>
+                        </div>
 
                         <!-- Users Table -->
                         <div class="table-container">
@@ -251,7 +247,7 @@
                                                 <th class="text-center pe-4">Actions</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody id="usersTableBody">
                                             @foreach($users as $user)
                                             <tr>
                                                 <td class="ps-4">
@@ -301,13 +297,71 @@
                                 </div>
                                 
                                 <!-- Pagination -->
-                                <div class="pagination-container d-flex justify-content-between align-items-center">
-                                    <div class="text-muted">
-                                        Showing {{ $users->firstItem() }} to {{ $users->lastItem() }} of {{ $users->total() }} users
-                                    </div>
-                                    <div>
-                                        {{ $users->withQueryString()->links() }}
-                                    </div>
+                                <div class="d-flex justify-content-center mt-4">
+                                    @if ($users->hasPages())
+                                        <nav aria-label="Page navigation">
+                                            <ul class="pagination justify-content-center">
+                                                {{-- Previous Page Link --}}
+                                                @if ($users->onFirstPage())
+                                                    <li class="page-item disabled" aria-disabled="true">
+                                                        <span class="page-link">&lsaquo;</span>
+                                                    </li>
+                                                @else
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="{{ $users->previousPageUrl() }}">&lsaquo;</a>
+                                                    </li>
+                                                @endif
+
+                                                {{-- First page --}}
+                                                @if ($users->currentPage() > 3)
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="{{ $users->url(1) }}">1</a>
+                                                    </li>
+                                                    @if ($users->currentPage() > 4)
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                    @endif
+                                                @endif
+
+                                                {{-- Page numbers --}}
+                                                @for ($page = max(1, $users->currentPage() - 2); $page <= min($users->lastPage(), $users->currentPage() + 2); $page++)
+                                                    @if ($page == $users->currentPage())
+                                                        <li class="page-item active" aria-current="page">
+                                                            <span class="page-link">{{ $page }}</span>
+                                                        </li>
+                                                    @else
+                                                        <li class="page-item">
+                                                            <a class="page-link" href="{{ $users->url($page) }}">{{ $page }}</a>
+                                                        </li>
+                                                    @endif
+                                                @endfor
+
+                                                {{-- Last page --}}
+                                                @if ($users->currentPage() < $users->lastPage() - 2)
+                                                    @if ($users->currentPage() < $users->lastPage() - 3)
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                    @endif
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="{{ $users->url($users->lastPage()) }}">{{ $users->lastPage() }}</a>
+                                                    </li>
+                                                @endif
+
+                                                {{-- Next Page Link --}}
+                                                @if ($users->hasMorePages())
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="{{ $users->nextPageUrl() }}">&rsaquo;</a>
+                                                    </li>
+                                                @else
+                                                    <li class="page-item disabled" aria-disabled="true">
+                                                        <span class="page-link">&rsaquo;</span>
+                                                    </li>
+                                                @endif
+                                            </ul>
+                                        </nav>
+                                    @endif
                                 </div>
                             @else
                                 <div class="text-center py-5">
@@ -747,94 +801,75 @@
 
 @push('scripts')
     <script>
+        // Live Search and Filter Functionality
         (function() {
-            const form = document.getElementById('userFilterForm');
             const searchInput = document.getElementById('searchInput');
             const roleFilter = document.getElementById('roleFilter');
             const clearBtn = document.getElementById('clearFiltersBtn');
+            const tableBody = document.getElementById('usersTableBody');
+            const rows = tableBody ? tableBody.querySelectorAll('tr') : [];
 
-            if (!form) {
-                console.error('User filter form not found');
-                return;
-            }
+            function filterTable() {
+                const searchValue = searchInput ? searchInput.value.toLowerCase() : '';
+                const roleValue = roleFilter ? roleFilter.value.toLowerCase() : '';
 
-            let debounceTimer;
-            const submitDebounced = () => {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(() => {
-                    if (form) {
-                        form.requestSubmit();
-                    }
-                }, 400);
-            };
+                rows.forEach(row => {
+                    const name = row.cells[0] ? row.cells[0].textContent.toLowerCase() : '';
+                    const email = row.cells[1] ? row.cells[1].textContent.toLowerCase() : '';
+                    const role = row.cells[2] ? row.cells[2].textContent.toLowerCase() : '';
 
-            // Search input - debounced auto-submit
-            if (searchInput) {
-                searchInput.addEventListener('input', function() {
-                    submitDebounced();
-                });
-                
-                // Also allow Enter key to submit immediately
-                searchInput.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        clearTimeout(debounceTimer);
-                        if (form) {
-                            form.requestSubmit();
+                    let showRow = true;
+
+                    // Search filter
+                    if (searchValue) {
+                        if (!name.includes(searchValue) && !email.includes(searchValue)) {
+                            showRow = false;
                         }
                     }
+
+                    // Role filter
+                    if (roleValue) {
+                        if (!role.includes(roleValue)) {
+                            showRow = false;
+                        }
+                    }
+
+                    row.style.display = showRow ? '' : 'none';
                 });
+
+                // Update showing count
+                updateShowingCount();
             }
 
-            // Role filter - immediate submit on change
+            function updateShowingCount() {
+                const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+                const totalRows = rows.length;
+                
+                // Since we're using client-side filtering, always show the count based on visible rows
+                // The pagination info will be handled by the server-side pagination
+                console.log(`Showing ${visibleRows.length} of ${totalRows} users (filtered)`);
+            }
+
+            // Event listeners
+            if (searchInput) {
+                searchInput.addEventListener('input', filterTable);
+            }
+
             if (roleFilter) {
-                roleFilter.addEventListener('change', function() {
-                    clearTimeout(debounceTimer);
-                    if (form) {
-                        form.requestSubmit();
-                    }
-                });
+                roleFilter.addEventListener('change', filterTable);
             }
 
-            // Clear button - reset all filters and submit
+            // Clear filters
             if (clearBtn) {
-                clearBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    clearTimeout(debounceTimer);
-                    
-                    // Clear search input
-                    if (searchInput) {
-                        searchInput.value = '';
-                    }
-                    
-                    // Reset role filter to "All Roles"
-                    if (roleFilter) {
-                        roleFilter.value = '';
-                    }
-                    
-                    // Submit form to reset URL and reload
-                    if (form) {
-                        form.requestSubmit();
-                    }
+                clearBtn.addEventListener('click', function() {
+                    if (searchInput) searchInput.value = '';
+                    if (roleFilter) roleFilter.value = '';
+                    filterTable();
                 });
             }
 
-            // Prevent double submission and add loading state
-            const searchBtn = document.getElementById('searchBtn');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    // Disable buttons during submission to prevent double clicks
-                    if (searchBtn) {
-                        searchBtn.disabled = true;
-                        const originalHTML = searchBtn.innerHTML;
-                        searchBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Searching...';
-                    }
-                    if (clearBtn) {
-                        clearBtn.disabled = true;
-                    }
-                    // Form will submit and page will reload, so no need to re-enable
-                });
-            }
+            // Initialize showing count
+            updateShowingCount();
         })();
 
         // Generic confirmation modal for destructive actions

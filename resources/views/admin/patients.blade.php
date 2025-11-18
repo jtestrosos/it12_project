@@ -232,7 +232,70 @@
 @endif
                         <!-- Pagination -->
                         <div class="d-flex justify-content-center mt-4">
-                            {{ $patients->links() }}
+                            @if ($patients->hasPages())
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination justify-content-center">
+                                        {{-- Previous Page Link --}}
+                                        @if ($patients->onFirstPage())
+                                            <li class="page-item disabled" aria-disabled="true">
+                                                <span class="page-link">&lsaquo;</span>
+                                            </li>
+                                        @else
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ $patients->previousPageUrl() }}">&lsaquo;</a>
+                                            </li>
+                                        @endif
+
+                                        {{-- First page --}}
+                                        @if ($patients->currentPage() > 3)
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ $patients->url(1) }}">1</a>
+                                            </li>
+                                            @if ($patients->currentPage() > 4)
+                                                <li class="page-item disabled">
+                                                    <span class="page-link">...</span>
+                                                </li>
+                                            @endif
+                                        @endif
+
+                                        {{-- Page numbers --}}
+                                        @for ($page = max(1, $patients->currentPage() - 2); $page <= min($patients->lastPage(), $patients->currentPage() + 2); $page++)
+                                            @if ($page == $patients->currentPage())
+                                                <li class="page-item active" aria-current="page">
+                                                    <span class="page-link">{{ $page }}</span>
+                                                </li>
+                                            @else
+                                                <li class="page-item">
+                                                    <a class="page-link" href="{{ $patients->url($page) }}">{{ $page }}</a>
+                                                </li>
+                                            @endif
+                                        @endfor
+
+                                        {{-- Last page --}}
+                                        @if ($patients->currentPage() < $patients->lastPage() - 2)
+                                            @if ($patients->currentPage() < $patients->lastPage() - 3)
+                                                <li class="page-item disabled">
+                                                    <span class="page-link">...</span>
+                                                </li>
+                                            @endif
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ $patients->url($patients->lastPage()) }}">{{ $patients->lastPage() }}</a>
+                                            </li>
+                                        @endif
+
+                                        {{-- Next Page Link --}}
+                                        @if ($patients->hasMorePages())
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ $patients->nextPageUrl() }}">&rsaquo;</a>
+                                            </li>
+                                        @else
+                                            <li class="page-item disabled" aria-disabled="true">
+                                                <span class="page-link">&rsaquo;</span>
+                                            </li>
+                                        @endif
+                                    </ul>
+                                </nav>
+                            @endif
                         </div>
                     </div>
                 </div>
