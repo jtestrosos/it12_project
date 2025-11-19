@@ -182,7 +182,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [PatientController::class, 'dashboard'])->name('dashboard');
         Route::get('/appointments', [PatientController::class, 'appointments'])->name('appointments');
         Route::get('/book-appointment', [PatientController::class, 'bookAppointment'])->name('book-appointment');
-        Route::post('/appointment', [PatientController::class, 'storeAppointment'])->name('appointment.store');
+        Route::post('/book-appointment', [PatientController::class, 'storeAppointment'])->name('store-appointment');
+        Route::get('/appointments/slots', [PatientController::class, 'getAvailableSlots'])->name('appointments.slots');
+        Route::get('/appointments/calendar', [PatientController::class, 'getCalendarData'])->name('appointments.calendar');
         Route::get('/appointment/{appointment}', [PatientController::class, 'showAppointment'])->name('appointment.show');
         Route::post('/appointment/{appointment}/cancel', [PatientController::class, 'cancelAppointment'])->name('appointment.cancel');
     });
@@ -202,6 +204,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
             Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
             Route::post('/appointment/create', [AdminController::class, 'createAppointment'])->name('appointment.create');
             Route::post('/appointment/{appointment}/update', [AdminController::class, 'updateAppointmentStatus'])->name('appointment.update');
+            Route::get('/appointments/slots', [AdminController::class, 'getAvailableSlots'])->name('appointments.slots');
+            Route::get('/appointments/calendar', [AdminController::class, 'getCalendarData'])->name('appointments.calendar');
             Route::get('/inventory', [AdminController::class, 'inventory'])->name('inventory');
             Route::post('/inventory/add', [AdminController::class, 'addInventory'])->name('inventory.add');
             Route::post('/inventory/{inventory}/update', [AdminController::class, 'updateInventory'])->name('inventory.update');

@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use App\Models\Inventory;
 use App\Models\InventoryTransaction;
 use App\Models\User;
+use App\Helpers\AppointmentHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
@@ -778,16 +779,71 @@ class AdminController extends Controller
         $dompdf->setPaper('a4', 'landscape');
         $dompdf->render();
 
-        $filename = 'appointments_' . $request->start_date . '_to_' . $request->end_date . '.pdf';
-
+        $filename = 'appointments_' . $request->start_date . '_to_' . $request->end_date . '.pdf';          
         return response()->streamDownload(
             function () use ($dompdf) {
                 echo $dompdf->output();
             },
-            $filename,
+            $filename,     
             [
-                'Content-Type' => 'application/pdf',
+                'Content-Type' => 'application/pdf',              
             ]
         );
+    }
+
+    /**
+     * Get available slots for a specific date
+     */
+    public function getAvailableSlots(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date|after_or_equal:today',
+        ]);
+
+        $date = $request->date;
+        
+        // Debug: Check what appointments exist for this date
+        $appointments = \App\Models\Appointment::whereDate('appointment_date', $date)
+            ->whereIn('status', ['pending', 'approved', 'completed'])
+            ->get();
+        
+        \Log::info("Appointments for date {$date}: " . $appointments->toJson());
+        
+        $slots = AppointmentHelper::getAvailableSlots($date);
+        
+        \Log::info("Slots data for date {$date}: " . json_encode($slots));
+
+        return response()->json([
+            'date' => $date,
+            'slots' => $slots,
+            'total_slots' => count($slots),
+            'available_count' => count(array_filter($slots, fn($slot) => $slot['available'])),
+            'occupied_count' => count(array_filter($slots, fn($slot) => !$slot['available'])),
+        ]);
+    }
+
+    /**
+     * Get calendar data for a month
+     */
+    public function getCalendarData(Request $request)
+    {
+        $request->validate([
+            'year' => 'required|integer|min:2020|max:2030',
+            'month' => 'required|integer|min:1|max:12',
+        ]);
+
+        $year = $request->year;
+        $month = $request->month;
+        
+        $calendarData = AppointmentHelper::getCalendarData($year, $month);
+        
+        // Debug: Log calendar data
+        \Log::info("Calendar data for {$year}-{$month}: " . json_encode($calendarData));
+
+        return response()->json([
+            'year' => $year,
+            'month' => $month,
+            'calendar' => $calendarData,
+        ]);
     }
 }

@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use App\Models\User;
+use App\Helpers\AppointmentHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class PatientController extends Controller
 {
@@ -79,5 +82,48 @@ class PatientController extends Controller
         }
 
         return view('patient.appointment-details', compact('appointment'));
+    }
+
+    /**
+     * Get available slots for a specific date
+     */
+    public function getAvailableSlots(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date|after_or_equal:today',
+        ]);
+
+        $date = $request->date;
+        $slots = AppointmentHelper::getAvailableSlots($date);
+
+        return response()->json([
+            'date' => $date,
+            'slots' => $slots,
+            'total_slots' => count($slots),
+            'available_count' => count(array_filter($slots, fn($slot) => $slot['available'])),
+            'occupied_count' => count(array_filter($slots, fn($slot) => !$slot['available'])),
+        ]);
+    }
+
+    /**
+     * Get calendar data for a month
+     */
+    public function getCalendarData(Request $request)
+    {
+        $request->validate([
+            'year' => 'required|integer|min:2020|max:2030',
+            'month' => 'required|integer|min:1|max:12',
+        ]);
+
+        $year = $request->year;
+        $month = $request->month;
+        
+        $calendarData = AppointmentHelper::getCalendarData($year, $month);
+
+        return response()->json([
+            'year' => $year,
+            'month' => $month,
+            'calendar' => $calendarData,
+        ]);
     }
 }
