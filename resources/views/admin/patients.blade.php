@@ -67,6 +67,184 @@
         /* Dark mode alerts */
         body.bg-dark .alert-success { background-color: #1e3a1e; color: #d4edda; border-color: #28a745; }
         body.bg-dark .alert-danger { background-color: #3a1e1e; color: #f8d7da; border-color: #dc3545; }
+
+        /* Calendar Styles */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            font-size: 0.8rem;
+        }
+        .calendar-header {
+            text-align: center;
+            font-weight: 600;
+            padding: 0.5rem;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #dee2e6;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .calendar-day:hover {
+            background-color: #e9ecef;
+        }
+        .calendar-day.selected {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .calendar-day.occupied {
+            background-color: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+        .calendar-day.partially-occupied {
+            background-color: #ffc107;
+            color: #212529;
+            border-color: #ffc107;
+        }
+        .calendar-day.weekend {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+        .calendar-day.past {
+            background-color: #e9ecef;
+            color: #adb5bd;
+            cursor: not-allowed;
+        }
+        .calendar-day .day-number {
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 70%;
+        }
+        .calendar-day .slot-indicator {
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.55rem;
+            background: rgba(0,0,0,0.15);
+            color: #666;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-weight: 600;
+            z-index: 2;
+            line-height: 1;
+            width: auto;
+            white-space: nowrap;
+        }
+        .time-slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.5rem;
+        }
+        .time-slot {
+            padding: 0.75rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .time-slot.available {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .time-slot.available:hover {
+            background-color: #c3e6cb;
+        }
+        .time-slot.occupied {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+            cursor: not-allowed;
+        }
+        .time-slot.selected {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+        }
+        .time-slot .time {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .time-slot .status {
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Dark Mode Overrides */
+        body.bg-dark .calendar-header {
+            background-color: #2a2f35;
+            color: #e6e6e6;
+            border-color: #2a2f35;
+        }
+        body.bg-dark .calendar-day {
+            border-color: #2a2f35;
+            color: #e6e6e6;
+        }
+        body.bg-dark .calendar-day:hover {
+            background-color: #2a2f35;
+        }
+        body.bg-dark .calendar-day.weekend {
+            background-color: #1e2124;
+            color: #6c757d;
+        }
+        body.bg-dark .calendar-day.past {
+            background-color: #1e2124;
+            color: #6c757d;
+        }
+        body.bg-dark .time-slot {
+            border-color: #2a2f35;
+        }
+        body.bg-dark .time-slot.available {
+            background-color: #1e3a1f;
+            border-color: #2a5f2e;
+            color: #90ee90;
+        }
+        body.bg-dark .time-slot.occupied {
+            background-color: #3d1a1a;
+            border-color: #5c2a2a;
+            color: #ff6b6b;
+        }
+        body.bg-dark .time-slot.selected {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+        }
+        
+        /* Dark Mode Pagination */
+        body.bg-dark .page-link {
+            background-color: #1e2124;
+            border-color: #2a2f35;
+            color: #e6e6e6;
+        }
+        body.bg-dark .page-item.disabled .page-link {
+            background-color: #1a1d20;
+            border-color: #2a2f35;
+            color: #6c757d;
+        }
+        body.bg-dark .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+        }
+        body.bg-dark .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
     </style>
 @endsection
 
@@ -204,7 +382,13 @@
                                                         <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewPatientModal{{ $patient->id }}">
                                                             <i class="fas fa-eye"></i>
                                                         </button>
-                                                        <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#appointmentModal{{ $patient->id }}">
+                                                        <button class="btn btn-outline-success btn-sm" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#createAppointmentModal"
+                                                            data-user-id="{{ $patient->id }}"
+                                                            data-user-name="{{ $patient->name }}"
+                                                            data-user-phone="{{ $patient->phone ?? '' }}"
+                                                            data-user-address="{{ $patient->address ?? $patient->barangay ?? '' }}">
                                                             <i class="fas fa-calendar-plus"></i>
                                                         </button>
                                                         <button class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editPatientModal{{ $patient->id }}">
@@ -718,73 +902,122 @@
     </div>
     @endforeach
 
-    <!-- Create Appointment Modal -->
-    @foreach($patients as $patient)
-    <div class="modal fade" id="appointmentModal{{ $patient->id }}" tabindex="-1">
+    <!-- Create Appointment Modal (Single Shared Modal) -->
+    <div class="modal fade" id="createAppointmentModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Create Appointment for {{ $patient->name }}</h5>
+                    <h5 class="modal-title">Create Appointment</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ route('admin.appointment.create') }}" method="POST">
+                <form action="{{ route('admin.appointment.create') }}" method="POST" id="createAppointmentForm">
                     @csrf
-                    <input type="hidden" name="user_id" value="{{ $patient->id }}">
+                    <input type="hidden" name="user_id" id="appointment_user_id">
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="appointment_patient_name{{ $patient->id }}" class="form-label">Patient Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="appointment_patient_name{{ $patient->id }}" name="patient_name" value="{{ $patient->name }}" required>
+                        <!-- Patient Details Section -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0">Patient Details</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Patient Name</label>
+                                            <input type="text" class="form-control" id="appointment_patient_name" name="patient_name" readonly>
+                                        </div>
+                                    </div>  
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Phone Number</label>
+                                            <input type="tel" class="form-control" id="appointment_patient_phone" name="patient_phone" readonly>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>  
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="appointment_patient_phone{{ $patient->id }}" class="form-label">Phone Number</label>
-                                    <input type="tel" class="form-control" id="appointment_patient_phone{{ $patient->id }}" name="patient_phone" value="{{ $patient->phone ?? '' }}">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <label class="form-label">Address</label>
+                                            <input type="text" class="form-control" id="appointment_patient_address" name="patient_address" readonly>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-12">
+
+                        <!-- Appointment Details Section -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0">Appointment Details</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <label for="service_type" class="form-label">Service Type <span class="text-danger">*</span></label>
+                                            <select class="form-select" id="service_type" name="service_type" required>
+                                                <option value="">Select Service</option>
+                                                <option value="General Checkup">General Checkup</option>
+                                                <option value="Prenatal">Prenatal</option>
+                                                <option value="Medical Check-up">Medical Check-up</option>
+                                                <option value="Immunization">Immunization</option>
+                                                <option value="Family Planning">Family Planning</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Calendar Selection -->
                                 <div class="mb-3">
-                                    <label for="appointment_patient_address{{ $patient->id }}" class="form-label">Address</label>
-                                    <input type="text" class="form-control" id="appointment_patient_address{{ $patient->id }}" name="patient_address" value="{{ $patient->address ?? $patient->barangay ?? '' }}">
+                                    <div class="card bg-primary text-white mb-3">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h6 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Select Appointment Date & Time</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3">
+                                        <!-- Calendar Column -->
+                                        <div class="col-md-5">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                                                <span class="fw-bold" id="currentMonth">Month Year</span>
+                                                <button type="button" class="btn btn-sm btn-outline-primary" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                                            </div>
+                                            <div class="calendar-grid" id="calendarGrid">
+                                                <!-- Calendar generated by JS -->
+                                            </div>
+                                        </div>
+
+                                        <!-- Time Slots Column -->
+                                        <div class="col-md-7">
+                                            <div class="card h-100">
+                                                <div class="card-header">
+                                                    <h6 class="mb-0" id="selectedDateDisplay">Select a date</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="time-slots-grid" id="timeSlotsGrid">
+                                                        <div class="text-center text-muted mt-4">
+                                                            <i class="fas fa-clock fa-2x mb-2"></i>
+                                                            <p>Select a date to view available time slots</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Hidden Inputs for Date/Time -->
+                                    <input type="hidden" name="appointment_date" id="appointment_date" required>
+                                    <input type="hidden" name="appointment_time" id="appointment_time" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="notes" class="form-label">Notes</label>
+                                    <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Additional notes or comments"></textarea>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="appointment_service_type{{ $patient->id }}" class="form-label">Service Type <span class="text-danger">*</span></label>
-                                    <select class="form-select" id="appointment_service_type{{ $patient->id }}" name="service_type" required>
-                                        <option value="">Select Service</option>
-                                        <option value="General Checkup">General Checkup</option>
-                                        <option value="Prenatal">Prenatal</option>
-                                        <option value="Medical Check-up">Medical Check-up</option>
-                                        <option value="Immunization">Immunization</option>
-                                        <option value="Family Planning">Family Planning</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="appointment_date{{ $patient->id }}" class="form-label">Appointment Date <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control" id="appointment_date{{ $patient->id }}" name="appointment_date" min="{{ date('Y-m-d') }}" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="appointment_time{{ $patient->id }}" class="form-label">Appointment Time <span class="text-danger">*</span></label>
-                                    <input type="time" class="form-control" id="appointment_time{{ $patient->id }}" name="appointment_time" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="appointment_notes{{ $patient->id }}" class="form-label">Notes</label>
-                            <textarea class="form-control" id="appointment_notes{{ $patient->id }}" name="notes" rows="3" placeholder="Additional notes or comments"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -795,7 +1028,6 @@
             </div>
         </div>
     </div>
-    @endforeach
 
 @push('scripts')
 <script>
@@ -898,6 +1130,267 @@
                 select.dispatchEvent(new Event('change'));
             });
             
+        });
+        // Calendar functionality for Create Appointment Modal
+        class AppointmentCalendar {
+            constructor() {
+                this.currentDate = new Date();
+                this.selectedDate = null;
+                this.calendarData = [];
+                this.init();
+            }
+
+            init() {
+                this.attachEventListeners();
+                this.loadCalendar();
+            }
+
+            attachEventListeners() {
+                document.getElementById('prevMonth').addEventListener('click', () => {
+                    this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                    this.loadCalendar();
+                });
+
+                document.getElementById('nextMonth').addEventListener('click', () => {
+                    this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                    this.loadCalendar();
+                });
+            }
+
+            async loadCalendar() {
+                const year = this.currentDate.getFullYear();
+                const month = this.currentDate.getMonth() + 1;
+                
+                try {
+                    const response = await fetch(`/admin/appointments/calendar?year=${year}&month=${month}`, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+
+                    if (!response.ok) throw new Error('Failed to load calendar data');
+                    
+                    const data = await response.json();
+                    this.calendarData = data.calendar;
+                    this.renderCalendar();
+                    this.updateMonthDisplay();
+                } catch (error) {
+                    console.error('Error loading calendar:', error);
+                    document.getElementById('calendarGrid').innerHTML = `<div class="col-12 text-center text-danger">Error loading calendar</div>`;
+                }
+            }
+
+            renderCalendar() {
+                const calendarGrid = document.getElementById('calendarGrid');
+                calendarGrid.innerHTML = '';
+
+                // Add day headers
+                const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                dayHeaders.forEach(day => {
+                    const header = document.createElement('div');
+                    header.className = 'calendar-header';
+                    header.textContent = day;
+                    calendarGrid.appendChild(header);
+                });
+
+                // Add empty cells
+                const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1).getDay();
+                for (let i = 0; i < firstDay; i++) {
+                    calendarGrid.appendChild(document.createElement('div'));
+                }
+
+                // Add calendar days
+                this.calendarData.forEach(dayData => {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    
+                    const dayNumber = document.createElement('span');
+                    dayNumber.className = 'day-number';
+                    dayNumber.textContent = dayData.day;
+                    dayElement.appendChild(dayNumber);
+                    
+                    if (dayData.is_weekend) dayElement.classList.add('weekend');
+                    
+                    if (dayData.is_past) {
+                        dayElement.classList.add('past');
+                    } else if (dayData.is_fully_occupied) {
+                        dayElement.classList.add('occupied');
+                    } else if (dayData.occupied_slots > 0) {
+                        dayElement.classList.add('partially-occupied');
+                    }
+
+                    const indicator = document.createElement('span');
+                    indicator.className = 'slot-indicator';
+                    indicator.textContent = `${dayData.occupied_slots}/${dayData.total_slots}`;
+                    dayElement.appendChild(indicator);
+
+                    if (!dayData.is_past) {
+                        dayElement.addEventListener('click', () => this.selectDate(dayData.date));
+                    }
+
+                    calendarGrid.appendChild(dayElement);
+                });
+            }
+
+            updateMonthDisplay() {
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'];
+                document.getElementById('currentMonth').textContent = 
+                    `${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
+            }
+
+            async selectDate(date) {
+                // Remove previous selection
+                document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
+
+                // Add selection to clicked date
+                document.querySelectorAll('.calendar-day').forEach(el => {
+                    // Note: This is a simple check, might need more robust matching if multiple months displayed (not the case here)
+                    // But since we redraw calendar on month change, checking text content or index is tricky. 
+                    // Ideally we'd store date in dataset.
+                    // Let's rely on re-rendering or just adding a data attribute in renderCalendar (which I didn't do above, let me fix that in renderCalendar logic implicitly or just add it now)
+                });
+                // Wait, I didn't add data-date in renderCalendar above. Let me fix that in the previous method or just handle it here.
+                // Actually, I can't easily find the element without the data attribute. 
+                // I will update renderCalendar to add data-date.
+                
+                this.selectedDate = date;
+                
+                // Update display
+                const selectedDateObj = new Date(date);
+                document.getElementById('selectedDateDisplay').textContent = selectedDateObj.toLocaleDateString('en-US', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                });
+
+                await this.loadTimeSlots(date);
+            }
+
+            async loadTimeSlots(date) {
+                try {
+                    const response = await fetch(`/admin/appointments/slots?date=${date}`, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    if (!response.ok) throw new Error('Failed to load slots');
+                    const data = await response.json();
+                    this.renderTimeSlots(data.slots);
+                } catch (error) {
+                    console.error('Error loading slots:', error);
+                    document.getElementById('timeSlotsGrid').innerHTML = `<div class="text-danger">Error loading slots</div>`;
+                }
+            }
+
+            renderTimeSlots(slots) {
+                const timeSlotsGrid = document.getElementById('timeSlotsGrid');
+                timeSlotsGrid.innerHTML = '';
+
+                if (!slots || slots.length === 0) {
+                    timeSlotsGrid.innerHTML = '<div class="text-center text-muted">No time slots available</div>';
+                    return;
+                }
+
+                slots.forEach(slot => {
+                    const slotElement = document.createElement('div');
+                    slotElement.className = `time-slot ${slot.available ? 'available' : 'occupied'}`;
+                    
+                    if (slot.available) {
+                        slotElement.addEventListener('click', () => {
+                            document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
+                            slotElement.classList.add('selected');
+                            document.getElementById('appointment_time').value = slot.time;
+                            document.getElementById('appointment_date').value = this.selectedDate;
+                        });
+                    }
+                    
+                    slotElement.innerHTML = `
+                        <div class="time">${slot.display}</div>
+                        <div class="status">${slot.available ? 'Available' : 'Occupied'}</div>
+                    `;
+                    
+                    timeSlotsGrid.appendChild(slotElement);
+                });
+            }
+        }
+
+        // Initialize modal and calendar
+        const createAppointmentModal = document.getElementById('createAppointmentModal');
+        let appointmentCalendar = null;
+
+        createAppointmentModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const userId = button.getAttribute('data-user-id');
+            const userName = button.getAttribute('data-user-name');
+            const userPhone = button.getAttribute('data-user-phone');
+            const userAddress = button.getAttribute('data-user-address');
+
+            // Populate patient details
+            document.getElementById('appointment_user_id').value = userId;
+            document.getElementById('appointment_patient_name').value = userName;
+            document.getElementById('appointment_patient_phone').value = userPhone;
+            document.getElementById('appointment_patient_address').value = userAddress;
+
+            // Initialize calendar if not already done
+            if (!appointmentCalendar) {
+                appointmentCalendar = new AppointmentCalendar();
+                // Monkey-patch renderCalendar to add data-date (since I missed it in the class definition above)
+                const originalRender = appointmentCalendar.renderCalendar.bind(appointmentCalendar);
+                appointmentCalendar.renderCalendar = function() {
+                    const calendarGrid = document.getElementById('calendarGrid');
+                    calendarGrid.innerHTML = '';
+                    
+                    // Headers
+                    ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+                        const header = document.createElement('div');
+                        header.className = 'calendar-header';
+                        header.textContent = day;
+                        calendarGrid.appendChild(header);
+                    });
+
+                    // Empty cells
+                    const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1).getDay();
+                    for (let i = 0; i < firstDay; i++) calendarGrid.appendChild(document.createElement('div'));
+
+                    // Days
+                    this.calendarData.forEach(dayData => {
+                        const dayElement = document.createElement('div');
+                        dayElement.className = 'calendar-day';
+                        dayElement.dataset.date = dayData.date; // Added this
+                        
+                        const dayNumber = document.createElement('span');
+                        dayNumber.className = 'day-number';
+                        dayNumber.textContent = dayData.day;
+                        dayElement.appendChild(dayNumber);
+                        
+                        if (dayData.is_weekend) dayElement.classList.add('weekend');
+                        if (dayData.is_past) dayElement.classList.add('past');
+                        else if (dayData.is_fully_occupied) dayElement.classList.add('occupied');
+                        else if (dayData.occupied_slots > 0) dayElement.classList.add('partially-occupied');
+
+                        const indicator = document.createElement('span');
+                        indicator.className = 'slot-indicator';
+                        indicator.textContent = `${dayData.occupied_slots}/${dayData.total_slots}`;
+                        dayElement.appendChild(indicator);
+
+                        if (!dayData.is_past) {
+                            dayElement.addEventListener('click', () => {
+                                document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
+                                dayElement.classList.add('selected');
+                                this.selectDate(dayData.date);
+                            });
+                        }
+                        calendarGrid.appendChild(dayElement);
+                    });
+                };
+                appointmentCalendar.renderCalendar(); // Initial render
+            }
+        });
+
+        createAppointmentModal.addEventListener('hidden.bs.modal', function () {
+            // Reset form and calendar selection
+            document.getElementById('createAppointmentForm').reset();
+            document.getElementById('selectedDateDisplay').textContent = 'Select a date';
+            document.getElementById('timeSlotsGrid').innerHTML = '<div class="text-center text-muted"><i class="fas fa-clock fa-2x mb-2"></i><p>Select a date to view time slots</p></div>';
+            if (appointmentCalendar) {
+                appointmentCalendar.selectedDate = null;
+                document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
+            }
         });
     </script>
 @endpush

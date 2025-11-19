@@ -251,6 +251,77 @@ Patient
         border-color: #5c2a2a;
         color: #ff6b6b;
     }
+
+    /* Dark Mode Form Controls */
+    body.bg-dark select.form-control,
+    body.bg-dark textarea.form-control {
+        background-color: #0f1316;
+        border-color: #2a2f35;
+        color: #e6e6e6;
+    }
+    body.bg-dark select.form-control:focus,
+    body.bg-dark textarea.form-control:focus {
+        background-color: #161b20;
+        border-color: #007bff;
+        color: #e6e6e6;
+    }
+    body.bg-dark option {
+        background-color: #1e2124;
+        color: #e6e6e6;
+    }
+
+    /* Dark Mode Calendar Navigation & Components */
+    body.bg-dark #prevMonth,
+    body.bg-dark #nextMonth {
+        color: #e6e6e6;
+        border-color: #007bff;
+    }
+    body.bg-dark #prevMonth:hover,
+    body.bg-dark #nextMonth:hover {
+        background-color: #007bff;
+        color: #fff;
+    }
+    body.bg-dark #currentMonth,
+    body.bg-dark #selectedDateDisplay {
+        color: #e6e6e6;
+    }
+    
+    /* Dark Mode Inner Cards */
+    body.bg-dark .card {
+        background-color: #1e2124;
+        border-color: #2a2f35;
+    }
+    body.bg-dark .card-header:not(.bg-primary) {
+        background-color: #2a2f35;
+        border-bottom-color: #343a40;
+    }
+    body.bg-dark .card-header h6 {
+        color: #e6e6e6;
+    }
+
+    /* Dark Mode Calendar Grid Refinements */
+    body.bg-dark .calendar-day.selected {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #fff;
+    }
+    body.bg-dark .calendar-day.occupied {
+        background-color: #3d1a1a;
+        border-color: #5c2a2a;
+        color: #ff6b6b;
+    }
+    body.bg-dark .calendar-day.partially-occupied {
+        background-color: #4d3e0b;
+        border-color: #66520f;
+        color: #ffd700;
+    }
+    
+    /* Dark Mode Time Slots */
+    body.bg-dark .time-slot.selected {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #fff;
+    }
 </style>
 @endsection
 

@@ -115,6 +115,31 @@ Patient
     body.bg-dark .fw-bold.text-dark {
         color: #e6e6e6 !important;
     }
+    
+    /* Dark Mode Pagination */
+    body.bg-dark .page-link {
+        background-color: #1e2124;
+        border-color: #2a2f35;
+        color: #e6e6e6;
+    }
+    body.bg-dark .page-item.disabled .page-link {
+        background-color: #1a1d20;
+        border-color: #2a2f35;
+        color: #6c757d;
+    }
+    body.bg-dark .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #fff;
+    }
+    
+    /* Dark Mode Text Utilities */
+    body.bg-dark .text-muted {
+        color: #adb5bd !important;
+    }
+    body.bg-dark .text-dark {
+        color: #e6e6e6 !important;
+    }
 </style>
 @endsection
 

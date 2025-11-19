@@ -240,6 +240,127 @@
             color: #ff6b6b;
         }
     </style>
+    <style>
+        /* Dark Mode Overrides */
+        body.bg-dark .appointment-card {
+            background: #1e2124;
+            border-color: #2a2f35;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        body.bg-dark .text-muted {
+            color: #adb5bd !important;
+        }
+        body.bg-dark .fw-bold {
+            color: #e6e6e6 !important;
+        }
+        
+        /* Dark Mode Pagination */
+        body.bg-dark .page-link {
+            background-color: #1e2124;
+            border-color: #2a2f35;
+            color: #e6e6e6;
+        }
+        body.bg-dark .page-item.disabled .page-link {
+            background-color: #1a1d20;
+            border-color: #2a2f35;
+            color: #6c757d;
+        }
+        body.bg-dark .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+        }
+
+        /* Dark Mode Calendar & Time Slots */
+        body.bg-dark .calendar-header {
+            background-color: #2a2f35;
+            color: #e6e6e6;
+            border-color: #2a2f35;
+        }
+        body.bg-dark .calendar-day {
+            border-color: #2a2f35;
+            color: #e6e6e6;
+        }
+        body.bg-dark .calendar-day:hover {
+            background-color: #2a2f35;
+        }
+        body.bg-dark .calendar-day.weekend {
+            background-color: #1e2124;
+            color: #6c757d;
+        }
+        body.bg-dark .calendar-day.past {
+            background-color: #1e2124;
+            color: #6c757d;
+        }
+        body.bg-dark .time-slot {
+            border-color: #2a2f35;
+        }
+        body.bg-dark .time-slot.available {
+            background-color: #1e3a1f;
+            border-color: #2a5f2e;
+            color: #90ee90;
+        }
+        body.bg-dark .time-slot.occupied {
+            background-color: #3d1a1a;
+            border-color: #5c2a2a;
+            color: #ff6b6b;
+        }
+        body.bg-dark .time-slot.selected {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+        }
+        
+        /* Dark Mode Modal & Forms */
+        body.bg-dark .modal-content {
+            background-color: #1e2124;
+            border-color: #2a2f35;
+            color: #e6e6e6;
+        }
+        body.bg-dark .modal-header {
+            border-bottom-color: #2a2f35;
+        }
+        body.bg-dark .modal-footer {
+            border-top-color: #2a2f35;
+        }
+        body.bg-dark .modal-content .card {
+            background-color: #16191c;
+            border-color: #2a2f35;
+        }
+        body.bg-dark .modal-content .card-header {
+            background-color: #1f2327;
+            border-bottom-color: #2a2f35;
+            color: #e6e6e6;
+        }
+        body.bg-dark .form-control,
+        body.bg-dark .form-select {
+            background-color: #0f1316;
+            border-color: #2a2f35;
+            color: #e6e6e6;
+        }
+        body.bg-dark .form-control:focus,
+        body.bg-dark .form-select:focus {
+            background-color: #161b20;
+            border-color: #007bff;
+            color: #e6e6e6;
+        }
+        body.bg-dark .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+        
+        /* Dark Mode Table */
+        body.bg-dark .table-modern thead th {
+            background-color: #1a1f24;
+            color: #e6e6e6;
+        }
+        body.bg-dark .table-modern tbody td {
+            border-bottom-color: #2a2f35;
+            color: #d6d6d6;
+        }
+        body.bg-dark .table-modern tbody tr:hover {
+            background-color: #2a2f35;
+        }
+    </style>
 @endsection
 
 @section('content')
