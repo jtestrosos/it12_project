@@ -76,7 +76,7 @@ class AppointmentHelper
     public static function getOccupiedSlots($date)
     {
         $appointments = Appointment::whereDate('appointment_date', $date)
-            ->whereIn('status', ['pending', 'approved', 'completed'])
+            ->whereIn('status', ['approved', 'completed'])
             ->get();
         
         // Debug: Log the raw appointment_time values
@@ -112,7 +112,7 @@ class AppointmentHelper
     {
         return Appointment::whereDate('appointment_date', $date)
             ->where('appointment_time', $time)
-            ->whereIn('status', ['pending', 'approved', 'completed'])
+            ->whereIn('status', ['approved', 'completed'])
             ->count();
     }
     

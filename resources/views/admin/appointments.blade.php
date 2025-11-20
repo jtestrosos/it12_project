@@ -42,6 +42,10 @@
             background-color: #f8d7da;
             color: #721c24;
         }
+        .status-no_show {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
         .table-modern {
             border-collapse: separate;
             border-spacing: 0;
@@ -482,7 +486,17 @@
                                                 <td>{{ $appointment->service_type }}</td>
                                             
                                                 <td>
-                                                <span class="status-badge status-{{ $appointment->status }}">{{ ucfirst($appointment->status) }}</span>
+                                                @php
+                                                    $statusDisplay = [
+                                                        'pending' => 'Pending',
+                                                        'approved' => 'Confirmed',
+                                                        'rescheduled' => 'Rescheduled',
+                                                        'cancelled' => 'Cancelled',
+                                                        'completed' => 'Completed',
+                                                        'no_show' => 'No Show'
+                                                    ][$appointment->status] ?? ucfirst($appointment->status);
+                                                @endphp
+                                                <span class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
                                                 </td>
                                             <td class="actions-col">
                                                 <div class="btn-group">
@@ -497,7 +511,11 @@
                                                             </form>
                                                         </li>
                                                         <li>
-                                                            <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#reschedModal{{ $appointment->id }}">Reschedule…</button>
+                                                            <button type="button" class="dropdown-item reschedule-btn" 
+                                                                    data-appointment-id="{{ $appointment->id }}"
+                                                                    data-action-url="{{ route('admin.appointment.update', $appointment) }}">
+                                                                Reschedule…
+                                                            </button>
                                                         </li>
                                                         <li>
                                                             <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="px-3 py-1">
@@ -509,8 +527,7 @@
                                                         <li>
                                                             <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="px-3 py-1">
                                                                 @csrf
-                                                                <input type="hidden" name="status" value="cancelled">
-                                                                <input type="hidden" name="notes" value="No-show">
+                                                                <input type="hidden" name="status" value="no_show">
                                                                 <button type="submit" class="btn btn-link p-0">Mark No-show</button>
                                                             </form>
                                                         </li>
@@ -526,52 +543,7 @@
                                                 </div>
                                             </td>
                                             </tr>
-                                        <!-- Reschedule Modal -->
-                                        <div class="modal fade" id="reschedModal{{ $appointment->id }}" tabindex="-1">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">Reschedule Appointment</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}">
-                                                        @csrf
-                                                        <input type="hidden" name="status" value="rescheduled">
-                                                        <div class="modal-body">
-                                                            <div class="row g-3">
-                                                                <div class="col-md-6">
-                                                                    <label class="form-label">New Date</label>
-                                                                    <input type="date" name="new_date" class="form-control" required>
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <label class="form-label">New Time</label>
-                                                                    <input type="time" name="new_time" class="form-control" step="1800" required>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row g-3 mt-3">
-                                                                <div class="col-md-6">
-                                                                    <label class="form-label">New Duration</label>
-                                                                    <select class="form-select" name="new_duration" required>
-                                                                        <option value="" disabled selected>Select Duration</option>
-                                                                        @for ($i = 30; $i <= 60; $i++)
-                                                                            <option value="{{ $i }}">{{ $i }} minutes</option>
-                                                                        @endfor
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                            <div class="mt-3">
-                                                                <label class="form-label">Notes (optional)</label>
-                                                                <textarea class="form-control" name="notes" rows="3"></textarea>
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                            <button type="submit" class="btn btn-primary">Save</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
+
                                         <!-- View Modal -->
                                         <div class="modal fade" id="viewAppointmentModal{{ $appointment->id }}" tabindex="-1">
                                             <div class="modal-dialog">
@@ -709,6 +681,77 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">Add Appointment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reschedule Appointment Modal (Single Instance) -->
+    <div class="modal fade" id="rescheduleAppointmentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reschedule Appointment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="rescheduleForm" method="POST">
+                    @csrf
+                    <input type="hidden" name="status" value="rescheduled">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <label class="form-label">New Appointment Date & Time <span class="text-danger">*</span></label>
+                            <div class="row g-3">
+                                <div class="col-md-5">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" id="reschedPrevMonth">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <h6 class="mb-0" id="reschedCurrentMonth">Loading...</h6>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" id="reschedNextMonth">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                    <div id="reschedCalendarGrid" class="calendar-grid">
+                                        <div class="col-12 text-center">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <div class="small text-muted mt-2">Loading calendar...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-7">
+                                    <div class="card h-100">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">Time Slots</h6>
+                                        </div>
+                                        <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                                            <div id="reschedSelectedDateDisplay" class="mb-3 text-muted">Select a date to view available time slots</div>
+                                            <div id="reschedTimeSlotsGrid" class="time-slots-grid">
+                                                <div class="text-center text-muted">
+                                                    <i class="fas fa-clock fa-2x mb-2"></i>
+                                                    <p>Select a date to view time slots</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Hidden inputs to store selected date and time -->
+                            <input type="hidden" id="resched_new_date" name="new_date" required>
+                            <input type="hidden" id="resched_new_time" name="new_time" required>
+                        </div>
+                        
+
+                        <div class="mt-3">
+                            <label class="form-label">Notes (optional)</label>
+                            <textarea class="form-control" name="notes" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
                     </div>
                 </form>
             </div>
@@ -938,8 +981,9 @@ console.log('Admin calendar script loading...');
 
         // Calendar functionality
         class AppointmentCalendar {
-            constructor() {
-                console.log('Admin AppointmentCalendar constructor called');
+            constructor(config) {
+                console.log('AppointmentCalendar constructor called', config);
+                this.config = config;
                 this.currentDate = new Date();
                 this.selectedDate = null;
                 this.calendarData = [];
@@ -952,23 +996,29 @@ console.log('Admin calendar script loading...');
             }
 
             attachEventListeners() {
-                document.getElementById('prevMonth').addEventListener('click', () => {
-                    this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-                    this.loadCalendar();
-                });
+                const prevBtn = document.getElementById(this.config.prevBtnId);
+                const nextBtn = document.getElementById(this.config.nextBtnId);
 
-                document.getElementById('nextMonth').addEventListener('click', () => {
-                    this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-                    this.loadCalendar();
-                });
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => {
+                        this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                        this.loadCalendar();
+                    });
+                }
+
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => {
+                        this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                        this.loadCalendar();
+                    });
+                }
             }
 
             async loadCalendar() {
                 const year = this.currentDate.getFullYear();
                 const month = this.currentDate.getMonth() + 1;
                 
-                console.log(`Loading admin calendar for: ${year} ${month}`);
-                console.log(`Fetching from: /admin/appointments/calendar?year=${year}&month=${month}`);
+                console.log(`Loading calendar for: ${year} ${month}`);
 
                 try {
                     const response = await fetch(`/admin/appointments/calendar?year=${year}&month=${month}`, {
@@ -977,27 +1027,27 @@ console.log('Admin calendar script loading...');
                         }
                     });
 
-                    console.log('Response status:', response.status);
-                    console.log('Response headers:', response.headers);
-
                     if (!response.ok) {
-                        console.error('Response not ok:', response.statusText);
                         throw new Error(`Failed to load calendar data: ${response.status} ${response.statusText}`);
                     }
                     
                     const data = await response.json();
-                    console.log('Calendar data received:', data);
                     this.calendarData = data.calendar;
                     this.renderCalendar();
                     this.updateMonthDisplay();
                 } catch (error) {
-                    console.error('Error loading admin calendar:', error);
-                    document.getElementById('calendarGrid').innerHTML = `<div class="col-12 text-center text-danger">Error loading calendar: ${error.message}</div>`;
+                    console.error('Error loading calendar:', error);
+                    const grid = document.getElementById(this.config.calendarGridId);
+                    if (grid) {
+                        grid.innerHTML = `<div class="col-12 text-center text-danger">Error loading calendar: ${error.message}</div>`;
+                    }
                 }
             }
 
             renderCalendar() {
-                const calendarGrid = document.getElementById('calendarGrid');
+                const calendarGrid = document.getElementById(this.config.calendarGridId);
+                if (!calendarGrid) return;
+                
                 calendarGrid.innerHTML = '';
 
                 // Add day headers
@@ -1047,7 +1097,6 @@ console.log('Admin calendar script loading...');
 
                     if (!dayData.is_past) {
                         dayElement.addEventListener('click', () => {
-                            console.log(`Date clicked: ${dayData.date}`);
                             this.selectDate(dayData.date);
                         });
                     }
@@ -1059,28 +1108,45 @@ console.log('Admin calendar script loading...');
             updateMonthDisplay() {
                 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
                     'July', 'August', 'September', 'October', 'November', 'December'];
-                document.getElementById('currentMonth').textContent = 
-                    `${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
+                const displayEl = document.getElementById(this.config.currentMonthId);
+                if (displayEl) {
+                    displayEl.textContent = `${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
+                }
             }
 
             async selectDate(date) {
-                console.log(`selectDate called with: ${date}`);
-                
-                // Remove previous selection
-                document.querySelectorAll('.calendar-day.selected').forEach(el => {
-                    el.classList.remove('selected');
-                });
+                // Remove previous selection in this calendar
+                const calendarGrid = document.getElementById(this.config.calendarGridId);
+                if (calendarGrid) {
+                    calendarGrid.querySelectorAll('.calendar-day.selected').forEach(el => {
+                        el.classList.remove('selected');
+                    });
 
-                // Add selection to clicked date
-                const dayElements = document.querySelectorAll('.calendar-day');
-                dayElements.forEach(el => {
-                    if (el.dataset.date === date) {
-                        el.classList.add('selected');
-                    }
+                    // Add selection to clicked date
+                    calendarGrid.querySelectorAll('.calendar-day').forEach(el => {
+                        // Find the day element that matches the date (we didn't store date in dataset in render, let's fix that logic or rely on closure)
+                        // Actually, in renderCalendar we added click listener to the specific element. 
+                        // But to highlight, we need to find it again or just add class in the click handler?
+                        // The click handler calls this.selectDate(dayData.date).
+                        // Let's match by text content or better, add data-date in render.
+                        // For now, let's assume we add data-date in render or just iterate.
+                        // Wait, I didn't add data-date in renderCalendar above. Let's just rely on the fact that we can't easily find it without data attribute.
+                        // I will add data-date to the element in renderCalendar in the next iteration or just fix it here.
+                        // Actually, let's fix renderCalendar to add data-date.
+                    });
+                }
+                
+                // Re-implementing selection logic to be robust
+                const allDays = document.getElementById(this.config.calendarGridId)?.querySelectorAll('.calendar-day') || [];
+                allDays.forEach(el => {
+                     // We need a way to identify the date. 
+                     // Let's assume I will add data-date in renderCalendar.
+                     if (el.dataset.date === date) {
+                         el.classList.add('selected');
+                     }
                 });
 
                 this.selectedDate = date;
-                console.log(`Selected date set to: ${this.selectedDate}`);
 
                 // Update display
                 const selectedDateObj = new Date(date);
@@ -1090,16 +1156,17 @@ console.log('Admin calendar script loading...');
                     month: 'long', 
                     day: 'numeric' 
                 });
-                document.getElementById('selectedDateDisplay').textContent = formattedDate;
-                console.log(`Date display updated to: ${formattedDate}`);
+                
+                const dateDisplay = document.getElementById(this.config.selectedDateDisplayId);
+                if (dateDisplay) {
+                    dateDisplay.textContent = formattedDate;
+                }
 
                 // Load time slots for selected date
-                console.log('About to load time slots...');
                 await this.loadTimeSlots(date);
             }
 
             async loadTimeSlots(date) {
-                console.log(`Loading time slots for date: ${date}`);
                 try {
                     const response = await fetch(`/admin/appointments/slots?date=${date}`, {
                         headers: {
@@ -1107,42 +1174,38 @@ console.log('Admin calendar script loading...');
                         }
                     });
 
-                    console.log('Slots response status:', response.status);
-
                     if (!response.ok) {
-                        console.error('Slots response not ok:', response.statusText);
-                        throw new Error(`Failed to load time slots: ${response.status} ${response.statusText}`);
+                        throw new Error(`Failed to load time slots`);
                     }
                     
                     const data = await response.json();
-                    console.log('Slots data received:', data);
                     this.renderTimeSlots(data.slots);
                 } catch (error) {
                     console.error('Error loading time slots:', error);
-                    document.getElementById('timeSlotsGrid').innerHTML = `<div class="col-12 text-center text-danger">Error loading time slots: ${error.message}</div>`;
+                    const slotsGrid = document.getElementById(this.config.timeSlotsGridId);
+                    if (slotsGrid) {
+                        slotsGrid.innerHTML = `<div class="col-12 text-center text-danger">Error loading time slots: ${error.message}</div>`;
+                    }
                 }
             }
 
             renderTimeSlots(slots) {
-                console.log('renderTimeSlots called with:', slots);
-                const timeSlotsGrid = document.getElementById('timeSlotsGrid');
+                const timeSlotsGrid = document.getElementById(this.config.timeSlotsGridId);
+                if (!timeSlotsGrid) return;
+                
                 timeSlotsGrid.innerHTML = '';
 
                 if (!slots || slots.length === 0) {
-                    console.log('No slots to render');
                     timeSlotsGrid.innerHTML = '<div class="text-center text-muted">No time slots available</div>';
                     return;
                 }
 
                 slots.forEach(slot => {
-                    console.log('Rendering slot:', slot);
                     const slotElement = document.createElement('div');
                     slotElement.className = `time-slot ${slot.available ? 'available' : 'occupied'}`;
                     
-                    // Add click event only for available slots
                     if (slot.available) {
                         slotElement.addEventListener('click', () => {
-                            console.log(`Time slot clicked: ${slot.time} - ${slot.display}`);
                             this.selectTimeSlot(slot.time, slot.display);
                         });
                     }
@@ -1163,55 +1226,169 @@ console.log('Admin calendar script loading...');
             }
 
             selectTimeSlot(time, display) {
-                console.log(`selectTimeSlot called with: ${time} - ${display}`);
-                
-                // Remove previous selection
-                document.querySelectorAll('.time-slot.selected').forEach(el => {
-                    el.classList.remove('selected');
-                });
+                const timeSlotsGrid = document.getElementById(this.config.timeSlotsGridId);
+                if (timeSlotsGrid) {
+                    timeSlotsGrid.querySelectorAll('.time-slot.selected').forEach(el => {
+                        el.classList.remove('selected');
+                    });
 
-                // Add selection to clicked slot
-                const slotElements = document.querySelectorAll('.time-slot');
-                slotElements.forEach(el => {
-                    const timeEl = el.querySelector('.time');
-                    if (timeEl && timeEl.textContent === display) {
-                        el.classList.add('selected');
-                    }
-                });
+                    timeSlotsGrid.querySelectorAll('.time-slot').forEach(el => {
+                        const timeEl = el.querySelector('.time');
+                        if (timeEl && timeEl.textContent === display) {
+                            el.classList.add('selected');
+                        }
+                    });
+                }
 
                 this.selectedTime = time;
-                console.log(`Selected time set to: ${this.selectedTime}`);
 
                 // Update hidden input
-                document.getElementById('appointment_time').value = time;
-                document.getElementById('appointment_date').value = this.selectedDate;
+                const timeInput = document.getElementById(this.config.timeInputId);
+                const dateInput = document.getElementById(this.config.dateInputId);
                 
-                console.log(`Hidden inputs updated - Date: ${this.selectedDate}, Time: ${time}`);
+                if (timeInput) timeInput.value = time;
+                if (dateInput) dateInput.value = this.selectedDate;
             }
+            
+            // Helper to fix the missing data-date in renderCalendar
+            // I'll override the renderCalendar method above to include data-date
+        }
+        
+        // Patch renderCalendar to include data-date
+        AppointmentCalendar.prototype.renderCalendar = function() {
+            const calendarGrid = document.getElementById(this.config.calendarGridId);
+            if (!calendarGrid) return;
+            
+            calendarGrid.innerHTML = '';
+
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-header';
+                header.textContent = day;
+                calendarGrid.appendChild(header);
+            });
+
+            const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1).getDay();
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                calendarGrid.appendChild(emptyDay);
+            }
+
+            this.calendarData.forEach(dayData => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.dataset.date = dayData.date; // Added this line
+                
+                const dayNumber = document.createElement('span');
+                dayNumber.className = 'day-number';
+                dayNumber.textContent = dayData.day;
+                dayElement.appendChild(dayNumber);
+                
+                if (dayData.is_weekend) dayElement.classList.add('weekend');
+                if (dayData.is_past) dayElement.classList.add('past');
+                else if (dayData.is_fully_occupied) dayElement.classList.add('occupied');
+                else if (dayData.occupied_slots > 0) dayElement.classList.add('partially-occupied');
+
+                const indicator = document.createElement('span');
+                indicator.className = 'slot-indicator';
+                indicator.textContent = `${dayData.occupied_slots}/${dayData.total_slots}`;
+                dayElement.appendChild(indicator);
+
+                if (!dayData.is_past) {
+                    dayElement.addEventListener('click', () => {
+                        this.selectDate(dayData.date);
+                    });
+                }
+
+                calendarGrid.appendChild(dayElement);
+            });
+        };
+
+        // Initialize Add Appointment Calendar
+        const addAppointmentModal = document.getElementById('addAppointmentModal');
+        let addCalendar = null;
+        
+        if (addAppointmentModal) {
+            addAppointmentModal.addEventListener('shown.bs.modal', function () {
+                if (!addCalendar) {
+                    addCalendar = new AppointmentCalendar({
+                        prevBtnId: 'prevMonth',
+                        nextBtnId: 'nextMonth',
+                        currentMonthId: 'currentMonth',
+                        calendarGridId: 'calendarGrid',
+                        selectedDateDisplayId: 'selectedDateDisplay',
+                        timeSlotsGridId: 'timeSlotsGrid',
+                        dateInputId: 'appointment_date',
+                        timeInputId: 'appointment_time'
+                    });
+                }
+            });
+            
+            addAppointmentModal.addEventListener('hidden.bs.modal', function () {
+                if (addCalendar) {
+                    addCalendar.selectedDate = null;
+                    addCalendar.selectedTime = null;
+                    // Reset UI
+                    document.getElementById('selectedDateDisplay').textContent = 'Select a date to view available time slots';
+                    document.getElementById('timeSlotsGrid').innerHTML = '<div class="text-center text-muted"><i class="fas fa-clock fa-2x mb-2"></i><p>Select a date to view time slots</p></div>';
+                    document.getElementById('appointment_date').value = '';
+                    document.getElementById('appointment_time').value = '';
+                    // Remove selection classes
+                    document.querySelectorAll('#calendarGrid .selected').forEach(el => el.classList.remove('selected'));
+                }
+            });
         }
 
-        // Initialize calendar when modal is shown
-        const addAppointmentModal = document.getElementById('addAppointmentModal');
-        let calendar = null;
-        
-        addAppointmentModal.addEventListener('shown.bs.modal', function () {
-            console.log('Modal opened, initializing admin calendar...');
-            if (!calendar) {
-                calendar = new AppointmentCalendar();
-                console.log('Admin calendar initialized successfully');
-            }
-        });
-        
-        addAppointmentModal.addEventListener('hidden.bs.modal', function () {
-            console.log('Modal closed');
-            // Optionally reset calendar when modal closes
-            if (calendar) {
-                calendar.selectedDate = null;
-                calendar.selectedTime = null;
-                document.getElementById('selectedDateDisplay').textContent = 'Select a date to view available time slots';
-                document.getElementById('timeSlotsGrid').innerHTML = '<div class="text-center text-muted"><i class="fas fa-clock fa-2x mb-2"></i><p>Select a date to view time slots</p></div>';
-                document.getElementById('appointment_date').value = '';
-                document.getElementById('appointment_time').value = '';
+        // Initialize Reschedule Appointment Calendar
+        const rescheduleModal = document.getElementById('rescheduleAppointmentModal');
+        let rescheduleCalendar = null;
+
+        if (rescheduleModal) {
+            rescheduleModal.addEventListener('shown.bs.modal', function () {
+                if (!rescheduleCalendar) {
+                    rescheduleCalendar = new AppointmentCalendar({
+                        prevBtnId: 'reschedPrevMonth',
+                        nextBtnId: 'reschedNextMonth',
+                        currentMonthId: 'reschedCurrentMonth',
+                        calendarGridId: 'reschedCalendarGrid',
+                        selectedDateDisplayId: 'reschedSelectedDateDisplay',
+                        timeSlotsGridId: 'reschedTimeSlotsGrid',
+                        dateInputId: 'resched_new_date',
+                        timeInputId: 'resched_new_time'
+                    });
+                }
+            });
+
+            rescheduleModal.addEventListener('hidden.bs.modal', function () {
+                if (rescheduleCalendar) {
+                    rescheduleCalendar.selectedDate = null;
+                    rescheduleCalendar.selectedTime = null;
+                    // Reset UI
+                    document.getElementById('reschedSelectedDateDisplay').textContent = 'Select a date to view available time slots';
+                    document.getElementById('reschedTimeSlotsGrid').innerHTML = '<div class="text-center text-muted"><i class="fas fa-clock fa-2x mb-2"></i><p>Select a date to view time slots</p></div>';
+                    document.getElementById('resched_new_date').value = '';
+                    document.getElementById('resched_new_time').value = '';
+                    document.querySelectorAll('#reschedCalendarGrid .selected').forEach(el => el.classList.remove('selected'));
+                }
+            });
+        }
+
+        // Handle Reschedule Button Clicks
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('reschedule-btn')) {
+                const btn = e.target;
+                const appointmentId = btn.dataset.appointmentId;
+                const actionUrl = btn.dataset.actionUrl;
+                
+                const form = document.getElementById('rescheduleForm');
+                if (form) {
+                    form.action = actionUrl;
+                }
+                
+                // Open the modal
+                const modal = new bootstrap.Modal(document.getElementById('rescheduleAppointmentModal'));
+                modal.show();
             }
         });
     });
