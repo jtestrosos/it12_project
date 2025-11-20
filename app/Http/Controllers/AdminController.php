@@ -78,17 +78,65 @@ class AdminController extends Controller
             ->groupBy('barangay')
             ->get();
 
-        // Service types data for the bar chart
-        $serviceTypes = Appointment::selectRaw('service_type, count(*) as count')
-            ->whereMonth('created_at', now()->month)
+        // --- Chart Data Preparation ---
+
+        // 1. Overview Chart Data (Appointments Count)
+        
+        // Weekly (Current Week: Sun-Sat)
+        $weeklyOverview = Appointment::selectRaw('DAYOFWEEK(appointment_date) as label_key, count(*) as count')
+            ->whereBetween('appointment_date', [now()->startOfWeek(), now()->endOfWeek()])
+            ->groupBy('label_key')
+            ->pluck('count', 'label_key')
+            ->toArray();
+
+        // Monthly (Current Month: 1-31)
+        $monthlyOverview = Appointment::selectRaw('DAY(appointment_date) as label_key, count(*) as count')
+            ->whereMonth('appointment_date', now()->month)
+            ->whereYear('appointment_date', now()->year)
+            ->groupBy('label_key')
+            ->pluck('count', 'label_key')
+            ->toArray();
+
+        // Yearly (Current Year: 1-12)
+        $yearlyOverview = Appointment::selectRaw('MONTH(appointment_date) as label_key, count(*) as count')
+            ->whereYear('appointment_date', now()->year)
+            ->groupBy('label_key')
+            ->pluck('count', 'label_key')
+            ->toArray();
+
+        // 2. Services Chart Data (Service Types Distribution)
+
+        // Weekly
+        $weeklyServices = Appointment::selectRaw('service_type, count(*) as count')
+            ->whereBetween('appointment_date', [now()->startOfWeek(), now()->endOfWeek()])
             ->groupBy('service_type')
             ->get();
 
-        // Weekly appointments data for the line chart
-        $weeklyAppointments = Appointment::selectRaw('DAYOFWEEK(appointment_date) as day_of_week, count(*) as count')
-            ->whereBetween('appointment_date', [now()->startOfWeek(), now()->endOfWeek()])
-            ->groupBy('day_of_week')
+        // Monthly
+        $monthlyServicesChart = Appointment::selectRaw('service_type, count(*) as count')
+            ->whereMonth('appointment_date', now()->month)
+            ->whereYear('appointment_date', now()->year)
+            ->groupBy('service_type')
             ->get();
+
+        // Yearly
+        $yearlyServices = Appointment::selectRaw('service_type, count(*) as count')
+            ->whereYear('appointment_date', now()->year)
+            ->groupBy('service_type')
+            ->get();
+
+        $chartData = [
+            'overview' => [
+                'weekly' => $weeklyOverview,
+                'monthly' => $monthlyOverview,
+                'yearly' => $yearlyOverview,
+            ],
+            'services' => [
+                'weekly' => $weeklyServices,
+                'monthly' => $monthlyServicesChart,
+                'yearly' => $yearlyServices,
+            ]
+        ];
 
         return view('admin.dashboard', compact(
             'totalPatients',
@@ -102,8 +150,8 @@ class AdminController extends Controller
             'recentAppointments',
             'lowStockInventory',
             'patientsByBarangay',
-            'serviceTypes',
-            'weeklyAppointments'
+            'patientsByBarangay',
+            'chartData'
         ));
     }
 
@@ -702,15 +750,42 @@ class AdminController extends Controller
             ->groupBy('service_type')
             ->get();
 
-        // Monthly appointments trend for the last 6 months
-        $monthlyTrend = Appointment::selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, count(*) as count')
-            ->where('created_at', '>=', now()->subMonths(6))
-            ->groupBy('year', 'month')
-            ->orderBy('year', 'asc')
-            ->orderBy('month', 'asc')
-            ->get();
+        // --- Multi-timeframe Trend Data ---
 
-        return view('admin.reports', compact('appointmentStats', 'inventoryStats', 'serviceTypes', 'monthlyTrend'));
+        // 1. Weekly (Current Week: Sun-Sat)
+        $startOfWeek = now()->startOfWeek();
+        $endOfWeek = now()->endOfWeek();
+        $weeklyData = Appointment::selectRaw('DAYOFWEEK(appointment_date) as day, count(*) as count')
+            ->whereBetween('appointment_date', [$startOfWeek, $endOfWeek])
+            ->groupBy('day')
+            ->pluck('count', 'day')
+            ->toArray();
+
+        // 2. Monthly (Current Month: 1st-End)
+        $startOfMonth = now()->startOfMonth();
+        $endOfMonth = now()->endOfMonth();
+        $monthlyData = Appointment::selectRaw('DAY(appointment_date) as day, count(*) as count')
+            ->whereBetween('appointment_date', [$startOfMonth, $endOfMonth])
+            ->groupBy('day')
+            ->pluck('count', 'day')
+            ->toArray();
+
+        // 3. Yearly (Current Year: Jan-Dec)
+        $startOfYear = now()->startOfYear();
+        $endOfYear = now()->endOfYear();
+        $yearlyData = Appointment::selectRaw('MONTH(appointment_date) as month, count(*) as count')
+            ->whereBetween('appointment_date', [$startOfYear, $endOfYear])
+            ->groupBy('month')
+            ->pluck('count', 'month')
+            ->toArray();
+
+        $trendData = [
+            'weekly' => $weeklyData,
+            'monthly' => $monthlyData,
+            'yearly' => $yearlyData
+        ];
+
+        return view('admin.reports', compact('appointmentStats', 'inventoryStats', 'serviceTypes', 'trendData'));
     }
 
     public function exportAppointmentsExcel(Request $request)

@@ -61,7 +61,45 @@
         /* Headings and muted text visibility */
         h1, h2, h3, h4, h5, h6 { color: inherit; }
         body.bg-dark .text-muted, body.bg-dark small, body.bg-dark .stat-label { color: #b0b0b0 !important; }
-    </style>
+        /* Headings and muted text visibility */
+        h1, h2, h3, h4, h5, h6 { color: inherit; }
+        body.bg-dark .text-muted, body.bg-dark small, body.bg-dark .stat-label { color: #b0b0b0 !important; }
+
+        /* Filter Toggle Styles */
+        .filter-toggle {
+            background: #e2e8f0;
+            border-radius: 50rem;
+            padding: 4px;
+            display: inline-flex;
+            align-items: center;
+        }
+        .filter-btn {
+            border: none;
+            background: transparent;
+            padding: 6px 18px;
+            border-radius: 50rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #64748b;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            line-height: 1.2;
+        }
+        .filter-btn:hover {
+            color: #334155;
+        }
+        .filter-btn.active {
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            font-weight: 600;
+        }
+        
+        /* Dark mode adjustments for filters */
+        body.bg-dark .filter-toggle { background: #27272a; }
+        body.bg-dark .filter-btn { color: #a1a1aa; }
+        body.bg-dark .filter-btn:hover { color: #e4e4e7; }
+        body.bg-dark .filter-btn.active { background: #3f3f46; color: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
 @endsection
 
 @section('content')
@@ -161,7 +199,14 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="chart-container">
-                                    <h6 class="mb-2">Monthly Appointments Trend</h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="mb-0">Appointments Trend</h6>
+                                        <div class="filter-toggle" id="trendFilter">
+                                            <button class="filter-btn" onclick="updateTrendChart('weekly', this)">Weekly</button>
+                                            <button class="filter-btn active" onclick="updateTrendChart('monthly', this)">Monthly</button>
+                                            <button class="filter-btn" onclick="updateTrendChart('yearly', this)">Yearly</button>
+                                        </div>
+                                    </div>
                                     <canvas id="trendChart" height="460"></canvas>
                                 </div>
                             </div>
@@ -176,7 +221,6 @@
 <script>
         // Get data from Laravel
         const serviceData = @json($serviceTypes);
-        const monthlyData = @json($monthlyTrend);
 
         // Service Chart
         const serviceCtx = document.getElementById('serviceChart').getContext('2d');
@@ -210,40 +254,24 @@
             }
         });
 
-        // Trend Chart - Monthly Appointments
+        // Trend Chart
         const trendCtx = document.getElementById('trendChart').getContext('2d');
-        
-        // Prepare monthly data
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const trendLabels = [];
-        const trendCounts = [];
-        
-        // Get last 6 months
-        for (let i = 5; i >= 0; i--) {
-            const date = new Date();
-            date.setMonth(date.getMonth() - i);
-            const month = date.getMonth() + 1;
-            const year = date.getFullYear();
-            
-            trendLabels.push(monthNames[date.getMonth()]);
-            
-            const monthData = monthlyData.find(item => item.month == month && item.year == year);
-            trendCounts.push(monthData ? monthData.count : 0);
-        }
-        
-        new Chart(trendCtx, {
+        const trendData = @json($trendData);
+
+        let trendChart = new Chart(trendCtx, {
             type: 'line',
             data: {
-                labels: trendLabels,
+                labels: [],
                 datasets: [{
                     label: 'Appointments',
-                    data: trendCounts,
+                    data: [],
                     borderColor: '#007bff',
                     backgroundColor: 'rgba(0, 123, 255, 0.1)',
                     tension: 0.4,
-                    borderWidth: 5,
-                    pointRadius: 8,
-                    pointHoverRadius: 10
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: true
                 }]
             },
             options: {
@@ -253,30 +281,53 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: {
-                            font: {
-                                size: 16
-                            }
-                        }
+                        ticks: { font: { size: 12 } }
                     },
                     x: {
-                        ticks: {
-                            font: {
-                                size: 16
-                            }
-                        }
+                        ticks: { font: { size: 12 } }
                     }
                 },
                 plugins: {
-                    legend: {
-                        labels: {
-                            font: {
-                                size: 16
-                            }
-                        }
-                    }
+                    legend: { display: false }
                 }
             }
         });
+
+        function updateTrendChart(timeframe, element) {
+            // Update active state
+            document.querySelectorAll('#trendFilter .filter-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+
+            let labels = [];
+            let data = [];
+            const rawData = trendData[timeframe];
+
+            if (timeframe === 'weekly') {
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                for (let i = 1; i <= 7; i++) {
+                    labels.push(dayNames[i-1]);
+                    data.push(rawData[i] || 0);
+                }
+            } else if (timeframe === 'monthly') {
+                const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+                for (let i = 1; i <= daysInMonth; i++) {
+                    labels.push(i);
+                    data.push(rawData[i] || 0);
+                }
+            } else if (timeframe === 'yearly') {
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                for (let i = 1; i <= 12; i++) {
+                    labels.push(monthNames[i-1]);
+                    data.push(rawData[i] || 0);
+                }
+            }
+
+            trendChart.data.labels = labels;
+            trendChart.data.datasets[0].data = data;
+            trendChart.update();
+        }
+
+        // Initialize Trend Chart
+        document.querySelector('#trendFilter .filter-btn.active').click();
     </script>
 @endpush

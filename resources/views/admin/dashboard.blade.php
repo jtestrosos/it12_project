@@ -132,6 +132,43 @@
                 max-height: 260px !important;
             }
         }
+        }
+        
+        /* Filter Toggle Styles */
+        .filter-toggle {
+            background: #e2e8f0;
+            border-radius: 50rem;
+            padding: 4px;
+            display: inline-flex;
+            align-items: center;
+        }
+        .filter-btn {
+            border: none;
+            background: transparent;
+            padding: 6px 18px;
+            border-radius: 50rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #64748b;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            line-height: 1.2;
+        }
+        .filter-btn:hover {
+            color: #334155;
+        }
+        .filter-btn.active {
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            font-weight: 600;
+        }
+        
+        /* Dark mode adjustments for filters */
+        body.bg-dark .filter-toggle { background: #27272a; }
+        body.bg-dark .filter-btn { color: #a1a1aa; }
+        body.bg-dark .filter-btn:hover { color: #e4e4e7; }
+        body.bg-dark .filter-btn.active { background: #3f3f46; color: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
     </style>
 @endsection
 
@@ -201,7 +238,7 @@
                                 <div class="metric-card">
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div>
-                                            <div class="metric-label">Services This Month</div>
+                                            <div class="metric-label">Services Overview</div>
                                             <div class="metric-number">{{ $monthlyServices ?? 0 }}</div>
                                             @if(!is_null($servicesChange ?? null))
                                                 <div class="metric-change {{ ($servicesChange ?? 0) >= 0 ? 'text-success' : 'text-danger' }}">
@@ -223,13 +260,27 @@
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <div class="chart-container">
-                                    <h6 class="mb-3">Dashboard Overview</h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="mb-0">Dashboard Overview</h6>
+                                        <div class="filter-toggle" id="overviewFilter">
+                                            <button class="filter-btn active" onclick="updateOverviewChart('weekly', this)">Weekly</button>
+                                            <button class="filter-btn" onclick="updateOverviewChart('monthly', this)">Monthly</button>
+                                            <button class="filter-btn" onclick="updateOverviewChart('yearly', this)">Yearly</button>
+                                        </div>
+                                    </div>
                                     <canvas id="overviewChart"></canvas>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="chart-container">
-                                    <h6 class="mb-3">Service this Month</h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="mb-0">Service this Month</h6>
+                                        <div class="filter-toggle" id="serviceFilter">
+                                            <button class="filter-btn" onclick="updateServiceChart('weekly', this)">Weekly</button>
+                                            <button class="filter-btn active" onclick="updateServiceChart('monthly', this)">Monthly</button>
+                                            <button class="filter-btn" onclick="updateServiceChart('yearly', this)">Yearly</button>
+                                        </div>
+                                    </div>
                                     <canvas id="serviceChart"></canvas>
                                 </div>
                             </div>
@@ -326,31 +377,18 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
         // Get data from Laravel
-        const weeklyData = @json($weeklyAppointments);
-        const serviceData = @json($serviceTypes);
+        const chartData = @json($chartData);
         const barangayData = @json($patientsByBarangay);
 
-        // Prepare weekly appointments data
-        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        const weeklyLabels = [];
-        const weeklyCounts = [];
-        
-        // Initialize with zeros for all days
-        for (let i = 1; i <= 7; i++) {
-            weeklyLabels.push(dayNames[i]);
-            const dayData = weeklyData.find(item => item.day_of_week == i);
-            weeklyCounts.push(dayData ? dayData.count : 0);
-        }
-
-        // Overview Chart (Weekly Appointments)
+        // --- Overview Chart ---
         const overviewCtx = document.getElementById('overviewChart').getContext('2d');
-        new Chart(overviewCtx, {
+        let overviewChart = new Chart(overviewCtx, {
             type: 'line',
             data: {
-                labels: weeklyLabels,
+                labels: [],
                 datasets: [{
                     label: 'Appointments',
-                    data: weeklyCounts,
+                    data: [],
                     borderColor: '#007bff',
                     backgroundColor: 'rgba(0, 123, 255, 0.1)',
                     tension: 0.4
@@ -361,25 +399,60 @@
                 maintainAspectRatio: true,
                 aspectRatio: 1.8,
                 scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+                    y: { beginAtZero: true }
                 }
             }
         });
 
-        // Service Chart (Monthly Services)
+        function updateOverviewChart(timeframe, element) {
+            // Update active state
+            document.querySelectorAll('#overviewFilter .filter-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+
+            let labels = [];
+            let data = [];
+            const rawData = chartData.overview[timeframe];
+
+            if (timeframe === 'weekly') {
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                for (let i = 1; i <= 7; i++) {
+                    labels.push(dayNames[i-1]); // Adjust index for array access
+                    data.push(rawData[i] || 0);
+                }
+            } else if (timeframe === 'monthly') {
+                const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+                for (let i = 1; i <= daysInMonth; i++) {
+                    labels.push(i);
+                    data.push(rawData[i] || 0);
+                }
+            } else if (timeframe === 'yearly') {
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                for (let i = 1; i <= 12; i++) {
+                    labels.push(monthNames[i-1]);
+                    data.push(rawData[i] || 0);
+                }
+            }
+
+            overviewChart.data.labels = labels;
+            overviewChart.data.datasets[0].data = data;
+            overviewChart.update();
+        }
+
+        // Initialize Overview Chart
+        // No need to call manually as the HTML has 'active' class and initial data is empty but will be filled on first click or we can init here
+        // Actually, let's just trigger the click on the active button to load data
+        document.querySelector('#overviewFilter .filter-btn.active').click();
+
+
+        // --- Service Chart ---
         const serviceCtx = document.getElementById('serviceChart').getContext('2d');
-        const serviceLabels = serviceData.map(item => item.service_type);
-        const serviceCounts = serviceData.map(item => item.count);
-        
-        new Chart(serviceCtx, {
+        let serviceChart = new Chart(serviceCtx, {
             type: 'bar',
             data: {
-                labels: serviceLabels,
+                labels: [],
                 datasets: [{
-                    label: 'Services This Month',
-                    data: serviceCounts,
+                    label: 'Services',
+                    data: [],
                     backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#17a2b8', '#6f42c1']
                 }]
             },
@@ -388,12 +461,28 @@
                 maintainAspectRatio: true,
                 aspectRatio: 1.8,
                 scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+                    y: { beginAtZero: true }
                 }
             }
         });
+
+        function updateServiceChart(timeframe, element) {
+            // Update active state
+            document.querySelectorAll('#serviceFilter .filter-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+
+            const rawData = chartData.services[timeframe];
+            const labels = rawData.map(item => item.service_type);
+            const data = rawData.map(item => item.count);
+
+            serviceChart.data.labels = labels;
+            serviceChart.data.datasets[0].data = data;
+            serviceChart.data.datasets[0].label = 'Services (' + timeframe.charAt(0).toUpperCase() + timeframe.slice(1) + ')';
+            serviceChart.update();
+        }
+
+        // Initialize Service Chart
+        document.querySelector('#serviceFilter .filter-btn.active').click();
 
         // Barangay Chart
         const barangayCtx = document.getElementById('barangayChart').getContext('2d');
