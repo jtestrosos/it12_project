@@ -281,7 +281,7 @@
                 <div>
                     <div class="metric-label">Today's Appointments</div>
                     <div class="metric-number">{{ $todayAppointments ?? 0 }}</div>
-                    <div class="metric-change text-info">
+                    <div class="metric-change text-primary">
                         {{ $todayCompleted ?? 0 }} completed, {{ $todayPending ?? 0 }} pending
                     </div>
                 </div>
@@ -398,8 +398,9 @@
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
         // Palette and grid based on theme
         const isDark = document.body.classList.contains('bg-dark');
         const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
@@ -529,6 +530,7 @@
                     }
                 }
             }
+        });
         });
     </script>
 @endpush

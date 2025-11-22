@@ -4,279 +4,26 @@
     <meta charset="utf-8">
     <title>Malasakit</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Preconnect to CDNs -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"></noscript>
 
     <style>
-        body {
-            background: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden; /* ✅ Prevents horizontal scroll */
-        }
-
-        /* Admin Dashboard Layout */
-        .admin-layout {
-            display: flex;
-            min-height: 100vh;
-            width: 100%;
-        }
-
-        /* Sidebar */
-        .admin-sidebar {
-            width: 250px;
-            background: #f8f9fa;
-            color: #495057;
-            position: fixed;
-            height: 100vh;
-            left: 0;
-            top: 0;
-            z-index: 1000;
-            overflow-y: auto;
-            border-right: 1px solid #e9ecef;
-        }
-
-        .admin-sidebar .sidebar-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .admin-sidebar .sidebar-header h4 {
-            color: #2c3e50;
-            margin: 0;
-            font-weight: 600;
-        }
-
-        .admin-sidebar .sidebar-header p {
-            color: #6c757d;
-            margin: 0;
-            font-size: 0.9rem;
-        }
-
-        .admin-sidebar .nav-link {
-            color: #495057;
-            padding: 1rem 1.5rem;
-            border: none;
-            display: flex;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-
-        .admin-sidebar .nav-link:hover {
-            background: #e9ecef;
-            color: #495057;
-        }
-
-        .admin-sidebar .nav-link.active {
-            background: #007bff;
-            color: #ffffff;
-        }
-
-        .admin-sidebar .nav-link i {
-            margin-right: 0.75rem;
-            width: 20px;
-        }
-
-        /* Main Content */
-        .admin-main {
-            flex: 1;
-            margin-left: 250px;
-            background: #f0f0f0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            width: calc(100% - 250px); /* ✅ Ensures full width minus sidebar */
-            overflow-x: hidden; /* ✅ Prevents right blank space */
-        }
-
-        /* Top Header */
-        .admin-header {
-            background: #ffffff;
-            color: #212529;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #e9ecef;
-            box-shadow: none;
-            width: 100%; /* ✅ Fix header stretch */
-        }
-
-        .admin-header .header-left {
-            display: flex;
-            align-items: center;
-        }
-
-        .admin-header .header-left .logo {
-            display: flex;
-            align-items: center;
-            margin-right: 2rem;
-        }
-
-        .admin-header .header-left .logo i {
-            font-size: 1.5rem;
-            margin-right: 0.5rem;
-        }
-
-        .admin-header .header-left h3 {
-            margin: 0;
-            font-weight: 600;
-        }
-
-        .admin-header .header-nav {
-            display: flex;
-            align-items: center;
-        }
-
-        .admin-header .header-nav .nav-link {
-            color: #495057;
-            margin: 0 1rem;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            transition: background 0.3s ease;
-        }
-
-        .admin-header .header-nav .nav-link:hover {
-            background: #f8f9fa;
-            color: #212529;
-        }
-
-        .admin-header .header-right {
-            display: flex;
-            align-items: center;
-        }
-
-        .admin-header .header-right .user-info {
-            display: flex;
-            align-items: center;
-            margin-left: 1rem;
-        }
-
-        .admin-header .header-right .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #0d6efd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 0.75rem;
-            font-weight: 600;
-            color: #ffffff;
-        }
-
-        .admin-header .header-right .user-details h6 {
-            margin: 0;
-            font-weight: 600;
-        }
-
-        .admin-header .header-right .user-details small {
-            opacity: 0.8;
-        }
-
-        /* Content Area */
-        .admin-content {
-            padding: 0;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            max-width: 100%;
-        }
-
-        /* Public Layout */
-        header .navbar {
-            background: #17a2b8 !important;
-            min-height: 80px;
-        }
-
-        .public-layout .navbar {
-            background: #17a2b8;
-            min-height: 80px;
-        }
-
-        .navbar-brand img {
-            height: 65px;
-            width: auto;
-            margin-right: 1rem;
-            object-fit: contain;
-        }
-
-        .public-layout .navbar-brand img {
-            height: 65px;
-            margin-right: 1rem;
-        }
-
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .navbar-brand span {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: white;
-            line-height: 1.2;
-        }
-
-        .public-layout .navbar-brand span {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: white;
-        }
-
-        .public-layout .navbar-nav .nav-link {
-            color: white;
-            font-weight: 500;
-            margin: 0 1rem;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            transition: background 0.3s ease;
-        }
-
-        .public-layout .navbar-nav .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-
-        .public-layout .navbar-nav .nav-link.active {
-            background: rgba(255,255,255,0.2);
-            color: white;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .admin-sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-            }
-
-            .admin-sidebar.show {
-                transform: translateX(0);
-            }
-
-            .admin-main {
-                margin-left: 0;
-                width: 100%;
-            }
-
-            .admin-header {
-                padding: 1rem;
-            }
-
-            .admin-content {
-                padding: 1rem;
-            }
-        }
-
-        footer {
-            background: #e9ecef;
-            color: #6c757d;
-        }
+        body{background:#f8f9fa;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;margin:0;padding:0;overflow-x:hidden}
+        /* Critical Layout CSS for CLS Prevention */
+        .admin-layout{display:flex;min-height:100vh;width:100%}
+        .admin-sidebar{width:250px;background:#f8f9fa;color:#495057;position:fixed;height:100vh;left:0;top:0;z-index:1000;overflow-y:auto;border-right:1px solid #e9ecef}
+        .admin-main{flex:1;margin-left:250px;background:#f0f0f0;display:flex;flex-direction:column;min-height:100vh;width:calc(100% - 250px);overflow-x:hidden;contain:paint}
+        @media (max-width:768px){.admin-sidebar{transform:translateX(-100%)}.admin-main{margin-left:0;width:100%}}
+        
+        /* Remaining styles */
+        .admin-sidebar .sidebar-header{padding:1.5rem;border-bottom:1px solid rgba(255,255,255,.1)}.admin-sidebar .sidebar-header h4{color:#2c3e50;margin:0;font-weight:600}.admin-sidebar .sidebar-header p{color:#6c757d;margin:0;font-size:.9rem}.admin-sidebar .nav-link{color:#495057;padding:1rem 1.5rem;border:none;display:flex;align-items:center;transition:all .3s ease}.admin-sidebar .nav-link:hover{background:#e9ecef;color:#495057}.admin-sidebar .nav-link.active{background:#007bff;color:#fff}.admin-sidebar .nav-link i{margin-right:.75rem;width:20px}.admin-header{background:#fff;color:#212529;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e9ecef;box-shadow:none;width:100%}.admin-header .header-left{display:flex;align-items:center}.admin-header .header-left .logo{display:flex;align-items:center;margin-right:2rem}.admin-header .header-left .logo i{font-size:1.5rem;margin-right:.5rem}.admin-header .header-left h3{margin:0;font-weight:600}.admin-header .header-nav{display:flex;align-items:center}.admin-header .header-nav .nav-link{color:#495057;margin:0 1rem;padding:.5rem 1rem;border-radius:4px;transition:background .3s ease}.admin-header .header-nav .nav-link:hover{background:#f8f9fa;color:#212529}.admin-header .header-right{display:flex;align-items:center}.admin-header .header-right .user-info{display:flex;align-items:center;margin-left:1rem}.admin-header .header-right .user-avatar{width:40px;height:40px;border-radius:50%;background:#0d6efd;display:flex;align-items:center;justify-content:center;margin-right:.75rem;font-weight:600;color:#fff}.admin-header .header-right .user-details h6{margin:0;font-weight:600}.admin-header .header-right .user-details small{opacity:.8}.admin-content{padding:0;flex:1;display:flex;flex-direction:column;width:100%;max-width:100%}.public-layout header .navbar{background:#17a2b8!important;min-height:80px}.public-layout .navbar{background:#17a2b8;min-height:80px}.navbar-brand img{height:65px;width:auto;margin-right:1rem;object-fit:contain}.public-layout .navbar-brand img{height:65px;margin-right:1rem}.navbar-brand{display:flex;align-items:center;gap:.75rem}.navbar-brand span{font-size:1.75rem;font-weight:700;color:#fff;line-height:1.2}.public-layout .navbar-brand span{font-size:1.75rem;font-weight:700;color:#fff}.public-layout .navbar-nav .nav-link{color:#fff;font-weight:500;margin:0 1rem;padding:.5rem 1rem;border-radius:4px;transition:background .3s ease}.public-layout .navbar-nav .nav-link:hover{background:rgba(255,255,255,.1);color:#fff}.public-layout .navbar-nav .nav-link.active{background:rgba(255,255,255,.2);color:#fff}@media (max-width:768px){.admin-sidebar{transform:translateX(-100%);transition:transform .3s ease}.admin-sidebar.show{transform:translateX(0)}.admin-main{margin-left:0;width:100%}.admin-header{padding:1rem}.admin-content{padding:1rem}}footer{background:#e9ecef;color:#6c757d}
     </style>
 
     @stack('styles')
@@ -290,7 +37,7 @@
             <div class="admin-sidebar">
                 <div class="sidebar-header">
                     <div class="d-flex align-items-center">
-                        <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="MALASAKIT Logo" style="width: 40px; height: 40px; margin-right: 0.5rem;">
+                        <img src="{{ asset('images/malasakit-logo-blue.webp') }}" alt="MALASAKIT Logo" loading="lazy" style="width: 40px; height: 40px; margin-right: 0.5rem;">
                         <div><h4>MALASAKIT</h4></div>
                     </div>
                 </div>
@@ -373,7 +120,7 @@
             <nav class="navbar navbar-expand-lg navbar-light shadow-sm">
                 <div class="container">
                     <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
-                        <img src="{{ asset('images/malasakit-logo.png') }}" alt="Malasakit Logo">
+                        <img src="{{ asset('images/malasakit-logo.png') }}" alt="Malasakit Logo" loading="lazy">
                         <span class="fw-bold text-white">MALASAKIT</span>
                     </a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
@@ -660,144 +407,10 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
     <script>
-        function requireLogin() {
-            @if(Auth::check())
-                @if(Auth::user()->isPatient())
-                    window.location.href = "{{ route('patient.book-appointment') }}";
-                @else
-                    window.location.href = "{{ Auth::user()->isSuperAdmin() ? route('superadmin.dashboard') : route('admin.dashboard') }}";
-                @endif
-            @else
-                var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-                loginModal.show();
-            @endif
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const feedbackModalEl = document.getElementById('feedbackModal');
-            if (feedbackModalEl) {
-                const feedbackModal = new bootstrap.Modal(feedbackModalEl);
-                feedbackModal.show();
-            }
-
-            // Show login modal automatically if there are login validation errors from the server
-            @if($errors->has('email') || $errors->has('password'))
-                const loginModalEl = document.getElementById('loginModal');
-                if (loginModalEl) {
-                    const loginModal = new bootstrap.Modal(loginModalEl);
-                    loginModal.show();
-                }
-            @endif
-
-            // Login form: show/hide password and handle AJAX submission
-            
-            const loginPasswordInput = document.getElementById('login-password');
-            const loginShowPasswordBtn = document.getElementById('login-show-password-btn');
-            const loginShowPasswordIcon = document.getElementById('login-show-password-icon');
-            const loginSubmitBtn = document.getElementById('loginSubmitBtn');
-
-            if (loginShowPasswordBtn && loginPasswordInput) {
-                loginShowPasswordBtn.addEventListener('click', function () {
-                    const showing = loginPasswordInput.type === 'text';
-                    const show = !showing;
-                    loginPasswordInput.type = show ? 'text' : 'password';
-
-                    if (loginShowPasswordIcon) {
-                        if (show) {
-                            loginShowPasswordIcon.classList.remove('fa-eye');
-                            loginShowPasswordIcon.classList.add('fa-eye-slash');
-                        } else {
-                            loginShowPasswordIcon.classList.remove('fa-eye-slash');
-                            loginShowPasswordIcon.classList.add('fa-eye');
-                        }
-                    }
-                });
-            }
-
-                                            
-            const barangayPurokMap = {
-                'Barangay 11': ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
-                'Barangay 12': ['Purok 1', 'Purok 2', 'Purok 3'],
-            };
-
-            const registrationForms = document.querySelectorAll('.registration-form');
-
-            registrationForms.forEach((form) => {
-                const barangaySelect = form.querySelector('[data-role="barangay"]');
-                const barangayOtherGroup = form.querySelector('[data-role="barangay-other-group"]');
-                const barangayOtherInput = form.querySelector('[data-role="barangay-other"]');
-                const purokGroup = form.querySelector('[data-role="purok-group"]');
-                const purokSelect = form.querySelector('[data-role="purok"]');
-                const birthDateInput = form.querySelector('[data-role="birth-date"]');
-                const nameInput = form.querySelector('input[name="name"]');
-                const phoneInput = form.querySelector('input[name="phone"]');
-                const passwordInput = form.querySelector('input[name="password"]');
-                const passwordConfirmInput = form.querySelector('input[name="password_confirmation"]');
-                const registerPasswordToggleBtn = form.querySelector('[data-role="register-password-toggle-btn"]');
-                const registerPasswordToggleIcon = form.querySelector('[data-role="register-password-toggle-icon"]');
-
-                const updatePurokOptions = (barangay) => {
-                    if (!purokSelect) {
-                        return;
-                    }
-
-                    const previouslySelected = purokSelect.getAttribute('data-selected');
-                    purokSelect.innerHTML = '<option value="">Select Purok</option>';
-
-                    if (!barangayPurokMap[barangay]) {
-                        purokSelect.removeAttribute('required');
-                        purokSelect.setAttribute('data-selected', '');
-                        return;
-                    }
-
-                    barangayPurokMap[barangay].forEach((purok) => {
-                        const option = document.createElement('option');
-                        option.value = purok;
-                        option.textContent = purok;
-                        if (previouslySelected === purok) {
-                            option.selected = true;
-                        }
-                        purokSelect.appendChild(option);
-                    });
-                    purokSelect.setAttribute('required', 'required');
-                };
-
-                const handleBarangayChange = () => {
-                    const selectedBarangay = barangaySelect ? barangaySelect.value : '';
-
-                    if (barangayOtherGroup && barangayOtherInput) {
-                        if (selectedBarangay === 'Other') {
-                            barangayOtherGroup.classList.remove('d-none');
-                            barangayOtherInput.setAttribute('required', 'required');
-                        } else {
-                            barangayOtherGroup.classList.add('d-none');
-                            barangayOtherInput.removeAttribute('required');
-                        }
-                    }
-
-                    if (purokGroup && purokSelect) {
-                        if (barangayPurokMap[selectedBarangay]) {
-                            purokGroup.classList.remove('d-none');
-                            updatePurokOptions(selectedBarangay);
-                        } else {
-                            purokGroup.classList.add('d-none');
-                            purokSelect.removeAttribute('required');
-                            purokSelect.value = '';
-                            purokSelect.setAttribute('data-selected', '');
-                        }
-                    }
-                };
-
-                if (barangaySelect) {
-                    barangaySelect.addEventListener('change', () => {
-                        if (purokSelect) {
-                            purokSelect.setAttribute('data-selected', '');
-                        }
-                        handleBarangayChange();
-                    });
-                    handleBarangayChange();
+        function requireLogin(){@if(Auth::check()) @if(Auth::user()->isPatient()) window.location.href="{{ route('patient.book-appointment') }}"; @else window.location.href="{{ Auth::user()->isSuperAdmin() ? route('superadmin.dashboard') : route('admin.dashboard') }}"; @endif @else var loginModal=new bootstrap.Modal(document.getElementById('loginModal'));loginModal.show(); @endif}
+        document.addEventListener('DOMContentLoaded',function(){const feedbackModalEl=document.getElementById('feedbackModal');if(feedbackModalEl){const feedbackModal=new bootstrap.Modal(feedbackModalEl);feedbackModal.show();}@if($errors->has('email')||$errors->has('password')) const loginModalEl=document.getElementById('loginModal');if(loginModalEl){const loginModal=new bootstrap.Modal(loginModalEl);loginModal.show();}@endif const loginPasswordInput=document.getElementById('login-password');const loginShowPasswordBtn=document.getElementById('login-show-password-btn');const loginShowPasswordIcon=document.getElementById('login-show-password-icon');if(loginShowPasswordBtn&&loginPasswordInput){loginShowPasswordBtn.addEventListener('click',function(){const showing=loginPasswordInput.type==='text';const show=!showing;loginPasswordInput.type=show?'text':'password';if(loginShowPasswordIcon){if(show){loginShowPasswordIcon.classList.remove('fa-eye');loginShowPasswordIcon.classList.add('fa-eye-slash');}else{loginShowPasswordIcon.classList.remove('fa-eye-slash');loginShowPasswordIcon.classList.add('fa-eye');}}});}const barangayPurokMap={'Barangay 11':['Purok 1','Purok 2','Purok 3','Purok 4','Purok 5'],'Barangay 12':['Purok 1','Purok 2','Purok 3']};const registrationForms=document.querySelectorAll('.registration-form');registrationForms.forEach((form)=>{const barangaySelect=form.querySelector('[data-role="barangay"]');const barangayOtherGroup=form.querySelector('[data-role="barangay-other-group"]');const barangayOtherInput=form.querySelector('[data-role="barangay-other"]');const purokGroup=form.querySelector('[data-role="purok-group"]');const purokSelect=form.querySelector('[data-role="purok"]');const updatePurokOptions=(barangay)=>{if(!purokSelect)return;const previouslySelected=purokSelect.getAttribute('data-selected');purokSelect.innerHTML='<option value="">Select Purok</option>';if(!barangayPurokMap[barangay]){purokSelect.removeAttribute('required');purokSelect.setAttribute('data-selected','');return;}barangayPurokMap[barangay].forEach((purok)=>{const option=document.createElement('option');option.value=purok;option.textContent=purok;if(previouslySelected===purok){option.selected=true;}purokSelect.appendChild(option);});purokSelect.setAttribute('required','required');};const handleBarangayChange=()=>{const selectedBarangay=barangaySelect?barangaySelect.value:'';if(barangayOtherGroup&&barangayOtherInput){if(selectedBarangay==='Other'){barangayOtherGroup.classList.remove('d-none');barangayOtherInput.setAttribute('required','required');}else{barangayOtherGroup.classList.add('d-none');barangayOtherInput.removeAttribute('required');}}if(purokGroup&&purokSelect){if(barangayPurokMap[selectedBarangay]){purokGroup.classList.remove('d-none');updatePurokOptions(selectedBarangay);}else{purokGroup.classList.add('d-none');purokSelect.removeAttribute('required');purokSelect.value='';purokSelect.setAttribute('data-selected','');}}};if(barangaySelect){barangaySelect.addEventListener('change',()=>{if(purokSelect){purokSelect.setAttribute('data-selected','');}handleBarangayChange();});handleBarangayChange();}});});
                 }
                 const clearClientErrors = () => {
                     const clientErrors = form.querySelectorAll('.invalid-feedback.js-register-error');
