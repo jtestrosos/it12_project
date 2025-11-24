@@ -133,7 +133,7 @@
                             <li class="nav-item"><a class="nav-link {{ request()->is('contact') ? 'active fw-bold' : '' }}" href="{{ url('/contact') }}">Contact Us!</a></li>
 
                             @guest
-                                <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">Login</a></li>
                             @else
                                 @if(Auth::user()->isSuperAdmin())
                                     <li class="nav-item"><a class="nav-link" href="{{ route('superadmin.dashboard') }}">Super Admin</a></li>
@@ -274,7 +274,7 @@
                     </form>
                     <div class="text-center mt-3">
                         <small>Don't have an account? 
-                            <a href="#" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#registerModal">Register</a>
+                            <a href="{{ route('register') }}">Register</a>
                         </small>
                     </div>
                 </div>
@@ -409,7 +409,7 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
     <script>
-        function requireLogin(){@if(Auth::check()) @if(Auth::user()->isPatient()) window.location.href="{{ route('patient.book-appointment') }}"; @else window.location.href="{{ Auth::user()->isSuperAdmin() ? route('superadmin.dashboard') : route('admin.dashboard') }}"; @endif @else var loginModal=new bootstrap.Modal(document.getElementById('loginModal'));loginModal.show(); @endif}
+        function requireLogin(){@if(Auth::check()) @if(Auth::user()->isPatient()) window.location.href="{{ route('patient.book-appointment') }}"; @else window.location.href="{{ Auth::user()->isSuperAdmin() ? route('superadmin.dashboard') : route('admin.dashboard') }}"; @endif @else window.location.href="{{ route('login') }}"; @endif}
         document.addEventListener('DOMContentLoaded',function(){const feedbackModalEl=document.getElementById('feedbackModal');if(feedbackModalEl){const feedbackModal=new bootstrap.Modal(feedbackModalEl);feedbackModal.show();}@if($errors->has('email')||$errors->has('password')) const loginModalEl=document.getElementById('loginModal');if(loginModalEl){const loginModal=new bootstrap.Modal(loginModalEl);loginModal.show();}@endif const loginPasswordInput=document.getElementById('login-password');const loginShowPasswordBtn=document.getElementById('login-show-password-btn');const loginShowPasswordIcon=document.getElementById('login-show-password-icon');if(loginShowPasswordBtn&&loginPasswordInput){loginShowPasswordBtn.addEventListener('click',function(){const showing=loginPasswordInput.type==='text';const show=!showing;loginPasswordInput.type=show?'text':'password';if(loginShowPasswordIcon){if(show){loginShowPasswordIcon.classList.remove('fa-eye');loginShowPasswordIcon.classList.add('fa-eye-slash');}else{loginShowPasswordIcon.classList.remove('fa-eye-slash');loginShowPasswordIcon.classList.add('fa-eye');}}});}const barangayPurokMap={'Barangay 11':['Purok 1','Purok 2','Purok 3','Purok 4','Purok 5'],'Barangay 12':['Purok 1','Purok 2','Purok 3']};const registrationForms=document.querySelectorAll('.registration-form');registrationForms.forEach((form)=>{const barangaySelect=form.querySelector('[data-role="barangay"]');const barangayOtherGroup=form.querySelector('[data-role="barangay-other-group"]');const barangayOtherInput=form.querySelector('[data-role="barangay-other"]');const purokGroup=form.querySelector('[data-role="purok-group"]');const purokSelect=form.querySelector('[data-role="purok"]');const updatePurokOptions=(barangay)=>{if(!purokSelect)return;const previouslySelected=purokSelect.getAttribute('data-selected');purokSelect.innerHTML='<option value="">Select Purok</option>';if(!barangayPurokMap[barangay]){purokSelect.removeAttribute('required');purokSelect.setAttribute('data-selected','');return;}barangayPurokMap[barangay].forEach((purok)=>{const option=document.createElement('option');option.value=purok;option.textContent=purok;if(previouslySelected===purok){option.selected=true;}purokSelect.appendChild(option);});purokSelect.setAttribute('required','required');};const handleBarangayChange=()=>{const selectedBarangay=barangaySelect?barangaySelect.value:'';if(barangayOtherGroup&&barangayOtherInput){if(selectedBarangay==='Other'){barangayOtherGroup.classList.remove('d-none');barangayOtherInput.setAttribute('required','required');}else{barangayOtherGroup.classList.add('d-none');barangayOtherInput.removeAttribute('required');}}if(purokGroup&&purokSelect){if(barangayPurokMap[selectedBarangay]){purokGroup.classList.remove('d-none');updatePurokOptions(selectedBarangay);}else{purokGroup.classList.add('d-none');purokSelect.removeAttribute('required');purokSelect.value='';purokSelect.setAttribute('data-selected','');}}};if(barangaySelect){barangaySelect.addEventListener('change',()=>{if(purokSelect){purokSelect.setAttribute('data-selected','');}handleBarangayChange();});handleBarangayChange();}});});
                 }
                 const clearClientErrors = () => {
