@@ -386,22 +386,29 @@
                 <button class="btn btn-link text-muted" title="Notifications"><i class="fas fa-bell"></i></button>
                 <button class="btn btn-link text-muted" id="themeToggle" title="Toggle theme"><i class="fas fa-moon"></i></button>
 
-                <div class="d-flex align-items-center">
-                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
-                         style="width:40px;height:40px;">
-                        @yield('user-initials', 'A')
-                    </div>
-                    <div>
-                        <div class="fw-bold">@yield('user-name', 'Admin')</div>
-                        <small class="text-muted">@yield('user-role', 'Administrator')</small>
-                    </div>
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                             style="width:40px;height:40px; overflow: hidden;">
+                            @if(Auth::user()->profile_picture)
+                                <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                            @else
+                                {{ substr(Auth::user()->name, 0, 1) }}
+                            @endif
+                        </div>
+                        <div class="fw-bold me-2">{{ Auth::user()->name }}</div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="dropdownUser1">
+                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('logout') }}"
+                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-
-                <a href="{{ route('logout') }}"
-                   class="btn btn-outline-secondary"
-                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fas fa-sign-out-alt"></i>
-                </a>
             </div>
         </header>
 

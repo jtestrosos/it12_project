@@ -56,7 +56,7 @@
         body.bg-dark .main-content { background-color: #151718; }
         body.bg-dark .sidebar { background: #131516; border-right-color: #2a2f35; }
         body.bg-dark .header { background: #1b1e20; border-bottom-color: #2a2f35; }
-        body.bg-dark .stats-card, body.bg-dark .chart-container { background: #1e2124; color: #e6e6e6; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        body.bg-dark .stats-card, body.bg-dark .chart-container { background: #1e2124; color: #e6e6e6; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border-color: #2a2f35; }
         body.bg-dark .table thead { background: #1a1f24; color: #e6e6e6; }
         /* Headings and muted text visibility */
         h1, h2, h3, h4, h5, h6 { color: inherit; }

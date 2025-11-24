@@ -81,16 +81,28 @@
                     </div>
                     <div class="header-right">
                         <i class="fas fa-bell me-3"></i>
-                        <div class="user-info">
-                            <div class="user-avatar">{{ Auth::user()->isSuperAdmin() ? 'SA' : 'P' }}</div>
-                            <div class="user-details">
-                                <h6>{{ Auth::user()->name }}</h6>
-                                <small>{{ Auth::user()->isSuperAdmin() ? 'Super Admin' : 'Patient' }}</small>
-                            </div>
+                        <div class="dropdown">
+                            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUserApp" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="user-avatar" style="overflow: hidden;">
+                                    @if(Auth::user()->profile_picture)
+                                        <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                                    @else
+                                        {{ substr(Auth::user()->name, 0, 1) }}
+                                    @endif
+                                </div>
+                                <div class="fw-bold me-2">{{ Auth::user()->name }}</div>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="dropdownUserApp">
+                                <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('logout') }}"
+                                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        Logout
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
-                        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="btn btn-outline-secondary ms-3" title="Logout">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </a>
                     </div>
                 </div>
 

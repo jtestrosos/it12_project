@@ -174,6 +174,29 @@
 
 @section('content')
                     <div class="p-0 p-md-4">
+                        <!-- Announcements and Alerts -->
+                        @if (session('announcement'))
+                            <div class="alert alert-primary alert-dismissible fade show mb-4" role="alert">
+                                <i class="fas fa-bullhorn me-2"></i> {{ session('announcement') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+
+                        @if (($expiringSoonCount ?? 0) > 0)
+                            <div class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i> <strong>Attention:</strong> {{ $expiringSoonCount }} item(s) are expiring within the next 90 days.
+                                <a href="{{ route('admin.inventory') }}" class="alert-link">View Inventory</a>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+
+                        @if (($outOfStockCount ?? 0) > 0)
+                            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                                <i class="fas fa-times-circle me-2"></i> <strong>Critical:</strong> {{ $outOfStockCount }} item(s) are out of stock.
+                                <a href="{{ route('admin.inventory') }}" class="alert-link">Restock Now</a>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
                         <!-- Quick Shortcuts -->
                         <div class="d-flex justify-content-end flex-wrap gap-2 mb-4">
                             <a href="{{ route('admin.appointments') }}" class="btn btn-primary"><i class="fas fa-calendar-plus me-2"></i>Book appointment</a>

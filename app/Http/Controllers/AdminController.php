@@ -40,6 +40,10 @@ class AdminController extends Controller
 
         // Inventory metrics
         $lowStockItems = Inventory::whereColumn('current_stock', '<=', 'minimum_stock')->count();
+        $outOfStockCount = Inventory::where('current_stock', 0)->count();
+        $expiringSoonCount = Inventory::whereNotNull('expiry_date')
+            ->whereBetween('expiry_date', [now(), now()->addDays(90)])
+            ->count();
 
         // Monthly services metrics
         $now = now();
@@ -151,7 +155,9 @@ class AdminController extends Controller
             'lowStockInventory',
             'patientsByBarangay',
             'patientsByBarangay',
-            'chartData'
+            'chartData',
+            'outOfStockCount',
+            'expiringSoonCount'
         ));
     }
 

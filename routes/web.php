@@ -73,6 +73,10 @@ Route::post('/login', function (Request $request) {
             return response()->json(['redirect' => $redirectUrl]);
         }
 
+        if ($user->isAdmin() || $user->isSuperAdmin()) {
+            session()->flash('announcement', 'Welcome back, ' . $user->name . '! You have successfully logged in.');
+        }
+
         return redirect()->to($redirectUrl);
     }
 
@@ -99,6 +103,12 @@ Route::get('/forgot-password/verify', [App\Http\Controllers\Auth\ForgotPasswordC
 Route::post('/forgot-password/verify', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'verifyOtp'])->name('password.verify');
 Route::get('/reset-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'resetPassword'])->name('password.update');
+
+// Profile Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+});
 
 Route::get('/register', fn() => view('auth.register'))->name('register');
 Route::post('/register', function (Request $request) {
