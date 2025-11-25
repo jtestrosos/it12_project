@@ -499,47 +499,33 @@
                                                 <span class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
                                                 </td>
                                             <td class="actions-col">
-                                                <div class="btn-group">
-                                                    <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewAppointmentModal{{ $appointment->id }}">View</button>
-                                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" data-bs-display="static"></button>
-                                                    <ul class="dropdown-menu dropdown-menu-end">
-                                                        <li>
-                                                            <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="px-3 py-1">
-                                                                @csrf
-                                                                <input type="hidden" name="status" value="approved">
-                                                                <button type="submit" class="btn btn-link p-0">Confirm</button>
-                                                            </form>
-                                                        </li>
-                                                        <li>
-                                                            <button type="button" class="dropdown-item reschedule-btn" 
-                                                                    data-appointment-id="{{ $appointment->id }}"
-                                                                    data-action-url="{{ route('admin.appointment.update', $appointment) }}">
-                                                                Reschedule…
-                                                            </button>
-                                                        </li>
-                                                        <li>
-                                                            <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="px-3 py-1">
-                                                                @csrf
-                                                                <input type="hidden" name="status" value="completed">
-                                                                <button type="submit" class="btn btn-link p-0">Mark Completed</button>
-                                                            </form>
-                                                        </li>
-                                                        <li>
-                                                            <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="px-3 py-1">
-                                                                @csrf
-                                                                <input type="hidden" name="status" value="no_show">
-                                                                <button type="submit" class="btn btn-link p-0">Mark No-show</button>
-                                                            </form>
-                                                        </li>
-                                                        <li><hr class="dropdown-divider"></li>
-                                                        <li>
-                                                            <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="px-3 py-1">
-                                                                @csrf
-                                                                <input type="hidden" name="status" value="cancelled">
-                                                                <button type="submit" class="btn btn-link text-danger p-0">Cancel</button>
-                                                            </form>
-                                                        </li>
-                                                    </ul>
+                                                <div class="d-flex gap-1">
+                                                    <!-- View Button -->
+                                                    <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewAppointmentModal{{ $appointment->id }}" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    
+                                                    <!-- Approve Button (only show if pending) -->
+                                                    @if($appointment->status === 'pending')
+                                                    <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
+                                                        @csrf
+                                                        <input type="hidden" name="status" value="approved">
+                                                        <button type="submit" class="btn btn-outline-success btn-sm" title="Approve">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    </form>
+                                                    @endif
+                                                    
+                                                    <!-- Cancel Button -->
+                                                    @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
+                                                    <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
+                                                        @csrf
+                                                        <input type="hidden" name="status" value="cancelled">
+                                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Cancel" onclick="return confirm('Are you sure you want to cancel this appointment?')">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </form>
+                                                    @endif
                                                 </div>
                                             </td>
                                             </tr>
@@ -556,13 +542,58 @@
                                                         <div class="mb-2"><strong>Patient:</strong> {{ $appointment->patient_name }}</div>
                                                         <div class="mb-2"><strong>Service:</strong> {{ $appointment->service_type }}</div>
                                                         <div class="mb-2"><strong>Date/Time:</strong> {{ $appointment->appointment_date->format('M d, Y') }} {{ $appointment->appointment_time }}</div>
-                                                        <div class="mb-2"><strong>Status:</strong> {{ ucfirst($appointment->status) }}</div>
+                                                        <div class="mb-2"><strong>Status:</strong> 
+                                                            @php
+                                                                $statusDisplay = [
+                                                                    'pending' => 'Pending',
+                                                                    'approved' => 'Confirmed',
+                                                                    'rescheduled' => 'Rescheduled',
+                                                                    'cancelled' => 'Cancelled',
+                                                                    'completed' => 'Completed',
+                                                                    'no_show' => 'No Show'
+                                                                ][$appointment->status] ?? ucfirst($appointment->status);
+                                                            @endphp
+                                                            <span class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
+                                                        </div>
                                                         @if($appointment->notes)
                                                             <div class="mb-2"><strong>Notes:</strong> {{ $appointment->notes }}</div>
                                                         @endif
                                                     </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <div class="modal-footer d-flex justify-content-between">
+                                                        <div class="d-flex gap-2">
+                                                            <!-- Reschedule -->
+                                                            @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
+                                                            <button type="button" class="btn btn-warning btn-sm reschedule-btn" 
+                                                                    data-appointment-id="{{ $appointment->id }}"
+                                                                    data-action-url="{{ route('admin.appointment.update', $appointment) }}"
+                                                                    data-bs-dismiss="modal">
+                                                                <i class="fas fa-calendar-alt me-1"></i> Reschedule
+                                                            </button>
+                                                            @endif
+                                                            
+                                                            <!-- Mark Completed -->
+                                                            @if($appointment->status === 'approved')
+                                                            <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
+                                                                @csrf
+                                                                <input type="hidden" name="status" value="completed">
+                                                                <button type="submit" class="btn btn-success btn-sm">
+                                                                    <i class="fas fa-check-circle me-1"></i> Complete
+                                                                </button>
+                                                            </form>
+                                                            @endif
+                                                            
+                                                            <!-- Mark No-show -->
+                                                            @if($appointment->status === 'approved')
+                                                            <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
+                                                                @csrf
+                                                                <input type="hidden" name="status" value="no_show">
+                                                                <button type="submit" class="btn btn-secondary btn-sm">
+                                                                    <i class="fas fa-user-slash me-1"></i> No-show
+                                                                </button>
+                                                            </form>
+                                                            @endif
+                                                        </div>
+                                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
                                                     </div>
                                                 </div>
                                             </div>

@@ -482,7 +482,7 @@ class AdminController extends Controller
     public function updateAppointmentStatus(Request $request, Appointment $appointment)
     {
         $request->validate([
-            'status' => 'required|in:pending,approved,rescheduled,cancelled,completed',
+            'status' => 'required|in:pending,approved,rescheduled,cancelled,completed,no_show',
             'notes' => 'nullable|string|max:1000',
             'new_date' => 'nullable|date|after_or_equal:today',
             'new_time' => 'nullable'
