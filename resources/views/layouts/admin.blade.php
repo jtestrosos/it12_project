@@ -10,6 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
 
     @stack('styles')
 
@@ -111,11 +113,11 @@
             height: 44px;
             min-height: 44px;
             padding: 0 14px;
-            margin: 2px 0;
+            margin: 2px 0 2px 13px;
             border-radius: 10px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             font-size: 14px;
             text-decoration: none;
             transition: all .2s ease;
@@ -130,6 +132,7 @@
             width: 24px;
             text-align: center;
             margin: 0;
+            flex-shrink: 0;
         }
 
         .sidebar .nav-link span {
@@ -156,8 +159,11 @@
         .sidebar .nav-link.active::before {
             content: '';
             position: absolute;
-            left: 0; top: 50%; transform: translateY(-50%);
-            width: 3px; height: 24px;
+            left: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 24px;
             background: var(--primary);
             border-radius: 0 2px 2px 0;
         }
@@ -170,8 +176,8 @@
 
         .sidebar.collapsed .nav-link {
             width: 44px;
-            padding: 0;
-            justify-content: center;
+            padding: 0 10px;
+            justify-content: flex-start;
         }
         .sidebar.collapsed .nav-link span {
             opacity: 0;
@@ -328,6 +334,106 @@
             --bs-table-active-bg: #2a2f35;
             --bs-table-hover-bg: #2a2f35;
             color: #d6d6d6;
+        }
+
+        /* ---------- Sidebar Dropdown Styles ---------- */
+        .sidebar-dropdown {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidebar-dropdown > .nav-link {
+            position: relative;
+        }
+
+        .dropdown-arrow {
+            font-size: 12px;
+            transition: transform 0.2s ease;
+            position: absolute;
+            right: 14px;
+            margin-left: 0 !important;
+        }
+
+        .sidebar.collapsed .dropdown-arrow {
+            display: none;
+        }
+
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
+
+        .submenu {
+            padding-left: 0;
+            overflow: hidden;
+        }
+
+        .sidebar:not(.collapsed) .submenu {
+            padding-left: 12px;
+        }
+
+        .submenu-section {
+            margin-bottom: 8px;
+        }
+
+        .submenu-header {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6c757d;
+            padding: 8px 14px 4px;
+            margin-top: 4px;
+        }
+
+        .submenu-link {
+            font-size: 13px;
+            height: 38px;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar:not(.collapsed) .submenu-link {
+            padding-left: 28px !important;
+        }
+
+        .submenu-link i {
+            font-size: 16px;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .submenu-link span {
+            margin-left: 12px;
+        }
+
+        /* Collapsed sidebar - hide submenu */
+        .sidebar.collapsed .submenu {
+            display: none !important;
+        }
+
+        .sidebar.collapsed .dropdown-arrow {
+            display: none;
+        }
+
+        /* Dark mode submenu */
+        body.bg-dark .submenu-header {
+            color: #9aa4ad;
+        }
+
+        body.bg-dark .submenu-link {
+            color: #e0e0e0;
+        }
+
+        body.bg-dark .submenu-link:hover {
+            background: rgba(13, 110, 253, 0.12);
+        }
+
+        body.bg-dark .submenu-link.active {
+            background: rgba(13, 110, 253, 0.18);
+            color: var(--primary-light) !important;
         }
 
         /* ---------- Responsive ---------- */

@@ -197,11 +197,6 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         @endif
-                        <!-- Quick Shortcuts -->
-                        <div class="d-flex justify-content-end flex-wrap gap-2 mb-4">
-                            <a href="{{ route('admin.appointments') }}" class="btn btn-primary"><i class="fas fa-calendar-plus me-2"></i>Book appointment</a>
-                            <a href="{{ route('admin.patients') }}" class="btn btn-outline-primary"><i class="fas fa-user-plus me-2"></i>Add patient</a>
-                        </div>
 
                         <!-- Metrics Cards -->
                         <div class="row g-3 mb-4">

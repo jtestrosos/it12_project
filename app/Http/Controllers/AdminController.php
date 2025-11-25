@@ -794,6 +794,141 @@ class AdminController extends Controller
         return view('admin.reports', compact('appointmentStats', 'inventoryStats', 'serviceTypes', 'trendData'));
     }
 
+    public function analytics()
+    {
+        // Reusing the main reports logic for now, or we can create a dedicated analytics view
+        return $this->reports();
+    }
+
+    public function patientReports()
+    {
+        // Patient statistics
+        $totalPatients = User::where('role', 'user')->count();
+        $maleCount = User::where('role', 'user')->where('gender', 'male')->count();
+        $femaleCount = User::where('role', 'user')->where('gender', 'female')->count();
+        $newPatientsThisMonth = User::where('role', 'user')
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        // Age distribution
+        $ageGroups = [
+            '0-17' => User::where('role', 'user')->whereBetween('age', [0, 17])->count(),
+            '18-30' => User::where('role', 'user')->whereBetween('age', [18, 30])->count(),
+            '31-50' => User::where('role', 'user')->whereBetween('age', [31, 50])->count(),
+            '51-70' => User::where('role', 'user')->whereBetween('age', [51, 70])->count(),
+            '71+' => User::where('role', 'user')->where('age', '>', 70)->count(),
+        ];
+
+        // Barangay distribution
+        $barangayDistribution = User::where('role', 'user')
+            ->selectRaw('barangay, count(*) as count')
+            ->groupBy('barangay')
+            ->get();
+
+        // Patients with most appointments
+        $topPatients = User::where('role', 'user')
+            ->withCount('appointments')
+            ->orderByDesc('appointments_count')
+            ->limit(5)
+            ->get();
+
+        // Recent registrations
+        $recentPatients = User::where('role', 'user')
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        return view('admin.reports.patients', compact(
+            'totalPatients',
+            'maleCount',
+            'femaleCount',
+            'newPatientsThisMonth',
+            'ageGroups',
+            'barangayDistribution',
+            'topPatients',
+            'recentPatients'
+        ));
+    }
+
+    public function inventoryReports()
+    {
+        // Inventory statistics
+        $totalItems = Inventory::count();
+        $lowStockCount = Inventory::whereColumn('current_stock', '<=', 'minimum_stock')->count();
+        $outOfStockCount = Inventory::where('current_stock', 0)->count();
+        $expiringSoonCount = Inventory::whereNotNull('expiry_date')
+            ->whereBetween('expiry_date', [now(), now()->addDays(90)])
+            ->count();
+
+        // Category breakdown
+        $categoryBreakdown = Inventory::selectRaw('category, count(*) as count, sum(current_stock) as total_stock')
+            ->groupBy('category')
+            ->get();
+
+        // Low stock items
+        $lowStockItems = Inventory::whereColumn('current_stock', '<=', 'minimum_stock')
+            ->orderBy('current_stock', 'asc')
+            ->limit(10)
+            ->get();
+
+        // Expiring soon items
+        $expiringSoonItems = Inventory::whereNotNull('expiry_date')
+            ->whereBetween('expiry_date', [now(), now()->addDays(90)])
+            ->orderBy('expiry_date', 'asc')
+            ->limit(10)
+            ->get();
+
+        // Recent transactions
+        $recentTransactions = InventoryTransaction::with(['inventory', 'user'])
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        return view('admin.reports.inventory', compact(
+            'totalItems',
+            'lowStockCount',
+            'outOfStockCount',
+            'expiringSoonCount',
+            'categoryBreakdown',
+            'lowStockItems',
+            'expiringSoonItems',
+            'recentTransactions'
+        ));
+    }
+
+    public function services()
+    {
+        $services = Service::latest()->paginate(10);
+        return view('admin.services.index', compact('services'));
+    }
+
+    public function createService()
+    {
+        return view('admin.services.create');
+    }
+
+    public function storeService(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:services',
+            'description' => 'nullable|string',
+            'price' => 'nullable|numeric|min:0',
+            'duration_minutes' => 'nullable|integer|min:1',
+            'active' => 'boolean'
+        ]);
+
+        Service::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'price' => $request->price,
+            'duration_minutes' => $request->duration_minutes,
+            'active' => $request->has('active')
+        ]);
+
+        return redirect()->route('admin.services.index')->with('success', 'Service created successfully.');
+    }
+
     public function exportAppointmentsExcel(Request $request)
     {
         $request->validate([
@@ -926,5 +1061,121 @@ class AdminController extends Controller
             'month' => $month,
             'calendar' => $calendarData,
         ]);
+    }
+
+    // Patient Reports Export Methods
+    public function exportPatientsExcel()
+    {
+        $patients = User::where('role', 'user')->get();
+        
+        $export = new class($patients) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+            protected $patients;
+            
+            public function __construct($patients) {
+                $this->patients = $patients;
+            }
+            
+            public function collection() {
+                return $this->patients->map(function($patient) {
+                    return [
+                        'Name' => $patient->name,
+                        'Email' => $patient->email,
+                        'Gender' => ucfirst($patient->gender ?? 'N/A'),
+                        'Age' => $patient->age ?? 'N/A',
+                        'Barangay' => $patient->barangay === 'Other' ? $patient->barangay_other : $patient->barangay,
+                        'Registered' => $patient->created_at->format('M d, Y'),
+                    ];
+                });
+            }
+            
+            public function headings(): array {
+                return ['Name', 'Email', 'Gender', 'Age', 'Barangay', 'Registered'];
+            }
+        };
+        
+        return Excel::download($export, 'patient_reports_' . now()->format('Y-m-d') . '.xlsx');
+    }
+
+    public function exportPatientsPdf()
+    {
+        $patients = User::where('role', 'user')->get();
+        
+        $html = view('admin.reports.patients-pdf', compact('patients'))->render();
+        
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $options->set('defaultFont', 'DejaVu Sans');
+        
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('a4', 'portrait');
+        $dompdf->render();
+        
+        $filename = 'patient_reports_' . now()->format('Y-m-d') . '.pdf';
+        return response()->streamDownload(
+            function () use ($dompdf) {
+                echo $dompdf->output();
+            },
+            $filename,
+            ['Content-Type' => 'application/pdf']
+        );
+    }
+
+    // Inventory Reports Export Methods
+    public function exportInventoryExcel()
+    {
+        $inventory = Inventory::all();
+        
+        $export = new class($inventory) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+            protected $inventory;
+            
+            public function __construct($inventory) {
+                $this->inventory = $inventory;
+            }
+            
+            public function collection() {
+                return $this->inventory->map(function($item) {
+                    return [
+                        'Item Name' => $item->item_name,
+                        'Category' => $item->category,
+                        'Current Stock' => $item->current_stock . ' ' . $item->unit,
+                        'Minimum Stock' => $item->minimum_stock . ' ' . $item->unit,
+                        'Status' => str_replace('_', ' ', ucfirst($item->status)),
+                        'Expiry Date' => $item->expiry_date ? \Carbon\Carbon::parse($item->expiry_date)->format('M d, Y') : 'N/A',
+                    ];
+                });
+            }
+            
+            public function headings(): array {
+                return ['Item Name', 'Category', 'Current Stock', 'Minimum Stock', 'Status', 'Expiry Date'];
+            }
+        };
+        
+        return Excel::download($export, 'inventory_reports_' . now()->format('Y-m-d') . '.xlsx');
+    }
+
+    public function exportInventoryPdf()
+    {
+        $inventory = Inventory::all();
+        
+        $html = view('admin.reports.inventory-pdf', compact('inventory'))->render();
+        
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $options->set('defaultFont', 'DejaVu Sans');
+        
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('a4', 'landscape');
+        $dompdf->render();
+        
+        $filename = 'inventory_reports_' . now()->format('Y-m-d') . '.pdf';
+        return response()->streamDownload(
+            function () use ($dompdf) {
+                echo $dompdf->output();
+            },
+            $filename,
+            ['Content-Type' => 'application/pdf']
+        );
     }
 }

@@ -231,8 +231,21 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
             Route::post('/inventory/{inventory}/deduct', [AdminController::class, 'deductInventory'])->name('inventory.deduct');
             Route::post('/walk-in', [AdminController::class, 'addWalkIn'])->name('walk-in');
             Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
+            Route::get('/reports/analytics', [AdminController::class, 'analytics'])->name('reports.analytics');
+            Route::get('/reports/patients', [AdminController::class, 'patientReports'])->name('reports.patients');
+            Route::get('/reports/inventory', [AdminController::class, 'inventoryReports'])->name('reports.inventory');
             Route::get('/reports/export/appointments', [AdminController::class, 'exportAppointmentsExcel'])->name('reports.export.appointments');
             Route::get('/reports/export/appointments/pdf', [AdminController::class, 'exportAppointmentsPdf'])->name('reports.export.appointments.pdf');
+            Route::get('/reports/export/patients', [AdminController::class, 'exportPatientsExcel'])->name('reports.export.patients');
+            Route::get('/reports/export/patients/pdf', [AdminController::class, 'exportPatientsPdf'])->name('reports.export.patients.pdf');
+            Route::get('/reports/export/inventory', [AdminController::class, 'exportInventoryExcel'])->name('reports.export.inventory');
+            Route::get('/reports/export/inventory/pdf', [AdminController::class, 'exportInventoryPdf'])->name('reports.export.inventory.pdf');
+
+
+            // Services Management
+            Route::get('/services', [AdminController::class, 'services'])->name('services.index');
+            Route::get('/services/create', [AdminController::class, 'createService'])->name('services.create');
+            Route::post('/services', [AdminController::class, 'storeService'])->name('services.store');
         });
 });
 
