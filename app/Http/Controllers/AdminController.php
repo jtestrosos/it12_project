@@ -498,6 +498,16 @@ class AdminController extends Controller
         ];
         if ($request->status === 'rescheduled') {
             if ($request->filled('new_date')) {
+                // Check for availability on the new date (Limit: 9 per service per day)
+                $existingCount = Appointment::whereDate('appointment_date', $request->new_date)
+                    ->where('service_type', $appointment->service_type)
+                    ->where('status', '!=', 'cancelled')
+                    ->count();
+
+                if ($existingCount >= 9) {
+                    return redirect()->back()->with('error', 'Cannot reschedule: The selected date is fully booked for ' . $appointment->service_type . '.');
+                }
+
                 $update['appointment_date'] = $request->new_date;
             }
             if ($request->filled('new_time')) {

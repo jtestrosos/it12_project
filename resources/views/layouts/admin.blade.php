@@ -11,6 +11,14 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- NProgress -->
+    <script src="https://unpkg.com/nprogress@0.2.0/nprogress.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/nprogress@0.2.0/nprogress.css" />
+    <style>
+        #nprogress .bar { background: #0d6efd !important; height: 3px !important; }
+        #nprogress .peg { box-shadow: 0 0 10px #0d6efd, 0 0 5px #0d6efd !important; }
+        #nprogress .spinner-icon { border-top-color: #0d6efd !important; border-left-color: #0d6efd !important; }
+    </style>
 
 
     @stack('styles')
@@ -524,33 +532,38 @@
         </main>
     </div>
 
-    <!-- Flash Modal -->
-    @php
-        $flashType = $flashMessage = null;
-        $map = ['success'=>'success','status'=>'success','error'=>'danger','warning'=>'warning','info'=>'info'];
-        foreach($map as $k=>$v){ if(session($k)){ $flashType=$v; $flashMessage=session($k); break; } }
-        $titles = ['success'=>'Success','danger'=>'Error','warning'=>'Warning','info'=>'Notice'];
-        $icons  = ['success'=>'fa-circle-check','danger'=>'fa-triangle-exclamation','warning'=>'fa-circle-exclamation','info'=>'fa-circle-info'];
-    @endphp
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    @if($flashType && $flashMessage)
-        <div class="modal fade" id="feedbackModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow card-surface">
-                    <div class="modal-header bg-{{ $flashType }} text-white">
-                        <h5 class="modal-title d-flex align-items-center gap-2">
-                            <i class="fas {{ $icons[$flashType] }}"></i>
-                            {{ $titles[$flashType] }}
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body py-4"><p class="mb-0">{{ $flashMessage }}</p></div>
-                    <div class="modal-footer border-0">
-                        <button type="button" class="btn btn-{{ $flashType==='danger'?'danger':'primary' }}" data-bs-dismiss="modal">Got it</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    @if(session('success') || session('status') || session('error') || session('warning') || session('info'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+
+            @if(session('success') || session('status'))
+                Toast.fire({ icon: 'success', title: "{{ session('success') ?? session('status') }}" });
+            @endif
+            @if(session('error'))
+                Toast.fire({ icon: 'error', title: "{{ session('error') }}" });
+            @endif
+            @if(session('warning'))
+                Toast.fire({ icon: 'warning', title: "{{ session('warning') }}" });
+            @endif
+            @if(session('info'))
+                Toast.fire({ icon: 'info', title: "{{ session('info') }}" });
+            @endif
+        });
+    </script>
     @endif
 
     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
@@ -689,6 +702,34 @@
             };
             initPatientRegistrationForms();
             init();
+
+            // NProgress Configuration
+            NProgress.configure({ showSpinner: false });
+            
+            // Show progress bar on link clicks
+            document.addEventListener('click', function(e) {
+                const link = e.target.closest('a');
+                if (link && 
+                    !link.getAttribute('target') && 
+                    !link.getAttribute('href').startsWith('#') && 
+                    !link.getAttribute('href').startsWith('javascript') &&
+                    link.getAttribute('href') !== '#'
+                ) {
+                    NProgress.start();
+                }
+            });
+
+            // Show progress bar on form submit
+            document.addEventListener('submit', function(e) {
+                if (!e.defaultPrevented) {
+                    NProgress.start();
+                }
+            });
+
+            // Stop progress bar when page finishes loading (in case of back button or cache)
+            window.addEventListener('pageshow', function() {
+                NProgress.done();
+            });
         });
     </script>
 

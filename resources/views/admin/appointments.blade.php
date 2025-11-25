@@ -243,6 +243,43 @@
             border-color: #5c2a2a;
             color: #ff6b6b;
         }
+        
+        /* Skeleton Loading */
+        .skeleton {
+            background: #eee;
+            background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+            border-radius: 5px;
+            background-size: 200% 100%;
+            animation: 1.5s shine linear infinite;
+        }
+        body.bg-dark .skeleton {
+            background: #2a2f35;
+            background: linear-gradient(110deg, #2a2f35 8%, #32383e 18%, #2a2f35 33%);
+            background-size: 200% 100%;
+        }
+        @keyframes shine {
+            to { background-position-x: -200%; }
+        }
+        .calendar-skeleton {
+            height: 300px;
+            width: 100%;
+        }
+        
+        /* Row Status Colors */
+        tr[data-status="pending"] { background-color: rgba(255, 243, 205, 0.3); }
+        tr[data-status="approved"] { background-color: rgba(212, 237, 218, 0.3); }
+        tr[data-status="completed"] { background-color: rgba(209, 236, 241, 0.3); }
+        tr[data-status="cancelled"] { background-color: rgba(248, 215, 218, 0.3); }
+        tr[data-status="no_show"] { background-color: rgba(226, 227, 229, 0.3); }
+        tr[data-status="rescheduled"] { background-color: rgba(255, 243, 205, 0.3); }
+
+        /* Dark Mode Row Status Colors */
+        body.bg-dark tr[data-status="pending"] { background-color: rgba(133, 100, 4, 0.15); }
+        body.bg-dark tr[data-status="approved"] { background-color: rgba(21, 87, 36, 0.15); }
+        body.bg-dark tr[data-status="completed"] { background-color: rgba(12, 84, 96, 0.15); }
+        body.bg-dark tr[data-status="cancelled"] { background-color: rgba(114, 28, 36, 0.15); }
+        body.bg-dark tr[data-status="no_show"] { background-color: rgba(56, 61, 65, 0.15); }
+        body.bg-dark tr[data-status="rescheduled"] { background-color: rgba(133, 100, 4, 0.15); }
     </style>
     <style>
         /* Dark Mode Overrides */
@@ -436,7 +473,7 @@
 
                         <!-- Appointments Table -->
                         <div class="table-card p-0">
-                                <div class="table-responsive">
+                                <div class="table-responsive d-none d-md-block">
                                 @php
                                     $currentSort = request('sort');
                                     $currentDirection = strtolower(request('direction', 'desc')) === 'asc' ? 'asc' : 'desc';
@@ -518,10 +555,10 @@
                                                     
                                                     <!-- Cancel Button -->
                                                     @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
-                                                    <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
+                                                    <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline cancel-form">
                                                         @csrf
                                                         <input type="hidden" name="status" value="cancelled">
-                                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Cancel" onclick="return confirm('Are you sure you want to cancel this appointment?')">
+                                                        <button type="button" class="btn btn-outline-danger btn-sm" title="Cancel" onclick="confirmCancel(this)">
                                                             <i class="fas fa-times"></i>
                                                         </button>
                                                     </form>
@@ -532,34 +569,83 @@
 
                                         <!-- View Modal -->
                                         <div class="modal fade" id="viewAppointmentModal{{ $appointment->id }}" tabindex="-1">
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg modal-dialog-centered">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title">Appointment Details</h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <div class="mb-2"><strong>Patient:</strong> {{ $appointment->patient_name }}</div>
-                                                        <div class="mb-2"><strong>Service:</strong> {{ $appointment->service_type }}</div>
-                                                        <div class="mb-2"><strong>Date/Time:</strong> {{ $appointment->appointment_date->format('M d, Y') }} {{ $appointment->appointment_time }}</div>
-                                                        <div class="mb-2"><strong>Status:</strong> 
-                                                            @php
-                                                                $statusDisplay = [
-                                                                    'pending' => 'Pending',
-                                                                    'approved' => 'Confirmed',
-                                                                    'rescheduled' => 'Rescheduled',
-                                                                    'cancelled' => 'Cancelled',
-                                                                    'completed' => 'Completed',
-                                                                    'no_show' => 'No Show'
-                                                                ][$appointment->status] ?? ucfirst($appointment->status);
-                                                            @endphp
-                                                            <span class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
+                                                        <div class="row g-4">
+                                                            <!-- Left Column: Patient Info -->
+                                                            <div class="col-md-6 border-end">
+                                                                <h6 class="text-uppercase text-muted small fw-bold mb-3">Patient Information</h6>
+                                                                <div class="mb-3">
+                                                                    <label class="small text-muted d-block">Name</label>
+                                                                    <div class="fw-bold">{{ $appointment->patient_name }}</div>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label class="small text-muted d-block">Contact</label>
+                                                                    <div>{{ $appointment->patient_phone }}</div>
+                                                                    <div class="small">{{ $appointment->user->email ?? 'No email linked' }}</div>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label class="small text-muted d-block">Address</label>
+                                                                    <div>{{ $appointment->patient_address ?? 'N/A' }}</div>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <!-- Right Column: Appointment Info -->
+                                                            <div class="col-md-6">
+                                                                <h6 class="text-uppercase text-muted small fw-bold mb-3">Appointment Information</h6>
+                                                                <div class="mb-3">
+                                                                    <label class="small text-muted d-block">Service</label>
+                                                                    <div class="fw-bold text-primary">{{ $appointment->service_type }}</div>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label class="small text-muted d-block">Date & Time</label>
+                                                                    <div class="fw-bold">
+                                                                        <i class="fas fa-calendar-alt me-1 text-muted"></i> {{ $appointment->appointment_date->format('F d, Y') }}
+                                                                    </div>
+                                                                    <div>
+                                                                        <i class="fas fa-clock me-1 text-muted"></i> {{ $appointment->appointment_time }}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label class="small text-muted d-block">Status</label>
+                                                                    @php
+                                                                        $statusDisplay = [
+                                                                            'pending' => 'Pending',
+                                                                            'approved' => 'Confirmed',
+                                                                            'rescheduled' => 'Rescheduled',
+                                                                            'cancelled' => 'Cancelled',
+                                                                            'completed' => 'Completed',
+                                                                            'no_show' => 'No Show'
+                                                                        ][$appointment->status] ?? ucfirst($appointment->status);
+                                                                    @endphp
+                                                                    <span class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
+                                                                </div>
+                                                                @if($appointment->notes)
+                                                                    <div class="mb-3">
+                                                                        <label class="small text-muted d-block">Notes</label>
+                                                                        <div class="p-2 bg-light rounded border">{{ $appointment->notes }}</div>
+                                                                    </div>
+                                                                @endif
+                                                                
+                                                                <div class="row mt-4 pt-3 border-top">
+                                                                    <div class="col-6">
+                                                                        <label class="small text-muted d-block">Created At</label>
+                                                                        <small>{{ $appointment->created_at->format('M d, Y h:i A') }}</small>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <label class="small text-muted d-block">Last Updated</label>
+                                                                        <small>{{ $appointment->updated_at->format('M d, Y h:i A') }}</small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        @if($appointment->notes)
-                                                            <div class="mb-2"><strong>Notes:</strong> {{ $appointment->notes }}</div>
-                                                        @endif
                                                     </div>
-                                                    <div class="modal-footer d-flex justify-content-between">
+                                                    <div class="modal-footer d-flex justify-content-between bg-light">
                                                         <div class="d-flex gap-2">
                                                             <!-- Reschedule -->
                                                             @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
@@ -598,6 +684,7 @@
                                                 </div>
                                             </div>
                                         </div>
+
                                         @empty
                                         <tr>
                                             <td colspan="6" class="text-center py-5">
@@ -608,6 +695,61 @@
                                         @endforelse
                                         </tbody>
                                     </table>
+                            </div>
+
+                            <!-- Mobile Card View (Visible on small screens) -->
+                            <div class="d-md-none p-3">
+                                @forelse($appointments as $appointment)
+                                <div class="appointment-card mb-3 p-3 border rounded shadow-sm bg-white" 
+                                     data-status="{{ strtolower($appointment->status) }}"
+                                     data-service="{{ strtolower($appointment->service_type) }}"
+                                     data-patient="{{ strtolower($appointment->patient_name) }}">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <div class="fw-bold">{{ $appointment->patient_name }}</div>
+                                            <div class="small text-muted">{{ $appointment->service_type }}</div>
+                                        </div>
+                                        @php
+                                            $statusDisplay = [
+                                                'pending' => 'Pending',
+                                                'approved' => 'Confirmed',
+                                                'rescheduled' => 'Rescheduled',
+                                                'cancelled' => 'Cancelled',
+                                                'completed' => 'Completed',
+                                                'no_show' => 'No Show'
+                                            ][$appointment->status] ?? ucfirst($appointment->status);
+                                        @endphp
+                                        <span class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex align-items-center text-muted small mb-1">
+                                            <i class="fas fa-calendar-alt me-2" style="width:16px"></i>
+                                            {{ $appointment->appointment_date->format('M d, Y') }}
+                                        </div>
+                                        <div class="d-flex align-items-center text-muted small">
+                                            <i class="fas fa-clock me-2" style="width:16px"></i>
+                                            {{ $appointment->appointment_time }}
+                                        </div>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-outline-info btn-sm flex-grow-1" data-bs-toggle="modal" data-bs-target="#viewAppointmentModal{{ $appointment->id }}">
+                                            View Details
+                                        </button>
+                                        @if($appointment->status === 'pending')
+                                        <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline flex-grow-1">
+                                            @csrf
+                                            <input type="hidden" name="status" value="approved">
+                                            <button type="submit" class="btn btn-outline-success btn-sm w-100">Approve</button>
+                                        </form>
+                                        @endif
+                                    </div>
+                                </div>
+                                @empty
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                                    <p>No appointments found.</p>
+                                </div>
+                                @endforelse
                             </div>
                         </div>
 
@@ -675,11 +817,8 @@
                                         </button>
                                     </div>
                                     <div id="calendarGrid" class="calendar-grid">
-                                        <div class="col-12 text-center">
-                                            <div class="spinner-border spinner-border-sm" role="status">
-                                                <span class="visually-hidden">Loading...</span>
-                                            </div>
-                                            <div class="small text-muted mt-2">Loading calendar...</div>
+                                        <div class="col-12">
+                                            <div class="skeleton calendar-skeleton"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -744,11 +883,8 @@
                                         </button>
                                     </div>
                                     <div id="reschedCalendarGrid" class="calendar-grid">
-                                        <div class="col-12 text-center">
-                                            <div class="spinner-border spinner-border-sm" role="status">
-                                                <span class="visually-hidden">Loading...</span>
-                                            </div>
-                                            <div class="small text-muted mt-2">Loading calendar...</div>
+                                        <div class="col-12">
+                                            <div class="skeleton calendar-skeleton"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -798,6 +934,23 @@ console.log('Admin calendar script loading...');
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Admin DOM loaded, initializing calendar...');
         const statusFilter = document.getElementById('appointmentStatusFilter');
+        
+        // SweetAlert2 Confirmation for Cancel
+        window.confirmCancel = function(btn) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You are about to cancel this appointment. This action cannot be undone!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, cancel it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    btn.closest('form').submit();
+                }
+            });
+        };
         const serviceFilter = document.getElementById('appointmentServiceFilter');
         const searchInput = document.getElementById('appointmentSearch');
         const resetButton = document.getElementById('appointmentFiltersReset');
@@ -1070,7 +1223,12 @@ console.log('Admin calendar script loading...');
                     console.error('Error loading calendar:', error);
                     const grid = document.getElementById(this.config.calendarGridId);
                     if (grid) {
-                        grid.innerHTML = `<div class="col-12 text-center text-danger">Error loading calendar: ${error.message}</div>`;
+                        grid.innerHTML = `<div class="col-12"><div class="skeleton calendar-skeleton"></div></div>`;
+                        // After a timeout, show error if it persists or just keep skeleton? 
+                        // Better to show error eventually.
+                        setTimeout(() => {
+                             grid.innerHTML = `<div class="col-12 text-center text-danger">Error loading calendar: ${error.message}</div>`;
+                        }, 1000);
                     }
                 }
             }
@@ -1215,7 +1373,10 @@ console.log('Admin calendar script loading...');
                     console.error('Error loading time slots:', error);
                     const slotsGrid = document.getElementById(this.config.timeSlotsGridId);
                     if (slotsGrid) {
-                        slotsGrid.innerHTML = `<div class="col-12 text-center text-danger">Error loading time slots: ${error.message}</div>`;
+                         slotsGrid.innerHTML = `<div class="col-12"><div class="skeleton" style="height: 100px; width: 100%;"></div></div>`;
+                         setTimeout(() => {
+                            slotsGrid.innerHTML = `<div class="col-12 text-center text-danger">Error loading time slots: ${error.message}</div>`;
+                         }, 1000);
                     }
                 }
             }

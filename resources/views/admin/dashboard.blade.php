@@ -292,7 +292,7 @@
                             <div class="col-md-6">
                                 <div class="chart-container">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h6 class="mb-0">Service this Month</h6>
+                                        <h6 class="mb-0">Services Overview</h6>
                                         <div class="filter-toggle" id="serviceFilter">
                                             <button class="filter-btn" onclick="updateServiceChart('weekly', this)">Weekly</button>
                                             <button class="filter-btn active" onclick="updateServiceChart('monthly', this)">Monthly</button>
