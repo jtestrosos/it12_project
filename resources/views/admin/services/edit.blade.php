@@ -1,25 +1,27 @@
 @extends('admin.layout')
 
-@section('title', 'Create Service - Barangay Health Center')
-@section('page-title', 'Create New Service')
-@section('page-description', 'Add a new health center service')
+@section('title', 'Edit Service - Barangay Health Center')
+@section('page-title', 'Edit Service')
+@section('page-description', 'Update service details')
 
 @section('content')
 <div class="p-0 p-md-4">
     <x-card>
-        <form method="POST" action="{{ route('admin.services.store') }}">
+        <form method="POST" action="{{ route('admin.services.update', $service) }}">
             @csrf
+            @method('PUT')
             
             <x-input 
                 name="name" 
                 label="Service Name" 
+                :value="$service->name" 
                 required 
             />
 
             <div class="mb-3">
                 <label for="description" class="form-label fw-medium">Description</label>
                 <textarea class="form-control @error('description') is-invalid @enderror" 
-                          id="description" name="description" rows="3">{{ old('description') }}</textarea>
+                          id="description" name="description" rows="3">{{ old('description', $service->description) }}</textarea>
                 @error('description')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -29,7 +31,7 @@
 
             <div class="mb-4 form-check">
                 <input type="checkbox" class="form-check-input" id="active" name="active" value="1"
-                       {{ old('active', true) ? 'checked' : '' }}>
+                       {{ old('active', $service->active) ? 'checked' : '' }}>
                 <label class="form-check-label" for="active">
                     Active (available for booking)
                 </label>
@@ -37,7 +39,7 @@
 
             <div class="d-flex gap-2">
                 <x-button type="submit" icon="fas fa-save">
-                    Create Service
+                    Update Service
                 </x-button>
                 <a href="{{ route('admin.services.index') }}" class="btn btn-secondary">
                     <i class="fas fa-times me-2"></i> Cancel

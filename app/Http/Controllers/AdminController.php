@@ -920,23 +920,53 @@ class AdminController extends Controller
 
     public function storeService(Request $request)
     {
+        Log::info('storeService called', $request->all());
         $request->validate([
             'name' => 'required|string|max:255|unique:services',
             'description' => 'nullable|string',
-            'price' => 'nullable|numeric|min:0',
-            'duration_minutes' => 'nullable|integer|min:1',
             'active' => 'boolean'
         ]);
 
         Service::create([
             'name' => $request->name,
             'description' => $request->description,
-            'price' => $request->price,
-            'duration_minutes' => $request->duration_minutes,
             'active' => $request->has('active')
         ]);
 
         return redirect()->route('admin.services.index')->with('success', 'Service created successfully.');
+    }
+
+    public function editService(Service $service)
+    {
+        return view('admin.services.edit', compact('service'));
+    }
+
+    public function updateService(Request $request, Service $service)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:services,name,' . $service->id,
+            'description' => 'nullable|string',
+            'active' => 'boolean'
+        ]);
+
+        $service->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'active' => $request->has('active')
+        ]);
+
+        return redirect()->route('admin.services.index')->with('success', 'Service updated successfully.');
+    }
+
+    public function deleteService(Service $service)
+    {
+        // Check if service has appointments
+        if ($service->appointments()->exists()) {
+            return redirect()->back()->with('error', 'Cannot delete service because it has associated appointments. Deactivate it instead.');
+        }
+
+        $service->delete();
+        return redirect()->route('admin.services.index')->with('success', 'Service deleted successfully.');
     }
 
     public function exportAppointmentsExcel(Request $request)

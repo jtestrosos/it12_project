@@ -250,6 +250,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
             Route::get('/services', [AdminController::class, 'services'])->name('services.index');
             Route::get('/services/create', [AdminController::class, 'createService'])->name('services.create');
             Route::post('/services', [AdminController::class, 'storeService'])->name('services.store');
+            Route::get('/services/{service}/edit', [AdminController::class, 'editService'])->name('services.edit');
+            Route::put('/services/{service}', [AdminController::class, 'updateService'])->name('services.update');
+            Route::delete('/services/{service}', [AdminController::class, 'deleteService'])->name('services.destroy');
         });
 });
 

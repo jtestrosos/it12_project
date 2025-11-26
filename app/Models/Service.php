@@ -15,6 +15,11 @@ class Service extends Model
         'day_of_week',
         'active',
     ];
+
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class, 'service_type', 'name');
+    }
 }
 
 
