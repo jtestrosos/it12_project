@@ -283,3 +283,49 @@ body.bg-dark {
 .transition-slow {
     transition: all var(--transition-slow);
 }
+
+/* ===== Component Utilities ===== */
+
+/* Ghost Button */
+.btn-ghost {
+    background-color: transparent;
+    color: var(--text-primary);
+    border: 1px solid transparent;
+}
+
+.btn-ghost:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--color-primary);
+}
+
+body.bg-dark .btn-ghost {
+    color: var(--text-primary);
+}
+
+body.bg-dark .btn-ghost:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--color-primary-light);
+}
+
+/* Object Fit Utilities */
+.object-fit-cover {
+    object-fit: cover;
+}
+
+.object-fit-contain {
+    object-fit: contain;
+}
+
+/* Cursor Utilities */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Opacity Utilities */
+.opacity-50 {
+    opacity: 0.5;
+}
+
+.opacity-75 {
+    opacity: 0.75;
+}

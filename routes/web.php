@@ -26,6 +26,9 @@ Route::get('/services', fn() => view('partials.services'))->name('services');
 // How It Works Page
 Route::get('/how-it-works', fn() => view('partials.how-it-works'))->name('how-it-works');
 
+// UI Style Guide (Dev only)
+Route::get('/style-guide', fn() => view('style-guide'))->name('style-guide');
+
 // Booking Page
 Route::get('/booking', function () {
     if (!Auth::check()) {
