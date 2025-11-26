@@ -552,7 +552,7 @@ class AdminController extends Controller
 
     public function inventory(Request $request)
     {
-        $query = Inventory::query()->latest();
+        $query = Inventory::query()->with('transactions')->latest();
         if ($request->filled('category')) {
             $query->where('category', $request->category);
         }

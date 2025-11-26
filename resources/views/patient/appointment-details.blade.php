@@ -222,17 +222,158 @@ Patient
                             <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
                         </a>
                         @if($appointment->status == 'pending')
-                        <form method="POST" action="{{ route('patient.appointment.cancel', $appointment) }}" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-danger btn-modern" 
-                                    onclick="return confirm('Are you sure you want to cancel this appointment?')">
-                                <i class="fas fa-times me-2"></i>Cancel Appointment
-                            </button>
-                        </form>
+                        <button type="button" class="btn btn-danger btn-modern cancel-appointment-btn" 
+                                data-cancel-url="{{ route('patient.appointment.cancel', $appointment) }}"
+                                data-appointment-date="{{ $appointment->appointment_date->format('Y-m-d') }}"
+                                data-appointment-time="{{ $appointment->appointment_time }}"
+                                data-service-type="{{ $appointment->service_type }}">
+                            <i class="fas fa-times me-2"></i>Cancel Appointment
+                        </button>
                         @endif
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
+    <!-- Cancel Confirmation Modal -->
+    <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>Cancel Appointment
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-3">Are you sure you want to cancel this appointment?</p>
+                    <div id="cancelAppointmentDetails">
+                        <!-- Details will be populated by JavaScript -->
+                    </div>
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <small>This action cannot be undone. You will need to book a new appointment if you change your mind.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Keep Appointment
+                    </button>
+                    <button type="button" id="confirmCancelBtn" class="btn btn-danger">
+                        <i class="fas fa-check me-2"></i>Yes, Cancel It
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const cancelBtn = document.querySelector('.cancel-appointment-btn');
+    
+    if (cancelBtn) {
+        const cancelModal = new bootstrap.Modal(document.getElementById('cancelModal'));
+        const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+        
+        cancelBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const cancelUrl = cancelBtn.dataset.cancelUrl;
+            const appointmentDate = cancelBtn.dataset.appointmentDate;
+            const appointmentTime = cancelBtn.dataset.appointmentTime;
+            const serviceType = cancelBtn.dataset.serviceType;
+            
+            // Populate modal with appointment details
+            const detailsContainer = document.getElementById('cancelAppointmentDetails');
+            detailsContainer.innerHTML = `
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f1f3f4;">
+                    <span style="font-weight: 600; color: #495057;">Date:</span>
+                    <span style="color: #6c757d;">${new Date(appointmentDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f1f3f4;">
+                    <span style="font-weight: 600; color: #495057;">Time:</span>
+                    <span style="color: #6c757d;">${appointmentTime}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0;">
+                    <span style="font-weight: 600; color: #495057;">Service:</span>
+                    <span style="color: #6c757d;">${serviceType}</span>
+                </div>
+            `;
+            
+            // Store the cancel URL
+            confirmCancelBtn.dataset.cancelUrl = cancelUrl;
+            confirmCancelBtn.dataset.csrfToken = '{{ csrf_token() }}';
+            
+            // Show modal
+            cancelModal.show();
+        });
+        
+        // Confirm cancel button
+        confirmCancelBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const cancelUrl = confirmCancelBtn.dataset.cancelUrl;
+            const csrfToken = confirmCancelBtn.dataset.csrfToken;
+            
+            if (cancelUrl) {
+                // Hide modal manually
+                const modalElement = document.getElementById('cancelModal');
+                modalElement.classList.remove('show');
+                modalElement.style.display = 'none';
+                modalElement.setAttribute('aria-hidden', 'true');
+                
+                // Remove backdrop
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+                
+                // Remove modal-open class from body
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('padding-right');
+                
+                // Show toast if available
+                if (window.toast && typeof window.toast.info === 'function') {
+                    window.toast.info('Cancelling appointment...', 'Please wait');
+                }
+                
+                // Create form dynamically and submit
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = cancelUrl;
+                form.style.display = 'none';
+                
+                // Add CSRF token
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_token';
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
+                
+                // Append to body and submit
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
+    
+    // Show session messages
+    @if(session('success'))
+        if (window.toast && typeof window.toast.success === 'function') {
+            window.toast.success('{{ session('success') }}');
+        }
+    @endif
+    
+    @if(session('error'))
+        if (window.toast && typeof window.toast.error === 'function') {
+            window.toast.error('{{ session('error') }}');
+        }
+    @endif
+});
+</script>
+@endpush

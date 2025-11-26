@@ -322,12 +322,203 @@ Patient
         border-color: #007bff;
         color: #fff;
     }
+    
+    /* Step Indicator */
+    .step-indicator {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    .step-indicator::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #e9ecef;
+        z-index: 0;
+    }
+    body.bg-dark .step-indicator::before {
+        background: #2a2f35;
+    }
+    .step {
+        flex: 1;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+    .step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: white;
+        border: 2px solid #e9ecef;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .step.active .step-circle {
+        background: #007bff;
+        border-color: #007bff;
+        color: white;
+        box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2);
+    }
+    .step.completed .step-circle {
+        background: #28a745;
+        border-color: #28a745;
+        color: white;
+    }
+    .step-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        font-weight: 500;
+    }
+    .step.active .step-label {
+        color: #007bff;
+        font-weight: 600;
+    }
+    .step.completed .step-label {
+        color: #28a745;
+    }
+    body.bg-dark .step-circle {
+        background: #1e2124;
+        border-color: #2a2f35;
+        color: #e6e6e6;
+    }
+    body.bg-dark .step-label {
+        color: #b0b0b0;
+    }
+    
+    /* Calendar Legend */
+    .calendar-legend {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    body.bg-dark .calendar-legend {
+        background: #25282c;
+    }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #495057;
+    }
+    body.bg-dark .legend-item {
+        color: #e6e6e6;
+    }
+    .legend-color {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+    body.bg-dark .legend-color {
+        border-color: rgba(255,255,255,0.2);
+    }
+    .legend-color.available {
+        background: white;
+        border-color: #dee2e6;
+    }
+    body.bg-dark .legend-color.available {
+        background: #1e2124;
+        border-color: #495057;
+    }
+    .legend-color.partially-occupied {
+        background: #ffc107;
+    }
+    .legend-color.occupied {
+        background: #dc3545;
+    }
+    .legend-color.selected {
+        background: #007bff;
+    }
+    
+    /* Confirmation Modal */
+    .modal-content {
+        border-radius: 16px;
+        border: none;
+    }
+    .modal-header {
+        border-bottom: 1px solid #e9ecef;
+        padding: 1.5rem;
+    }
+    body.bg-dark .modal-content {
+        background: #1e2124;
+        color: #e6e6e6;
+    }
+    body.bg-dark .modal-header {
+        border-bottom-color: #2a2f35;
+    }
+    .confirmation-detail {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    .confirmation-detail:last-child {
+        border-bottom: none;
+    }
+    body.bg-dark .confirmation-detail {
+        border-bottom-color: #2a2f35;
+    }
+    .confirmation-label {
+        font-weight: 600;
+        color: #495057;
+    }
+    body.bg-dark .confirmation-label {
+        color: #cbd3da;
+    }
+    .confirmation-value {
+        color: #6c757d;
+    }
+    body.bg-dark .confirmation-value {
+        color: #b0b0b0;
+    }
 </style>
 @endsection
 
 @section('content')
     <div class="row justify-content-center">
         <div class="col-md-10">
+            <!-- Step Indicator -->
+            <div class="step-indicator mb-4">
+                <div class="step active" data-step="1">
+                    <div class="step-circle">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="step-label">Patient Info</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-circle">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <div class="step-label">Date & Time</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-circle">
+                        <i class="fas fa-notes-medical"></i>
+                    </div>
+                    <div class="step-label">Details</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-circle">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="step-label">Confirm</div>
+                </div>
+            </div>
+            
             <div class="card booking-card">
                 <div class="booking-header text-white">
                     <div class="d-flex align-items-center">
@@ -374,6 +565,26 @@ Patient
                         <!-- Appointment Details -->
                         <div class="form-section">
                             <h6><i class="fas fa-calendar me-2"></i>Appointment Details</h6>
+                            
+                            <!-- Calendar Legend -->
+                            <div class="calendar-legend">
+                                <div class="legend-item">
+                                    <div class="legend-color available"></div>
+                                    <span>Available</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color partially-occupied"></div>
+                                    <span>Limited Slots</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color occupied"></div>
+                                    <span>Fully Booked</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color selected"></div>
+                                    <span>Selected</span>
+                                </div>
+                            </div>
                             
                             <!-- Calendar View -->
                             <div class="card mb-4">
@@ -459,11 +670,39 @@ Patient
                             <a href="{{ route('patient.dashboard') }}" class="btn btn-secondary">
                                 <i class="fas fa-times me-2"></i>Cancel
                             </a>
-                            <button type="submit" class="btn btn-primary">
+                            <button type="button" id="bookAppointmentBtn" class="btn btn-primary">
                                 <i class="fas fa-calendar-check me-2"></i>Book Appointment
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">
+                        <i class="fas fa-check-circle text-success me-2"></i>Confirm Your Appointment
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-3">Please review your appointment details before confirming:</p>
+                    <div id="confirmationDetails">
+                        <!-- Details will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Go Back
+                    </button>
+                    <button type="button" id="confirmBookingBtn" class="btn btn-primary">
+                        <i class="fas fa-check me-2"></i>Confirm Booking
+                    </button>
                 </div>
             </div>
         </div>
@@ -706,6 +945,147 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Creating calendar instance...');
     const calendar = new PatientAppointmentCalendar();
     console.log('Calendar initialized successfully');
+    
+    // Step tracking
+    const steps = document.querySelectorAll('.step');
+    const form = document.querySelector('form[method="POST"]');
+    const bookBtn = document.getElementById('bookAppointmentBtn');
+    const confirmBtn = document.getElementById('confirmBookingBtn');
+    const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+    
+    // Track form progress and update steps
+    const updateStepProgress = () => {
+        const hasPatientInfo = document.getElementById('patient_name').value && 
+                              document.getElementById('patient_phone').value;
+        const hasDateTime = document.getElementById('appointment_date').value && 
+                           document.getElementById('appointment_time').value;
+        const hasService = document.getElementById('service_type').value;
+        
+        // Update step 1
+        if (hasPatientInfo) {
+            steps[0].classList.add('completed');
+        } else {
+            steps[0].classList.remove('completed');
+        }
+        
+        // Update step 2
+        if (hasDateTime) {
+            steps[1].classList.add('completed');
+        } else {
+            steps[1].classList.remove('completed');
+        }
+        
+        // Update step 3
+        if (hasService) {
+            steps[2].classList.add('completed');
+        } else {
+            steps[2].classList.remove('completed');
+        }
+    };
+    
+    // Listen for form changes
+    form.addEventListener('change', updateStepProgress);
+    form.addEventListener('input', updateStepProgress);
+    
+    // Book appointment button - show confirmation modal
+    bookBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Validate form
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            window.toast.warning('Please fill in all required fields', 'Incomplete Form');
+            return;
+        }
+        
+        // Check if date and time are selected
+        const dateInput = document.getElementById('appointment_date');
+        const timeInput = document.getElementById('appointment_time');
+        
+        if (!dateInput.value || !timeInput.value) {
+            if (window.toast && typeof window.toast.warning === 'function') {
+                window.toast.warning('Please select both date and time for your appointment', 'Missing Information');
+            } else {
+                alert('Please select both date and time for your appointment');
+            }
+            return;
+        }
+        
+        // Populate confirmation modal
+        const confirmationDetails = document.getElementById('confirmationDetails');
+        const patientName = document.getElementById('patient_name').value;
+        const patientPhone = document.getElementById('patient_phone').value;
+        const appointmentDate = new Date(dateInput.value).toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        const appointmentTime = timeInput.value;
+        const serviceType = document.getElementById('service_type').value;
+        const medicalHistory = document.getElementById('medical_history').value || 'None provided';
+        const notes = document.getElementById('notes').value || 'None';
+        
+        confirmationDetails.innerHTML = `
+            <div class="confirmation-detail">
+                <span class="confirmation-label">Patient Name:</span>
+                <span class="confirmation-value">${patientName}</span>
+            </div>
+            <div class="confirmation-detail">
+                <span class="confirmation-label">Phone Number:</span>
+                <span class="confirmation-value">${patientPhone}</span>
+            </div>
+            <div class="confirmation-detail">
+                <span class="confirmation-label">Appointment Date:</span>
+                <span class="confirmation-value">${appointmentDate}</span>
+            </div>
+            <div class="confirmation-detail">
+                <span class="confirmation-label">Appointment Time:</span>
+                <span class="confirmation-value">${appointmentTime}</span>
+            </div>
+            <div class="confirmation-detail">
+                <span class="confirmation-label">Service Type:</span>
+                <span class="confirmation-value">${serviceType}</span>
+            </div>
+            <div class="confirmation-detail">
+                <span class="confirmation-label">Medical History:</span>
+                <span class="confirmation-value">${medicalHistory}</span>
+            </div>
+            <div class="confirmation-detail">
+                <span class="confirmation-label">Additional Notes:</span>
+                <span class="confirmation-value">${notes}</span>
+            </div>
+        `;
+        
+        // Mark step 4 as active
+        steps.forEach(s => s.classList.remove('active'));
+        steps[3].classList.add('active');
+        
+        // Show modal
+        confirmationModal.show();
+    });
+    
+    // Confirm booking button - submit form
+    confirmBtn.addEventListener('click', () => {
+        confirmationModal.hide();
+        if (window.toast && typeof window.toast.info === 'function') {
+            window.toast.info('Submitting your appointment...', 'Please wait');
+        }
+        form.submit();
+    });
+    
+    // Show session messages
+    @if(session('success'))
+        if (window.toast && typeof window.toast.success === 'function') {
+            window.toast.success('{{ session('success') }}');
+        }
+    @endif
+    
+    @if(session('error'))
+        if (window.toast && typeof window.toast.error === 'function') {
+            window.toast.error('{{ session('error') }}');
+        }
+    @endif
 });
 </script>
 @endpush

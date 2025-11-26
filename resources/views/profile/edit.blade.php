@@ -110,7 +110,69 @@
 
                     <hr class="my-4">
 
+                    <h5 class="mb-3">Personal Information</h5>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $user->name) }}" required>
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', $user->email) }}" required>
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" name="phone" id="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $user->phone) }}" placeholder="09123456789">
+                            @error('phone')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label for="date_of_birth" class="form-label">Date of Birth</label>
+                            <input type="date" name="date_of_birth" id="date_of_birth" class="form-control @error('date_of_birth') is-invalid @enderror" value="{{ old('date_of_birth', $user->date_of_birth) }}">
+                            @error('date_of_birth')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea name="address" id="address" rows="3" class="form-control @error('address') is-invalid @enderror" placeholder="Enter your full address">{{ old('address', $user->address) }}</textarea>
+                        @error('address')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <hr class="my-4">
+
                     <h5 class="mb-3">Change Password</h5>
+                    <p class="text-muted small mb-3">Leave the password fields blank if you don't want to change your password.</p>
+                    
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label">Current Password</label>
+                        <div class="input-group">
+                            <input type="password" name="current_password" id="current-password" class="form-control @error('current_password') is-invalid @enderror">
+                            <button class="btn btn-outline-secondary" type="button" id="current-show-password-btn">
+                                <i id="current-show-password-icon" class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        @error('current_password')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                        <div class="form-text">Required if you want to change your password.</div>
+                    </div>
+
                     <div class="mb-3">
                         <label for="password" class="form-label">New Password</label>
                         <div class="input-group">
@@ -122,7 +184,7 @@
                         @error('password')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
-                        <div class="form-text">Leave blank if you don't want to change it.</div>
+                        <div class="form-text">Must be at least 8 characters long.</div>
                     </div>
 
                     <div class="mb-4">
@@ -130,8 +192,13 @@
                         <input type="password" name="password_confirmation" id="profile-password-confirm" class="form-control">
                     </div>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                        <a href="{{ url()->previous() }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
                     </div>
                 </form>
             </div>
@@ -141,6 +208,24 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Current password toggle
+        const currentPasswordInput = document.getElementById('current-password');
+        const currentToggleBtn = document.getElementById('current-show-password-btn');
+        const currentToggleIcon = document.getElementById('current-show-password-icon');
+
+        if (currentToggleBtn && currentPasswordInput) {
+            currentToggleBtn.addEventListener('click', function() {
+                const showing = currentPasswordInput.type === 'text';
+                currentPasswordInput.type = showing ? 'password' : 'text';
+                
+                if (currentToggleIcon) {
+                    currentToggleIcon.classList.toggle('fa-eye');
+                    currentToggleIcon.classList.toggle('fa-eye-slash');
+                }
+            });
+        }
+
+        // New password toggle
         const passwordInput = document.getElementById('profile-password');
         const passwordConfirmInput = document.getElementById('profile-password-confirm');
         const toggleBtn = document.getElementById('profile-show-password-btn');

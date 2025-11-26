@@ -19,7 +19,13 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:20',
+            'date_of_birth' => 'nullable|date',
+            'address' => 'nullable|string|max:500',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'current_password' => 'nullable|required_with:password',
             'password' => [
                 'nullable',
                 'min:8',
@@ -29,6 +35,13 @@ class ProfileController extends Controller
         ], [
             'password.regex' => 'The password must contain at least one lowercase letter, one uppercase letter, and one special character.',
         ]);
+
+        // Update basic info
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->phone = $request->phone;
+        $user->birth_date = $request->date_of_birth;
+        $user->address = $request->address;
 
         if ($request->hasFile('profile_picture')) {
             // Delete old profile picture if exists
@@ -41,6 +54,9 @@ class ProfileController extends Controller
         }
 
         if ($request->filled('password')) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                return back()->withErrors(['current_password' => 'The provided password does not match your current password.']);
+            }
             $user->password = Hash::make($request->password);
         }
 

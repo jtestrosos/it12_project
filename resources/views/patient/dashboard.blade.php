@@ -97,6 +97,26 @@ Patient
     .metric-change {
         font-size: 0.8rem;
         margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    .metric-change i {
+        font-size: 0.7rem;
+    }
+    .trend-up {
+        animation: trendUp 0.5s ease-out;
+    }
+    .trend-down {
+        animation: trendDown 0.5s ease-out;
+    }
+    @keyframes trendUp {
+        0% { transform: translateY(10px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes trendDown {
+        0% { transform: translateY(-10px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
     }
     .appointment-avatar {
         width: 40px;
@@ -155,78 +175,90 @@ Patient
     body.bg-dark .fw-bold.text-dark {
         color: #e6e6e6 !important;
     }
+    
+    /* Empty State Improvements */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+    .empty-state-icon {
+        font-size: 4rem;
+        color: #cbd5e1;
+        margin-bottom: 1.5rem;
+        animation: float 3s ease-in-out infinite;
+    }
+    body.bg-dark .empty-state-icon {
+        color: #475569;
+    }
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    .empty-state-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+    }
+    body.bg-dark .empty-state-title {
+        color: #94a3b8;
+    }
+    .empty-state-description {
+        color: #94a3b8;
+        margin-bottom: 2rem;
+    }
+    body.bg-dark .empty-state-description {
+        color: #64748b;
+    }
+    .btn-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; transform: scale(1.02); }
+    }
 </style>
 @endsection
 
 @section('content')
     <!-- Quick Stats -->
     <div class="row mb-4 g-3">
-        <div class="col-lg-3 col-md-6 mb-3">
+        <div class="col-lg-6 col-md-6 mb-3">
             <div class="metric-card">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
-                                    <div class="metric-label">Total Appointments</div>
-                                    <div class="metric-number">{{ $appointments->total() }}</div>
-                                    <div class="metric-change text-success">+12% from last month</div>
-                                </div>
-                                <div class="text-primary">
-                                    <i class="fas fa-calendar fa-2x"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="metric-card">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <div class="metric-label">Pending</div>
+                                    <div class="metric-label">Pending Appointments</div>
                                     <div class="metric-number">{{ $appointments->where('status', 'pending')->count() }}</div>
-                                    <div class="text-warning">Awaiting approval</div>
+                                    <div class="metric-change text-warning trend-up">
+                                        <i class="fas fa-arrow-up"></i>
+                                        <span>Awaiting approval</span>
+                                    </div>
                                 </div>
                                 <div class="text-warning">
                                     <i class="fas fa-clock fa-2x"></i>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="metric-card">
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 mb-3">
+            <div class="metric-card">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
-                                    <div class="metric-label">Approved</div>
+                                    <div class="metric-label">Approved Appointments</div>
                                     <div class="metric-number">{{ $appointments->where('status', 'approved')->count() }}</div>
-                                    <div class="text-success">Ready for visit</div>
+                                    <div class="metric-change text-success trend-up">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Ready for visit</span>
+                                    </div>
                                 </div>
                                 <div class="text-success">
                                     <i class="fas fa-check-circle fa-2x"></i>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="metric-card">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <div class="metric-label">Completed</div>
-                                    <div class="metric-number">{{ $appointments->where('status', 'completed')->count() }}</div>
-                                    <div class="metric-change text-success">+8% from last month</div>
-                                </div>
-                                <div class="text-info">
-                                    <i class="fas fa-check-double fa-2x"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            <!-- Book Appointment Button -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <a href="{{ route('patient.book-appointment') }}" class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i> Book New Appointment
-                    </a>
-                </div>
             </div>
+        </div>
+    </div>
+
 
             <!-- Appointments Table -->
             <div class="row">
@@ -286,13 +318,14 @@ Patient
                                                             <i class="fas fa-eye me-1"></i> View
                                                         </a>
                                                         @if($appointment->status == 'pending')
-                                                        <form method="POST" action="{{ route('patient.appointment.cancel', $appointment) }}" class="d-inline">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                                                    onclick="return confirm('Are you sure you want to cancel this appointment?')">
-                                                                <i class="fas fa-times me-1"></i> Cancel
-                                                            </button>
-                                                        </form>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger cancel-appointment-btn" 
+                                                                data-appointment-id="{{ $appointment->id }}"
+                                                                data-cancel-url="{{ route('patient.appointment.cancel', $appointment) }}"
+                                                                data-appointment-date="{{ $appointment->appointment_date }}"
+                                                                data-appointment-time="{{ $appointment->appointment_time }}"
+                                                                data-service-type="{{ $appointment->service_type }}">
+                                                            <i class="fas fa-times me-1"></i> Cancel
+                                                        </button>
                                                         @endif
                                                     </div>
                                                 </td>
@@ -309,14 +342,53 @@ Patient
                                 </div>
                                 @endif
                             @else
-                                <div class="text-center py-5">
-                                    <i class="fas fa-calendar text-muted mb-3" style="font-size: 3rem;"></i>
-                                    <p class="text-muted mb-3">No appointments found.</p>
-                                    <a href="{{ route('patient.book-appointment') }}" class="btn btn-primary">Book Your First Appointment</a>
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <h3 class="empty-state-title">No Appointments Yet</h3>
+                                    <p class="empty-state-description">
+                                        You haven't booked any appointments yet. Start your healthcare journey by scheduling your first visit.
+                                    </p>
+                                    <a href="{{ route('patient.book-appointment') }}" class="btn btn-primary btn-pulse">
+                                        <i class="fas fa-plus me-2"></i>Book Your First Appointment
+                                    </a>
                                 </div>
                             @endif
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cancel Confirmation Modal -->
+    <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>Cancel Appointment
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-3">Are you sure you want to cancel this appointment?</p>
+                    <div id="cancelAppointmentDetails">
+                        <!-- Details will be populated by JavaScript -->
+                    </div>
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <small>This action cannot be undone. You will need to book a new appointment if you change your mind.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Keep Appointment
+                    </button>
+                    <button type="button" id="confirmCancelBtn" class="btn btn-danger">
+                        <i class="fas fa-check me-2"></i>Yes, Cancel It
+                    </button>
                 </div>
             </div>
         </div>
@@ -346,6 +418,122 @@ Patient
             attributes: true,
             attributeFilter: ['class']
         });
+        
+        cancelBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                const appointmentId = btn.dataset.appointmentId;
+                const cancelUrl = btn.dataset.cancelUrl;
+                const appointmentDate = btn.dataset.appointmentDate;
+                const appointmentTime = btn.dataset.appointmentTime;
+                const serviceType = btn.dataset.serviceType;
+                
+                // Populate modal with appointment details
+                const detailsContainer = document.getElementById('cancelAppointmentDetails');
+                detailsContainer.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f1f3f4;">
+                        <span style="font-weight: 600; color: #495057;">Date:</span>
+                        <span style="color: #6c757d;">${new Date(appointmentDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f1f3f4;">
+                        <span style="font-weight: 600; color: #495057;">Time:</span>
+                        <span style="color: #6c757d;">${appointmentTime}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.75rem 0;">
+                        <span style="font-weight: 600; color: #495057;">Service:</span>
+                        <span style="color: #6c757d;">${serviceType}</span>
+                    </div>
+                `;
+                
+                // Store the cancel URL
+                confirmCancelBtn.dataset.cancelUrl = cancelUrl;
+                confirmCancelBtn.dataset.csrfToken = '{{ csrf_token() }}';
+                
+                // Show modal
+                cancelModal.show();
+            });
+        });
+        
+        // Confirm cancel button - use direct event listener without Bootstrap modal interference
+        confirmCancelBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const cancelUrl = confirmCancelBtn.dataset.cancelUrl;
+            const csrfToken = confirmCancelBtn.dataset.csrfToken;
+            
+            console.log('Cancel button clicked, URL:', cancelUrl);
+            
+            if (cancelUrl) {
+                // Hide modal manually
+                const modalElement = document.getElementById('cancelModal');
+                modalElement.classList.remove('show');
+                modalElement.style.display = 'none';
+                modalElement.setAttribute('aria-hidden', 'true');
+                
+                // Remove backdrop
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+                
+                // Remove modal-open class from body
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('padding-right');
+                
+                // Show toast if available
+                if (window.toast && typeof window.toast.info === 'function') {
+                    window.toast.info('Cancelling appointment...', 'Please wait');
+                }
+                
+                // Create form dynamically and submit
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = cancelUrl;
+                form.style.display = 'none';
+                
+                // Add CSRF token
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_token';
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
+                
+                // Add POST method (not PUT for this route)
+                const methodInput = document.createElement('input');
+                methodInput.type = 'hidden';
+                methodInput.name = '_method';
+                methodInput.value = 'POST';
+                form.appendChild(methodInput);
+                
+                // Append to body and submit
+                document.body.appendChild(form);
+                console.log('Submitting form to:', form.action);
+                form.submit();
+            } else {
+                console.error('No cancel URL found');
+                if (window.toast && typeof window.toast.error === 'function') {
+                    window.toast.error('Error: Could not cancel appointment', 'Error');
+                } else {
+                    alert('Error: Could not cancel appointment');
+                }
+            }
+        });
+        
+        // Show success/error messages from session
+        @if(session('success'))
+            if (window.toast && typeof window.toast.success === 'function') {
+                window.toast.success('{{ session('success') }}');
+            }
+        @endif
+        
+        @if(session('error'))
+            if (window.toast && typeof window.toast.error === 'function') {
+                window.toast.error('{{ session('error') }}');
+            }
+        @endif
     });
 </script>
 @endpush

@@ -94,6 +94,54 @@
         body.bg-dark .table-modern thead th { background-color: #1a1f24; color: #e6e6e6; }
         body.bg-dark .table-modern tbody td { border-bottom-color: #2a2f35; color: #d6d6d6; }
         body.bg-dark .table-modern tbody tr:hover { background-color: #2a2f35; }
+        .cursor-pointer { cursor: pointer; }
+        
+        /* Dark Mode Modal Specifics */
+        body.bg-dark .modal-content .card {
+            background-color: #2a2f35 !important;
+            border: 1px solid #3f4751 !important;
+        }
+        body.bg-dark .modal-content .card h6 {
+            color: #fff !important;
+        }
+        body.bg-dark .modal-content .text-muted {
+            color: #b0b3b8 !important;
+        }
+        body.bg-dark .modal-content .card span:not(.badge):not(.fw-bold) {
+            color: #b0b3b8 !important;
+        }
+        body.bg-dark .modal-content .card .fw-bold {
+            color: #fff !important;
+        }
+        body.bg-dark .modal-content .card p.text-muted {
+            color: #b0b3b8 !important;
+        }
+        body.bg-dark .modal-content .table thead th {
+            background-color: #23272b;
+            color: #fff;
+            border-bottom: 1px solid #3f4751;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+        body.bg-dark .modal-content .table td {
+            color: #e6e6e6;
+            border-color: #3f4751;
+            vertical-align: middle;
+        }
+        body.bg-dark .modal-content .table-hover tbody tr:hover {
+            background-color: #323840;
+        }
+        
+        /* Dark Mode Badges */
+        body.bg-dark .badge.bg-success-subtle {
+            background-color: rgba(25, 135, 84, 0.2) !important;
+            color: #75b798 !important;
+        }
+        body.bg-dark .badge.bg-danger-subtle {
+            background-color: rgba(220, 53, 69, 0.2) !important;
+            color: #ea868f !important;
+        }
     </style>
 @endsection
 
@@ -205,12 +253,13 @@
                                             <th scope="col">Expiry Date</th>
                                             <th scope="col">Location</th>
                                             <th scope="col">Status</th>
-                                            <th scope="col">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody id="inventoryTableBody">
                                     @foreach($inventory as $item)
                                         <tr
+                                            class="cursor-pointer"
+                                            onclick="new bootstrap.Modal(document.getElementById('viewDetailModal{{ $item->id }}')).show()"
                                             data-name="{{ strtolower($item->item_name ?? '') }}"
                                             data-category="{{ strtolower($item->category ?? '') }}"
                                             data-status="{{ strtolower($item->status ?? '') }}"
@@ -236,14 +285,6 @@
                                                 @endphp
                                                 <span class="badge bg-{{ $badge }}">{{ str_replace('_',' ', ucfirst($item->status)) }}</span>
                                             </td>
-                                            <td class="d-flex gap-2">
-                                                <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#restockModal{{ $item->id }}">
-                                                    <i class="fas fa-plus me-1"></i> Restock
-                                                </button>
-                                                <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deductModal{{ $item->id }}">
-                                                    <i class="fas fa-minus me-1"></i> Deduct
-                                                </button>
-                                            </td>
                                         </tr>
                                     @endforeach
                                     </tbody>
@@ -266,45 +307,102 @@
                             <!-- Per-item View Modals -->
                             @foreach($inventory as $item)
                             <div class="modal fade" id="viewDetailModal{{ $item->id }}" tabindex="-1">
-                                <div class="modal-dialog">
+                                <div class="modal-dialog modal-lg">
                                     <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Inventory Item Details</h5>
+                                        <div class="modal-header border-0 pb-0">
+                                            <div>
+                                                <h5 class="modal-title fw-bold">{{ $item->item_name }}</h5>
+                                                <span class="text-muted small">{{ $item->category }}</span>
+                                            </div>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                         </div>
                                         <div class="modal-body">
-                                            <div class="inventory-card">
-                                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                                    <div class="flex-grow-1">
-                                                        <h6 class="fw-bold mb-1">{{ $item->item_name }}</h6>
-                                                        <small class="text-muted">{{ $item->category }}</small>
+                                            <div class="row mb-4">
+                                                <div class="col-md-6">
+                                                    <div class="card bg-light border-0 h-100">
+                                                        <div class="card-body">
+                                                            <h6 class="fw-bold mb-3">Item Details</h6>
+                                                            <div class="d-flex justify-content-between mb-2">
+                                                                <span class="text-muted">Current Stock:</span>
+                                                                <span class="fw-bold {{ $item->current_stock <= $item->minimum_stock ? 'text-danger' : 'text-success' }}">
+                                                                    {{ $item->current_stock }} {{ $item->unit }}
+                                                                </span>
+                                                            </div>
+                                                            <div class="d-flex justify-content-between mb-2">
+                                                                <span class="text-muted">Minimum Stock:</span>
+                                                                <span>{{ $item->minimum_stock }} {{ $item->unit }}</span>
+                                                            </div>
+                                                            <div class="d-flex justify-content-between mb-2">
+                                                                <span class="text-muted">Expiry Date:</span>
+                                                                <span class="{{ $item->expiry_date && $item->expiry_date < now() ? 'text-danger fw-bold' : '' }}">
+                                                                    {{ $item->expiry_date ? \Illuminate\Support\Carbon::parse($item->expiry_date)->format('M d, Y') : 'N/A' }}
+                                                                </span>
+                                                            </div>
+                                                            <div class="d-flex justify-content-between">
+                                                                <span class="text-muted">Location:</span>
+                                                                <span>{{ $item->location ?? 'N/A' }}</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <span class="stock-indicator @if($item->current_stock == 0) stock-out @elseif($item->current_stock <= $item->minimum_stock) stock-low @else stock-good @endif"></span>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <div class="d-flex justify-content-between mb-2">
-                                                        <span class="text-muted">Current Stock:</span>
-                                                        <span class="fw-bold">{{ $item->current_stock }} {{ $item->unit }}</span>
+                                                <div class="col-md-6">
+                                                    <div class="card bg-light border-0 h-100">
+                                                        <div class="card-body">
+                                                            <h6 class="fw-bold mb-3">Description</h6>
+                                                            <p class="text-muted small mb-0">
+                                                                {{ $item->description ?? 'No description available.' }}
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                    <div class="d-flex justify-content-between mb-2">
-                                                        <span class="text-muted">Minimum Stock:</span>
-                                                        <span>{{ $item->minimum_stock }} {{ $item->unit }}</span>
-                                                    </div>
-                                                    @if($item->description)
-                                                    <div class="mb-2">
-                                                        <small class="text-muted">{{ $item->description }}</small>
-                                                    </div>
-                                                    @endif
-                                                </div>
-                                                <div class="d-flex gap-2">
-                                                    <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#restockModal{{ $item->id }}">
-                                                        <i class="fas fa-plus me-1"></i> Restock
-                                                    </button>
-                                                    <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deductModal{{ $item->id }}">
-                                                        <i class="fas fa-minus me-1"></i> Deduct
-                                                    </button>
                                                 </div>
                                             </div>
+
+                                            <h6 class="fw-bold mb-3">Transaction History</h6>
+                                            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                                <table class="table table-sm table-hover">
+                                                    <thead class="table-light sticky-top">
+                                                        <tr>
+                                                            <th>Date</th>
+                                                            <th>Type</th>
+                                                            <th>Quantity</th>
+                                                            <th>Notes</th>
+                                                            <th>User</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @forelse($item->transactions->sortByDesc('created_at') as $transaction)
+                                                            <tr>
+                                                                <td>{{ $transaction->created_at->format('M d, Y H:i') }}</td>
+                                                                <td>
+                                                                    @if($transaction->transaction_type === 'restock')
+                                                                        <span class="badge bg-success-subtle text-success">Restock</span>
+                                                                    @else
+                                                                        <span class="badge bg-danger-subtle text-danger">Deduct</span>
+                                                                    @endif
+                                                                </td>
+                                                                <td class="{{ $transaction->transaction_type === 'restock' ? 'text-success' : 'text-danger' }} fw-bold">
+                                                                    {{ $transaction->transaction_type === 'restock' ? '+' : '-' }}{{ $transaction->quantity }}
+                                                                </td>
+                                                                <td class="small text-muted">{{ $transaction->notes ?? '-' }}</td>
+                                                                <td class="small">{{ $transaction->user->name ?? 'System' }}</td>
+                                                            </tr>
+                                                        @empty
+                                                            <tr>
+                                                                <td colspan="5" class="text-center text-muted py-3">No transaction history found.</td>
+                                                            </tr>
+                                                        @endforelse
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-0 pt-0">
+                                            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#restockModal{{ $item->id }}">
+                                                <i class="fas fa-plus me-1"></i> Restock
+                                            </button>
+                                            <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deductModal{{ $item->id }}">
+                                                <i class="fas fa-minus me-1"></i> Deduct
+                                            </button>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                         </div>
                                     </div>
                                 </div>

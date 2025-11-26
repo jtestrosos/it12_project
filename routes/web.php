@@ -205,6 +205,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/appointments/calendar', [PatientController::class, 'getCalendarData'])->name('appointments.calendar');
         Route::get('/appointment/{appointment}', [PatientController::class, 'showAppointment'])->name('appointment.show');
         Route::post('/appointment/{appointment}/cancel', [PatientController::class, 'cancelAppointment'])->name('appointment.cancel');
+        Route::put('/appointment/{appointment}/cancel', [PatientController::class, 'cancelAppointment'])->name('cancel-appointment');
     });
 });
 

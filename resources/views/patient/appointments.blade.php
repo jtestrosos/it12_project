@@ -55,6 +55,9 @@ Patient
         background: #1e2124;
         border-color: #2a2f35;
     }
+    body.bg-dark .appointments-header h5 {
+        color: #e6e6e6 !important;
+    }
     .appointments-body {
         padding: 1.5rem;
     }
@@ -140,10 +143,150 @@ Patient
     body.bg-dark .text-dark {
         color: #e6e6e6 !important;
     }
+    
+    /* Dark Mode Table Styling */
+    body.bg-dark .table-modern {
+        color: #e6e6e6;
+    }
+    body.bg-dark .table-modern td,
+    body.bg-dark .table-modern th {
+        color: #e6e6e6 !important;
+    }
+    body.bg-dark .table-modern .appointment-title {
+        color: #fff !important;
+    }
+    body.bg-dark .table-modern .appointment-subtitle {
+        color: #adb5bd !important;
+    }
+    /* Ultra-specific selectors for table content */
+    body.bg-dark .appointments-card .table-modern tbody td {
+        color: #e6e6e6 !important;
+    }
+    body.bg-dark .appointments-card .table-modern tbody td * {
+        color: inherit !important;
+    }
+    body.bg-dark .appointments-card .table-modern tbody td div {
+        color: #e6e6e6 !important;
+    }
+    body.bg-dark .appointments-card .table-modern tbody td span:not(.badge):not(.status-badge) {
+        color: #e6e6e6 !important;
+    }
+    
+    
+    
+    /* Filter Chips */
+    .filter-chips {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+    .filter-chip {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        border: 2px solid #e9ecef;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    .filter-chip:hover {
+        border-color: #007bff;
+        background: #f0f8ff;
+    }
+    .filter-chip.active {
+        background: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+    body.bg-dark .filter-chip {
+        background: #1e2124;
+        border-color: #2a2f35;
+        color: #e6e6e6 !important;
+    }
+    body.bg-dark .filter-chip:hover {
+        border-color: #007bff;
+        background: #1a3a52;
+        color: #fff !important;
+    }
+    body.bg-dark .filter-chip.active {
+        background: #007bff;
+        border-color: #007bff;
+        color: white !important;
+    }
+    body.bg-dark .filter-chip i {
+        color: inherit;
+    }
+    
+    /* Search Box Enhancement */
+    .search-box {
+        position: relative;
+    }
+    .search-box .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+    .search-box input {
+        padding-left: 2.5rem;
+    }
+    .search-box .clear-search {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+        display: none;
+    }
+    .search-box.has-value .clear-search {
+        display: block;
+    }
 </style>
 @endsection
 
 @section('content')
+    <!-- Filter Chips -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="filter-chips">
+                <button class="filter-chip active" data-filter="all">
+                    <i class="fas fa-list me-1"></i> All
+                </button>
+                <button class="filter-chip" data-filter="pending">
+                    <i class="fas fa-clock me-1"></i> Pending
+                </button>
+                <button class="filter-chip" data-filter="approved">
+                    <i class="fas fa-check-circle me-1"></i> Approved
+                </button>
+                <button class="filter-chip" data-filter="completed">
+                    <i class="fas fa-check-double me-1"></i> Completed
+                </button>
+                <button class="filter-chip" data-filter="cancelled">
+                    <i class="fas fa-times-circle me-1"></i> Cancelled
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Box -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="appointmentSearch" class="form-control" placeholder="Search by appointment ID, service type...">
+                <button class="clear-search" id="clearSearch">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Book Appointment Button -->
     <div class="row mb-4">
         <div class="col-12">
@@ -209,15 +352,16 @@ Patient
                                             <a href="{{ route('patient.appointment.show', $appointment) }}" class="btn btn-sm btn-outline-primary btn-modern me-2">
                                                 <i class="fas fa-eye me-1"></i> View
                                             </a>
-                                            @if($appointment->status == 'pending')
-                                            <form method="POST" action="{{ route('patient.appointment.cancel', $appointment) }}" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-sm btn-outline-danger btn-modern" 
-                                                        onclick="return confirm('Are you sure you want to cancel this appointment?')">
-                                                    <i class="fas fa-times me-1"></i> Cancel
-                                                </button>
-                                            </form>
-                                            @endif
+                                            @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
+                                            <button type="button" class="btn btn-sm btn-danger cancel-appointment-btn" 
+                                                    data-appointment-id="{{ $appointment->id }}"
+                                                    data-cancel-url="{{ route('patient.cancel-appointment', $appointment) }}"
+                                                    data-appointment-date="{{ $appointment->appointment_date }}"
+                                                    data-appointment-time="{{ $appointment->appointment_time }}"
+                                                    data-service-type="{{ $appointment->service_type }}">
+                                                <i class="fas fa-times"></i> Cancel
+                                            </button>
+                                        @endif
                                         </td>
                                     </tr>
                                     @endforeach
@@ -232,6 +376,38 @@ Patient
                             <a href="{{ route('patient.book-appointment') }}" class="btn btn-primary btn-modern">Book Your First Appointment</a>
                         </div>
                     @endif
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cancel Confirmation Modal -->
+    <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>Cancel Appointment
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-3">Are you sure you want to cancel this appointment?</p>
+                    <div id="cancelAppointmentDetails">
+                        <!-- Details will be populated by JavaScript -->
+                    </div>
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <small>This action cannot be undone. You will need to book a new appointment if you change your mind.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Keep Appointment
+                    </button>
+                    <button type="button" id="confirmCancelBtn" class="btn btn-danger">
+                        <i class="fas fa-check me-2"></i>Yes, Cancel It
+                    </button>
                 </div>
             </div>
         </div>
@@ -261,6 +437,187 @@ Patient
             attributes: true,
             attributeFilter: ['class']
         });
+        
+        // Filter functionality
+        const filterChips = document.querySelectorAll('.filter-chip');
+        const appointmentRows = document.querySelectorAll('.table-modern tbody tr');
+        
+        filterChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                // Update active state
+                filterChips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                
+                const filter = chip.dataset.filter;
+                
+                // Filter rows
+                appointmentRows.forEach(row => {
+                    if (filter === 'all') {
+                        row.style.display = '';
+                    } else {
+                        const statusBadge = row.querySelector('.status-badge');
+                        if (statusBadge && statusBadge.textContent.trim().toLowerCase() === filter) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        });
+        
+        // Search functionality
+        const searchInput = document.getElementById('appointmentSearch');
+        const searchBox = searchInput.closest('.search-box');
+        const clearBtn = document.getElementById('clearSearch');
+        
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            // Toggle clear button
+            if (searchTerm) {
+                searchBox.classList.add('has-value');
+            } else {
+                searchBox.classList.remove('has-value');
+            }
+            
+            // Filter rows
+            appointmentRows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+        
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchBox.classList.remove('has-value');
+            appointmentRows.forEach(row => row.style.display = '');
+        });
+        
+        // Toast notifications for actions
+        const cancelBtns = document.querySelectorAll('.cancel-appointment-btn');
+        const cancelModal = new bootstrap.Modal(document.getElementById('cancelModal'));
+        const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+        
+        cancelBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                const appointmentId = btn.dataset.appointmentId;
+                const cancelUrl = btn.dataset.cancelUrl;
+                const appointmentDate = btn.dataset.appointmentDate;
+                const appointmentTime = btn.dataset.appointmentTime;
+                const serviceType = btn.dataset.serviceType;
+                
+                // Populate modal with appointment details
+                const detailsContainer = document.getElementById('cancelAppointmentDetails');
+                detailsContainer.innerHTML = `
+                    <div class="confirmation-detail" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f1f3f4;">
+                        <span style="font-weight: 600; color: #495057;">Date:</span>
+                        <span style="color: #6c757d;">${new Date(appointmentDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    </div>
+                    <div class="confirmation-detail" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f1f3f4;">
+                        <span style="font-weight: 600; color: #495057;">Time:</span>
+                        <span style="color: #6c757d;">${appointmentTime}</span>
+                    </div>
+                    <div class="confirmation-detail" style="display: flex; justify-content: space-between; padding: 0.75rem 0;">
+                        <span style="font-weight: 600; color: #495057;">Service:</span>
+                        <span style="color: #6c757d;">${serviceType}</span>
+                    </div>
+                `;
+                
+                // Store the cancel URL
+                confirmCancelBtn.dataset.cancelUrl = cancelUrl;
+                confirmCancelBtn.dataset.csrfToken = '{{ csrf_token() }}';
+                
+                // Show modal
+                cancelModal.show();
+            });
+        });
+        
+        // Confirm cancel button - use direct event listener without Bootstrap modal interference
+        confirmCancelBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const cancelUrl = confirmCancelBtn.dataset.cancelUrl;
+            const csrfToken = confirmCancelBtn.dataset.csrfToken;
+            
+            console.log('Cancel button clicked, URL:', cancelUrl);
+            
+            if (cancelUrl) {
+                // Hide modal manually
+                const modalElement = document.getElementById('cancelModal');
+                modalElement.classList.remove('show');
+                modalElement.style.display = 'none';
+                modalElement.setAttribute('aria-hidden', 'true');
+                
+                // Remove backdrop
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+                
+                // Remove modal-open class from body
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('padding-right');
+                
+                // Show toast if available
+                if (window.toast && typeof window.toast.info === 'function') {
+                    window.toast.info('Cancelling appointment...', 'Please wait');
+                }
+                
+                // Create form dynamically and submit
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = cancelUrl;
+                form.style.display = 'none';
+                
+                // Add CSRF token
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_token';
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
+                
+                // Add PUT method
+                const methodInput = document.createElement('input');
+                methodInput.type = 'hidden';
+                methodInput.name = '_method';
+                methodInput.value = 'PUT';
+                form.appendChild(methodInput);
+                
+                // Append to body and submit
+                document.body.appendChild(form);
+                console.log('Submitting form to:', form.action);
+                form.submit();
+            } else {
+                console.error('No cancel URL found');
+                if (window.toast && typeof window.toast.error === 'function') {
+                    window.toast.error('Error: Could not cancel appointment', 'Error');
+                } else {
+                    alert('Error: Could not cancel appointment');
+                }
+            }
+        });
+        
+        // Show session messages
+        @if(session('success'))
+            if (window.toast && typeof window.toast.success === 'function') {
+                window.toast.success('{{ session('success') }}');
+            }
+        @endif
+        
+        @if(session('error'))
+            if (window.toast && typeof window.toast.error === 'function') {
+                window.toast.error('{{ session('error') }}');
+            }
+        @endif
     });
 </script>
 @endpush
