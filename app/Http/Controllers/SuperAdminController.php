@@ -22,58 +22,101 @@ class SuperAdminController extends Controller
 {
     public function dashboard()
     {
-        $totalUsers = Patient::count() + Admin::count() + SuperAdmin::count();
-        $totalAppointments = Appointment::count();
-        $pendingAppointments = Appointment::pending()->count();
-        $totalInventory = Inventory::count();
+        // ===== USER MANAGEMENT METRICS =====
+        $totalPatients = Patient::count();
+        $totalAdmins = Admin::count();
+        $totalSuperAdmins = SuperAdmin::count();
+        $totalSystemUsers = $totalPatients + $totalAdmins + $totalSuperAdmins;
 
-        $recentUsers = Patient::latest()->limit(5)->get();
-        $recentAppointments = Appointment::with('user')->latest()->limit(5)->get();
-        $recentLogs = SystemLog::with('user')->latest()->limit(5)->get();
+        // User Growth (last 30 days)
+        $newUsersLast30Days = Patient::where('created_at', '>=', now()->subDays(30))->count();
+        $previousPeriodUsers = Patient::whereBetween('created_at', [now()->subDays(60), now()->subDays(30)])->count();
+        $userGrowthRate = $previousPeriodUsers > 0 ? round((($newUsersLast30Days - $previousPeriodUsers) / $previousPeriodUsers) * 100, 1) : 0;
 
-        // Weekly appointments data for the line chart
+        // ===== SYSTEM HEALTH METRICS =====
+        $recentBackup = Backup::where('status', 'completed')->latest()->first();
+        $lastBackupTime = $recentBackup ? $recentBackup->completed_at->diffForHumans() : 'Never';
+
+        // Low stock items
+        $lowStockItems = Inventory::where('status', 'low_stock')->count();
+        $lowStockList = Inventory::where('status', 'low_stock')->orderBy('current_stock')->limit(5)->get();
+
+        // ===== ADMIN PERFORMANCE TRACKING =====
+        $adminPerformance = Admin::withCount([
+            'approvedAppointments' => function ($query) {
+                $query->whereMonth('created_at', now()->month);
+            }
+        ])->get()->map(function ($admin) {
+            return [
+                'name' => $admin->name,
+                'appointments' => $admin->approved_appointments_count ?? 0
+            ];
+        });
+
+        // ===== USER GROWTH TREND (Last 30 Days) =====
         $driver = DB::getDriverName();
-        $dayOfWeekSql = $driver === 'pgsql' ? 'EXTRACT(DOW FROM created_at) + 1' : 'DAYOFWEEK(created_at)';
+        $dateFormat = $driver === 'pgsql' ? "TO_CHAR(created_at, 'YYYY-MM-DD')" : "DATE(created_at)";
 
-        $weeklyAppointments = Appointment::selectRaw("$dayOfWeekSql as day_of_week, count(*) as count")
-            ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
-            ->groupBy('day_of_week')
+        $userGrowthData = Patient::selectRaw("$dateFormat as date, COUNT(*) as count")
+            ->where('created_at', '>=', now()->subDays(30))
+            ->groupBy('date')
+            ->orderBy('date')
             ->get();
 
-        // Service types data for the bar chart
-        $serviceTypes = Appointment::selectRaw('service_type, count(*) as count')
-            ->whereMonth('created_at', now()->month)
-            ->groupBy('service_type')
-            ->get();
+        // ===== ROLE DISTRIBUTION =====
+        $roleDistribution = [
+            ['role' => 'Patients', 'count' => $totalPatients],
+            ['role' => 'Admins', 'count' => $totalAdmins],
+            ['role' => 'Super Admins', 'count' => $totalSuperAdmins]
+        ];
 
-        // Patients by Barangay data
+        // ===== BARANGAY DISTRIBUTION =====
         $patientsByBarangay = Patient::whereNotNull('barangay')
             ->selectRaw('barangay, count(*) as count')
             ->groupBy('barangay')
             ->get();
 
-        // Today's statistics
-        $todayCompleted = Appointment::where('status', 'completed')
-            ->whereDate('appointment_date', today())
-            ->count();
+        // ===== AGE DEMOGRAPHICS =====
+        $ageGroups = Patient::selectRaw("
+            CASE 
+                WHEN age < 18 THEN '0-17'
+                WHEN age BETWEEN 18 AND 35 THEN '18-35'
+                WHEN age BETWEEN 36 AND 50 THEN '36-50'
+                WHEN age BETWEEN 51 AND 65 THEN '51-65'
+                ELSE '65+'
+            END as age_group,
+            COUNT(*) as count
+        ")
+            ->whereNotNull('age')
+            ->groupBy('age_group')
+            ->get();
 
-        $todayPending = Appointment::where('status', 'pending')
-            ->whereDate('appointment_date', today())
-            ->count();
+        // ===== RECENT SYSTEM ACTIVITY =====
+        $recentLogs = SystemLog::latest()->limit(10)->get();
+
+        // ===== STORAGE INFO (Placeholder) =====
+        $storageUsed = '2.4 GB';
+        $storageTotal = '10 GB';
+        $storagePercentage = 24;
 
         return view('superadmin.dashboard', compact(
-            'totalUsers',
-            'totalAppointments',
-            'pendingAppointments',
-            'totalInventory',
-            'recentUsers',
-            'recentAppointments',
-            'recentLogs',
-            'weeklyAppointments',
-            'serviceTypes',
+            'totalSystemUsers',
+            'totalPatients',
+            'totalAdmins',
+            'totalSuperAdmins',
+            'userGrowthRate',
+            'lastBackupTime',
+            'lowStockItems',
+            'lowStockList',
+            'adminPerformance',
+            'userGrowthData',
+            'roleDistribution',
             'patientsByBarangay',
-            'todayCompleted',
-            'todayPending'
+            'ageGroups',
+            'recentLogs',
+            'storageUsed',
+            'storageTotal',
+            'storagePercentage'
         ));
     }
 
