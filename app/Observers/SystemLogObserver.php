@@ -3,7 +3,9 @@
 namespace App\Observers;
 
 use App\Models\SystemLog;
-use App\Models\User;
+use App\Models\Patient;
+use App\Models\Admin;
+use App\Models\SuperAdmin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
@@ -38,8 +40,24 @@ class SystemLogObserver
             $oldValues = $action === 'created' ? null : $model->getOriginal();
         }
 
+        // Determine the authenticated user from any guard
+        $loggableType = null;
+        $loggableId = null;
+
+        if (Auth::guard('patient')->check()) {
+            $loggableType = Patient::class;
+            $loggableId = Auth::guard('patient')->id();
+        } elseif (Auth::guard('admin')->check()) {
+            $loggableType = Admin::class;
+            $loggableId = Auth::guard('admin')->id();
+        } elseif (Auth::guard('super_admin')->check()) {
+            $loggableType = SuperAdmin::class;
+            $loggableId = Auth::guard('super_admin')->id();
+        }
+
         SystemLog::create([
-            'user_id' => Auth::id(),
+            'loggable_type' => $loggableType,
+            'loggable_id' => $loggableId,
             'action' => $action,
             'table_name' => $model->getTable(),
             'record_id' => $model->getKey(),

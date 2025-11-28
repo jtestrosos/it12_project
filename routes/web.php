@@ -46,9 +46,34 @@ Route::post('/login', function (Request $request) {
         'password' => 'required|string',
     ]);
 
-    $user = \App\Models\User::where('email', $request->input('email'))->first();
+    $credentials = $request->only('email', 'password');
+    $email = $request->input('email');
 
-    if (!$user) {
+    // Try to find user in all three tables
+    $patient = \App\Models\Patient::where('email', $email)->first();
+    $admin = \App\Models\Admin::where('email', $email)->first();
+    $superAdmin = \App\Models\SuperAdmin::where('email', $email)->first();
+
+    // Determine which guard to use
+    $guard = null;
+    $redirectUrl = null;
+    $welcomeMessage = null;
+
+    if ($patient) {
+        $guard = 'patient';
+        $redirectUrl = route('patient.dashboard');
+    } elseif ($admin) {
+        $guard = 'admin';
+        $redirectUrl = route('admin.dashboard');
+        $welcomeMessage = 'Welcome back, ' . $admin->name . '! You have successfully logged in.';
+    } elseif ($superAdmin) {
+        $guard = 'super_admin';
+        $redirectUrl = route('superadmin.dashboard');
+        $welcomeMessage = 'Welcome back, ' . $superAdmin->name . '! You have successfully logged in.';
+    }
+
+    // If no user found in any table
+    if (!$guard) {
         $errors = ['email' => 'Invalid Credentials.'];
 
         if ($request->expectsJson() || $request->ajax()) {
@@ -58,31 +83,22 @@ Route::post('/login', function (Request $request) {
         return back()->withErrors($errors)->withInput($request->only('email'));
     }
 
-    $credentials = $request->only('email', 'password');
-
-    if (Auth::attempt($credentials)) {
+    // Attempt authentication with the appropriate guard
+    if (Auth::guard($guard)->attempt($credentials)) {
         $request->session()->regenerate();
-        $user = Auth::user();
 
-        // Redirect based on user role
-        $redirectUrl = route('patient.dashboard');
-        if ($user->isSuperAdmin()) {
-            $redirectUrl = route('superadmin.dashboard');
-        } elseif ($user->isAdmin()) {
-            $redirectUrl = route('admin.dashboard');
+        if ($welcomeMessage) {
+            session()->flash('announcement', $welcomeMessage);
         }
 
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json(['redirect' => $redirectUrl]);
         }
 
-        if ($user->isAdmin() || $user->isSuperAdmin()) {
-            session()->flash('announcement', 'Welcome back, ' . $user->name . '! You have successfully logged in.');
-        }
-
         return redirect()->to($redirectUrl);
     }
 
+    // Authentication failed
     $errors = ['password' => 'Incorrect password. Please try again.'];
 
     if ($request->expectsJson() || $request->ajax()) {
@@ -93,7 +109,11 @@ Route::post('/login', function (Request $request) {
 });
 
 Route::post('/logout', function (Request $request) {
-    Auth::logout();
+    // Logout from all guards
+    Auth::guard('patient')->logout();
+    Auth::guard('admin')->logout();
+    Auth::guard('super_admin')->logout();
+
     $request->session()->invalidate();
     $request->session()->regenerateToken();
     return redirect('/');
@@ -108,7 +128,7 @@ Route::get('/reset-password', [App\Http\Controllers\Auth\ForgotPasswordControlle
 Route::post('/reset-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'resetPassword'])->name('password.update');
 
 // Profile Routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth.multi'])->group(function () {
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 });
@@ -122,7 +142,7 @@ Route::post('/register', function (Request $request) {
             'max:255',
             'regex:/^[a-zA-Z\s\.\-\']+$/',
         ],
-        'email' => 'required|email|unique:users,email',
+        'email' => 'required|email|unique:patients,email',
         'gender' => 'required|in:male,female,other',
         'phone' => [
             'nullable',
@@ -137,11 +157,11 @@ Route::post('/register', function (Request $request) {
             'nullable',
             'string',
             'max:255',
-            Rule::requiredIf(fn () => $request->barangay === 'Other'),
+            Rule::requiredIf(fn() => $request->barangay === 'Other'),
         ],
         'purok' => [
             'nullable',
-            Rule::requiredIf(fn () => in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
+            Rule::requiredIf(fn() => in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
             Rule::when(
                 $request->barangay === 'Barangay 11',
                 Rule::in(['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'])
@@ -178,7 +198,7 @@ Route::post('/register', function (Request $request) {
 
     $age = Carbon::parse($validated['birth_date'])->age;
 
-    $user = \App\Models\User::create([
+    $patient = \App\Models\Patient::create([
         'name' => $validated['name'],
         'email' => $validated['email'],
         'gender' => $validated['gender'],
@@ -190,15 +210,14 @@ Route::post('/register', function (Request $request) {
         'birth_date' => $validated['birth_date'],
         'age' => $age,
         'password' => bcrypt($validated['password']),
-        'role' => 'user' // Default role for new registrations
     ]);
 
-    Auth::login($user);
+    Auth::guard('patient')->login($patient);
     return redirect()->route('patient.dashboard');
 });
 
 // Patient Routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['patient'])->group(function () {
     Route::prefix('patient')->name('patient.')->group(function () {
         Route::get('/dashboard', [PatientController::class, 'dashboard'])->name('dashboard');
         Route::get('/appointments', [PatientController::class, 'appointments'])->name('appointments');
@@ -213,60 +232,60 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Admin Routes
-Route::middleware(['auth', 'role:admin'])->group(function () {
-        Route::prefix('admin')->name('admin.')->group(function () {
-            Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-            Route::get('/patients', [AdminController::class, 'patients'])->name('patients');
-            Route::post('/patient/create', [AdminController::class, 'createPatient'])->name('patient.create');
-            Route::put('/patient/{user}/update', [AdminController::class, 'updatePatient'])->name('patient.update');
-            Route::post('/patient/{user}/archive', [AdminController::class, 'archivePatient'])->name('patient.archive');
-            Route::get('/patients/archive', [AdminController::class, 'archivedPatients'])->name('patients.archive');
-            Route::post('/patient/{id}/restore', [AdminController::class, 'restorePatient'])->name('patient.restore');
-            Route::delete('/patient/{id}/force-delete', [AdminController::class, 'forceDeletePatient'])->name('patient.force-delete');
-            Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
-            Route::post('/appointment/create', [AdminController::class, 'createAppointment'])->name('appointment.create');
-            Route::post('/appointment/{appointment}/update', [AdminController::class, 'updateAppointmentStatus'])->name('appointment.update');
-            Route::get('/appointments/slots', [AdminController::class, 'getAvailableSlots'])->name('appointments.slots');
-            Route::get('/appointments/calendar', [AdminController::class, 'getCalendarData'])->name('appointments.calendar');
-            Route::get('/inventory', [AdminController::class, 'inventory'])->name('inventory');
-            Route::post('/inventory/add', [AdminController::class, 'addInventory'])->name('inventory.add');
-            Route::post('/inventory/{inventory}/update', [AdminController::class, 'updateInventory'])->name('inventory.update');
-            Route::post('/inventory/{inventory}/restock', [AdminController::class, 'restockInventory'])->name('inventory.restock');
-            Route::post('/inventory/{inventory}/deduct', [AdminController::class, 'deductInventory'])->name('inventory.deduct');
-            Route::post('/walk-in', [AdminController::class, 'addWalkIn'])->name('walk-in');
-            Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
-            Route::get('/reports/analytics', [AdminController::class, 'analytics'])->name('reports.analytics');
-            Route::get('/reports/patients', [AdminController::class, 'patientReports'])->name('reports.patients');
-            Route::get('/reports/inventory', [AdminController::class, 'inventoryReports'])->name('reports.inventory');
-            Route::get('/reports/export/appointments', [AdminController::class, 'exportAppointmentsExcel'])->name('reports.export.appointments');
-            Route::get('/reports/export/appointments/pdf', [AdminController::class, 'exportAppointmentsPdf'])->name('reports.export.appointments.pdf');
-            Route::get('/reports/export/patients', [AdminController::class, 'exportPatientsExcel'])->name('reports.export.patients');
-            Route::get('/reports/export/patients/pdf', [AdminController::class, 'exportPatientsPdf'])->name('reports.export.patients.pdf');
-            Route::get('/reports/export/inventory', [AdminController::class, 'exportInventoryExcel'])->name('reports.export.inventory');
-            Route::get('/reports/export/inventory/pdf', [AdminController::class, 'exportInventoryPdf'])->name('reports.export.inventory.pdf');
+Route::middleware(['admin'])->group(function () {
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+        Route::get('/patients', [AdminController::class, 'patients'])->name('patients');
+        Route::post('/patient/create', [AdminController::class, 'createPatient'])->name('patient.create');
+        Route::put('/patient/{patient}/update', [AdminController::class, 'updatePatient'])->name('patient.update');
+        Route::post('/patient/{patient}/archive', [AdminController::class, 'archivePatient'])->name('patient.archive');
+        Route::get('/patients/archive', [AdminController::class, 'archivedPatients'])->name('patients.archive');
+        Route::post('/patient/{id}/restore', [AdminController::class, 'restorePatient'])->name('patient.restore');
+        Route::delete('/patient/{id}/force-delete', [AdminController::class, 'forceDeletePatient'])->name('patient.force-delete');
+        Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
+        Route::post('/appointment/create', [AdminController::class, 'createAppointment'])->name('appointment.create');
+        Route::post('/appointment/{appointment}/update', [AdminController::class, 'updateAppointmentStatus'])->name('appointment.update');
+        Route::get('/appointments/slots', [AdminController::class, 'getAvailableSlots'])->name('appointments.slots');
+        Route::get('/appointments/calendar', [AdminController::class, 'getCalendarData'])->name('appointments.calendar');
+        Route::get('/inventory', [AdminController::class, 'inventory'])->name('inventory');
+        Route::post('/inventory/add', [AdminController::class, 'addInventory'])->name('inventory.add');
+        Route::post('/inventory/{inventory}/update', [AdminController::class, 'updateInventory'])->name('inventory.update');
+        Route::post('/inventory/{inventory}/restock', [AdminController::class, 'restockInventory'])->name('inventory.restock');
+        Route::post('/inventory/{inventory}/deduct', [AdminController::class, 'deductInventory'])->name('inventory.deduct');
+        Route::post('/walk-in', [AdminController::class, 'addWalkIn'])->name('walk-in');
+        Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
+        Route::get('/reports/analytics', [AdminController::class, 'analytics'])->name('reports.analytics');
+        Route::get('/reports/patients', [AdminController::class, 'patientReports'])->name('reports.patients');
+        Route::get('/reports/inventory', [AdminController::class, 'inventoryReports'])->name('reports.inventory');
+        Route::get('/reports/export/appointments', [AdminController::class, 'exportAppointmentsExcel'])->name('reports.export.appointments');
+        Route::get('/reports/export/appointments/pdf', [AdminController::class, 'exportAppointmentsPdf'])->name('reports.export.appointments.pdf');
+        Route::get('/reports/export/patients', [AdminController::class, 'exportPatientsExcel'])->name('reports.export.patients');
+        Route::get('/reports/export/patients/pdf', [AdminController::class, 'exportPatientsPdf'])->name('reports.export.patients.pdf');
+        Route::get('/reports/export/inventory', [AdminController::class, 'exportInventoryExcel'])->name('reports.export.inventory');
+        Route::get('/reports/export/inventory/pdf', [AdminController::class, 'exportInventoryPdf'])->name('reports.export.inventory.pdf');
 
 
-            // Services Management
-            Route::get('/services', [AdminController::class, 'services'])->name('services.index');
-            Route::get('/services/create', [AdminController::class, 'createService'])->name('services.create');
-            Route::post('/services', [AdminController::class, 'storeService'])->name('services.store');
-            Route::get('/services/{service}/edit', [AdminController::class, 'editService'])->name('services.edit');
-            Route::put('/services/{service}', [AdminController::class, 'updateService'])->name('services.update');
-            Route::delete('/services/{service}', [AdminController::class, 'deleteService'])->name('services.destroy');
-        });
+        // Services Management
+        Route::get('/services', [AdminController::class, 'services'])->name('services.index');
+        Route::get('/services/create', [AdminController::class, 'createService'])->name('services.create');
+        Route::post('/services', [AdminController::class, 'storeService'])->name('services.store');
+        Route::get('/services/{service}/edit', [AdminController::class, 'editService'])->name('services.edit');
+        Route::put('/services/{service}', [AdminController::class, 'updateService'])->name('services.update');
+        Route::delete('/services/{service}', [AdminController::class, 'deleteService'])->name('services.destroy');
+    });
 });
 
 // Super Admin Routes
-Route::middleware(['auth', 'role:superadmin'])->group(function () {
+Route::middleware(['super_admin'])->group(function () {
     Route::prefix('superadmin')->name('superadmin.')->group(function () {
         Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
         Route::get('/users', [SuperAdminController::class, 'users'])->name('users');
         Route::get('/users/archive', [SuperAdminController::class, 'archivedUsers'])->name('users.archive');
         Route::post('/user/create', [SuperAdminController::class, 'createUser'])->name('user.create');
-        Route::post('/user/{user}/update', [SuperAdminController::class, 'updateUser'])->name('user.update');
-        Route::post('/user/{user}/delete', [SuperAdminController::class, 'deleteUser'])->name('user.delete');
-        Route::post('/user/{id}/restore', [SuperAdminController::class, 'restoreUser'])->name('user.restore');
-        Route::delete('/user/{id}/force-delete', [SuperAdminController::class, 'forceDeleteUser'])->name('user.force-delete');
+        Route::post('/user/{type}/{id}/update', [SuperAdminController::class, 'updateUser'])->name('user.update');
+        Route::post('/user/{type}/{id}/delete', [SuperAdminController::class, 'deleteUser'])->name('user.delete');
+        Route::post('/user/{type}/{id}/restore', [SuperAdminController::class, 'restoreUser'])->name('user.restore');
+        Route::delete('/user/{type}/{id}/force-delete', [SuperAdminController::class, 'forceDeleteUser'])->name('user.force-delete');
         Route::get('/system-logs', [SuperAdminController::class, 'systemLogs'])->name('system-logs');
         Route::get('/audit-trail', [SuperAdminController::class, 'auditTrail'])->name('audit-trail');
         Route::get('/analytics', [SuperAdminController::class, 'analytics'])->name('analytics');
@@ -277,3 +296,4 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
         Route::delete('/backup/{backup}/delete', [SuperAdminController::class, 'deleteBackup'])->name('backup.delete');
     });
 });
+

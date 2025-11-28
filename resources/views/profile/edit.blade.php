@@ -4,7 +4,7 @@
 @section('page-title', 'My Profile')
 
 @section('sidebar-menu')
-    @if(Auth::user()->isSuperAdmin())
+    @if(\App\Helpers\AuthHelper::user()->isSuperAdmin())
         <a class="nav-link" href="{{ route('superadmin.dashboard') }}" data-tooltip="Dashboard">
             <i class="fas fa-th-large"></i> <span class="sidebar-content">Dashboard</span>
         </a>
@@ -20,7 +20,7 @@
         <a class="nav-link" href="{{ route('superadmin.backup') }}" data-tooltip="Backup">
             <i class="fas fa-download"></i> <span class="sidebar-content">Backup</span>
         </a>
-    @elseif(Auth::user()->isAdmin())
+    @elseif(\App\Helpers\AuthHelper::user()->isAdmin())
         <a class="nav-link" href="{{ route('admin.dashboard') }}" data-tooltip="Dashboard">
             <i class="fas fa-th-large"></i> <span class="sidebar-content">Dashboard</span>
         </a>
@@ -50,128 +50,128 @@
 @endsection
 
 @section('user-initials')
-    @if(Auth::user()->isSuperAdmin())
+    @if(\App\Helpers\AuthHelper::user()->isSuperAdmin())
         SA
     @else
-        {{ substr(Auth::user()->name, 0, 2) }}
+        {{ substr(\App\Helpers\AuthHelper::user()->name, 0, 2) }}
     @endif
 @endsection
 
 @section('user-name')
-    @if(Auth::user()->isSuperAdmin())
+    @if(\App\Helpers\AuthHelper::user()->isSuperAdmin())
         Super Admin
     @else
-        {{ Auth::user()->name }}
+        {{ \App\Helpers\AuthHelper::user()->name }}
     @endif
 @endsection
 
 @section('user-role')
-    @if(Auth::user()->isSuperAdmin())
+    @if(\App\Helpers\AuthHelper::user()->isSuperAdmin())
         Administrator
-    @elseif(Auth::user()->isAdmin())
-        {{ ucfirst(Auth::user()->role) }}
+    @elseif(\App\Helpers\AuthHelper::user()->isAdmin())
+        {{ ucfirst(\App\Helpers\AuthHelper::user()->role) }}
     @else
         Patient
     @endif
 @endsection
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <x-card class="shadow-sm border-0" noPadding>
-            <div class="card-body p-4">
-                @if (session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-
-                <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
-                    @csrf
-
-                    <div class="text-center mb-4">
-                        <div class="position-relative d-inline-block">
-                            @if($user->profile_picture)
-                                <img src="{{ asset('storage/' . $user->profile_picture) }}" alt="Profile Picture" class="rounded-circle object-fit-cover" style="width: 120px; height: 120px; border: 3px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                            @else
-                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto" style="width: 120px; height: 120px; font-size: 3rem; border: 3px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                                    {{ substr($user->name, 0, 1) }}
-                                </div>
-                            @endif
-                            <label for="profile_picture" class="position-absolute bottom-0 end-0 bg-white rounded-circle shadow-sm p-2" style="cursor: pointer;">
-                                <i class="fas fa-camera text-primary"></i>
-                                <input type="file" name="profile_picture" id="profile_picture" class="d-none" accept="image/*" onchange="this.form.submit()">
-                            </label>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <x-card class="shadow-sm border-0" noPadding>
+                <div class="card-body p-4">
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
-                        <h4 class="mt-3 mb-1">{{ $user->name }}</h4>
-                        <p class="text-muted">{{ ucfirst($user->role) }}</p>
-                    </div>
+                    @endif
 
-                    <hr class="my-4">
+                    <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
+                        @csrf
 
-                    <h5 class="mb-3">Personal Information</h5>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <x-input name="name" label="Full Name" required value="{{ old('name', $user->name) }}" />
+                        <div class="text-center mb-4">
+                            <div class="position-relative d-inline-block">
+                                @if($user->profile_picture)
+                                    <img src="{{ asset('storage/' . $user->profile_picture) }}" alt="Profile Picture"
+                                        class="rounded-circle object-fit-cover"
+                                        style="width: 120px; height: 120px; border: 3px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                @else
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto"
+                                        style="width: 120px; height: 120px; font-size: 3rem; border: 3px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                        {{ substr($user->name, 0, 1) }}
+                                    </div>
+                                @endif
+                                <label for="profile_picture"
+                                    class="position-absolute bottom-0 end-0 bg-white rounded-circle shadow-sm p-2"
+                                    style="cursor: pointer;">
+                                    <i class="fas fa-camera text-primary"></i>
+                                    <input type="file" name="profile_picture" id="profile_picture" class="d-none"
+                                        accept="image/*" onchange="this.form.submit()">
+                                </label>
+                            </div>
+                            <h4 class="mt-3 mb-1">{{ $user->name }}</h4>
+                            <p class="text-muted">{{ ucfirst($user->role) }}</p>
                         </div>
-                        <div class="col-md-6">
-                            <x-input name="email" label="Email Address" type="email" required value="{{ old('email', $user->email) }}" />
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3">Personal Information</h5>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <x-input name="name" label="Full Name" required value="{{ old('name', $user->name) }}" />
+                            </div>
+                            <div class="col-md-6">
+                                <x-input name="email" label="Email Address" type="email" required
+                                    value="{{ old('email', $user->email) }}" />
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <x-input name="phone" label="Phone Number" type="tel" placeholder="09123456789" value="{{ old('phone', $user->phone) }}" />
+                        <div class="row">
+                            <div class="col-md-6">
+                                <x-input name="phone" label="Phone Number" type="tel" placeholder="09123456789"
+                                    value="{{ old('phone', $user->phone) }}" />
+                            </div>
+                            <div class="col-md-6">
+                                <x-input name="date_of_birth" label="Date of Birth" type="date"
+                                    value="{{ old('date_of_birth', $user->date_of_birth) }}" />
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <x-input name="date_of_birth" label="Date of Birth" type="date" value="{{ old('date_of_birth', $user->date_of_birth) }}" />
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label fw-medium">Address</label>
+                            <textarea name="address" id="address" rows="3"
+                                class="form-control @error('address') is-invalid @enderror"
+                                placeholder="Enter your full address">{{ old('address', $user->address) }}</textarea>
+                            @error('address')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <label for="address" class="form-label fw-medium">Address</label>
-                        <textarea name="address" id="address" rows="3" class="form-control @error('address') is-invalid @enderror" placeholder="Enter your full address">{{ old('address', $user->address) }}</textarea>
-                        @error('address')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+                        <hr class="my-4">
 
-                    <hr class="my-4">
+                        <h5 class="mb-3">Change Password</h5>
+                        <p class="text-muted small mb-3">Leave the password fields blank if you don't want to change your
+                            password.</p>
 
-                    <h5 class="mb-3">Change Password</h5>
-                    <p class="text-muted small mb-3">Leave the password fields blank if you don't want to change your password.</p>
-                    
-                    <x-input 
-                        name="current_password" 
-                        label="Current Password" 
-                        type="password" 
-                        helper="Required if you want to change your password." 
-                    />
+                        <x-input name="current_password" label="Current Password" type="password"
+                            helper="Required if you want to change your password." />
 
-                    <x-input 
-                        name="password" 
-                        label="New Password" 
-                        type="password" 
-                        helper="Must be at least 8 characters long." 
-                    />
+                        <x-input name="password" label="New Password" type="password"
+                            helper="Must be at least 8 characters long." />
 
-                    <x-input 
-                        name="password_confirmation" 
-                        label="Confirm New Password" 
-                        type="password" 
-                    />
+                        <x-input name="password_confirmation" label="Confirm New Password" type="password" />
 
-                    <div class="d-grid gap-2">
-                        <x-button type="submit" variant="primary" icon="fas fa-save">Save Changes</x-button>
-                        <a href="{{ url()->previous() }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-times me-2"></i>Cancel
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </x-card>
+                        <div class="d-grid gap-2">
+                            <x-button type="submit" variant="primary" icon="fas fa-save">Save Changes</x-button>
+                            <a href="{{ url()->previous() }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </x-card>
+        </div>
     </div>
-</div>
 @endsection

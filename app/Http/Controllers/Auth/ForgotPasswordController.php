@@ -7,10 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use App\Models\User;
+use App\Models\Patient;
+use App\Models\Admin;
+use App\Models\SuperAdmin;
 use App\Mail\OtpMail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class ForgotPasswordController extends Controller
 {
@@ -19,9 +22,34 @@ class ForgotPasswordController extends Controller
         return view('auth.passwords.email');
     }
 
+    private function findUserByEmail($email)
+    {
+        $patient = Patient::where('email', $email)->first();
+        if ($patient)
+            return $patient;
+
+        $admin = Admin::where('email', $email)->first();
+        if ($admin)
+            return $admin;
+
+        $superAdmin = SuperAdmin::where('email', $email)->first();
+        if ($superAdmin)
+            return $superAdmin;
+
+        return null;
+    }
+
     public function sendOtp(Request $request)
     {
-        $request->validate(['email' => 'required|email|exists:users,email']);
+        $request->validate(['email' => 'required|email']);
+
+        $user = $this->findUserByEmail($request->email);
+
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'email' => ['We can\'t find a user with that email address.'],
+            ]);
+        }
 
         $otp = rand(100000, 999999);
         $email = $request->email;
@@ -49,9 +77,16 @@ class ForgotPasswordController extends Controller
     public function verifyOtp(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:users,email',
+            'email' => 'required|email',
             'otp' => 'required|numeric',
         ]);
+
+        $user = $this->findUserByEmail($request->email);
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'email' => ['We can\'t find a user with that email address.'],
+            ]);
+        }
 
         $record = DB::table('otps')->where('email', $request->email)->first();
 
@@ -74,7 +109,7 @@ class ForgotPasswordController extends Controller
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:users,email',
+            'email' => 'required|email',
             'otp' => 'required|numeric',
             'password' => [
                 'required',
@@ -90,10 +125,15 @@ class ForgotPasswordController extends Controller
         $record = DB::table('otps')->where('email', $request->email)->first();
 
         if (!$record || $record->otp != $request->otp || Carbon::parse($record->expires_at)->isPast()) {
-             return redirect()->route('password.request')->withErrors(['email' => 'Invalid or expired OTP session. Please try again.']);
+            return redirect()->route('password.request')->withErrors(['email' => 'Invalid or expired OTP session. Please try again.']);
         }
 
-        $user = User::where('email', $request->email)->first();
+        $user = $this->findUserByEmail($request->email);
+
+        if (!$user) {
+            return redirect()->route('password.request')->withErrors(['email' => 'User not found.']);
+        }
+
         $user->password = Hash::make($request->password);
         $user->save();
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,9 +16,19 @@
     <script src="https://unpkg.com/nprogress@0.2.0/nprogress.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/nprogress@0.2.0/nprogress.css" />
     <style>
-        #nprogress .bar { background: #0d6efd !important; height: 3px !important; }
-        #nprogress .peg { box-shadow: 0 0 10px #0d6efd, 0 0 5px #0d6efd !important; }
-        #nprogress .spinner-icon { border-top-color: #0d6efd !important; border-left-color: #0d6efd !important; }
+        #nprogress .bar {
+            background: #0d6efd !important;
+            height: 3px !important;
+        }
+
+        #nprogress .peg {
+            box-shadow: 0 0 10px #0d6efd, 0 0 5px #0d6efd !important;
+        }
+
+        #nprogress .spinner-icon {
+            border-top-color: #0d6efd !important;
+            border-left-color: #0d6efd !important;
+        }
     </style>
 
 
@@ -51,12 +62,17 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             transition: background-color .3s, color .3s;
         }
-        body.bg-dark { background-color: var(--bg-dark); color: var(--text-dark); }
+
+        body.bg-dark {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
 
         /* ---------- Sidebar ---------- */
         .sidebar {
             position: fixed;
-            top: 0; left: 0;
+            top: 0;
+            left: 0;
             width: var(--sidebar-width);
             height: 100vh;
             background: var(--sidebar-bg-light);
@@ -64,10 +80,13 @@
             z-index: 1000;
             transition: width var(--transition), transform var(--transition);
             overflow: hidden;
-            box-shadow: 2px 0 8px rgba(0,0,0,.05);
+            box-shadow: 2px 0 8px rgba(0, 0, 0, .05);
             contain: layout style;
         }
-        .sidebar.collapsed { width: var(--sidebar-collapsed); }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
 
         .sidebar-header {
             position: relative;
@@ -99,10 +118,12 @@
             box-shadow: none !important;
             transition: background 0.15s ease, color 0.15s ease;
         }
+
         .burger-menu-btn:hover {
             background: #f2f2f2;
             color: var(--primary);
         }
+
         .burger-menu-btn:active {
             background: #e0e0e0 !important;
             transform: none !important;
@@ -161,9 +182,11 @@
             color: var(--primary) !important;
             font-weight: 500;
         }
+
         .sidebar .nav-link.active i {
             color: var(--primary);
         }
+
         .sidebar .nav-link.active::before {
             content: '';
             position: absolute;
@@ -187,6 +210,7 @@
             padding: 0 10px;
             justify-content: flex-start;
         }
+
         .sidebar.collapsed .nav-link span {
             opacity: 0;
             pointer-events: none;
@@ -194,12 +218,20 @@
             overflow: hidden;
             margin: 0;
         }
+
         .sidebar.collapsed .nav-link:hover::after {
             content: attr(data-tooltip);
-            position: absolute; left: 100%; margin-left: 12px;
-            background: rgba(0,0,0,.8); color: #fff; padding: 8px 12px;
-            border-radius: 4px; font-size: 12px; white-space: nowrap;
-            z-index: 1001; pointer-events: none;
+            position: absolute;
+            left: 100%;
+            margin-left: 12px;
+            background: rgba(0, 0, 0, .8);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1001;
+            pointer-events: none;
         }
 
         .close-sidebar-btn {
@@ -211,23 +243,42 @@
             height: 44px;
             z-index: 1001;
         }
+
         @media (max-width: 991px) {
-            .close-sidebar-btn { display: flex; }
-            .burger-menu-btn:not(.close-sidebar-btn) { display: none; }
+            .close-sidebar-btn {
+                display: flex;
+            }
+
+            .burger-menu-btn:not(.close-sidebar-btn) {
+                display: none;
+            }
         }
 
         /* ---------- Header ---------- */
         .header {
-            position: sticky; top: 0; z-index: 100;
+            position: sticky;
+            top: 0;
+            z-index: 100;
             background: var(--header-bg-light);
             border-bottom: 1px solid var(--border-color);
             min-height: var(--header-height);
             padding: 1rem 2rem;
-            display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 1px 2px rgba(0,0,0,.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
         }
-        .header h4 { font-size: 1.25rem; font-weight: 500; margin: 0; }
-        .header .text-muted { font-size: .875rem; margin: 0; }
+
+        .header h4 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .header .text-muted {
+            font-size: .875rem;
+            margin: 0;
+        }
 
         /* ---------- Main Content ---------- */
         .main-content {
@@ -236,12 +287,17 @@
             background: #f9f9f9;
             transition: margin-left var(--transition);
         }
-        .main-content.sidebar-closed { margin-left: var(--sidebar-collapsed); }
+
+        .main-content.sidebar-closed {
+            margin-left: var(--sidebar-collapsed);
+        }
 
         /* ---------- Cards ---------- */
         .card-surface {
-            background: var(--card-bg-light); border-radius: 12px;
-            padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,.15);
+            background: var(--card-bg-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
             transition: transform .2s ease;
         }
 
@@ -249,25 +305,48 @@
         #feedbackModal .modal-content.card-surface {
             padding: 0;
         }
-        .card-surface:hover { transform: translateY(-2px); }
-        .filter-card { padding: 1rem; margin-bottom: 1rem; }
-        .chart-container { padding: 1.75rem 1.5rem 1.5rem; margin-bottom: 1.5rem; }
 
-        .btn { border-radius: 8px; font-weight: 600; }
-        .btn i { margin-right: .35rem; }
-        .btn-sm { padding: .375rem .75rem; font-size: .875rem; }
+        .card-surface:hover {
+            transform: translateY(-2px);
+        }
+
+        .filter-card {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .chart-container {
+            padding: 1.75rem 1.5rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .btn i {
+            margin-right: .35rem;
+        }
+
+        .btn-sm {
+            padding: .375rem .75rem;
+            font-size: .875rem;
+        }
 
         /* ---------- Dark Mode – General ---------- */
-        body.bg-dark .sidebar { 
-            background: var(--sidebar-bg-dark); 
-            border-color: var(--border-dark); 
+        body.bg-dark .sidebar {
+            background: var(--sidebar-bg-dark);
+            border-color: var(--border-dark);
         }
-        body.bg-dark .header { 
-            background: var(--header-bg-dark); 
-            border-color: var(--border-dark); 
+
+        body.bg-dark .header {
+            background: var(--header-bg-dark);
+            border-color: var(--border-dark);
         }
-        body.bg-dark .main-content { 
-            background: var(--bg-dark); 
+
+        body.bg-dark .main-content {
+            background: var(--bg-dark);
         }
 
         body.bg-dark .card-surface,
@@ -277,7 +356,7 @@
             background: var(--card-bg-dark);
             color: var(--text-dark);
             border-color: var(--border-dark);
-            box-shadow: 0 2px 8px rgba(0,0,0,.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
         }
 
         body.bg-dark .form-control,
@@ -286,18 +365,30 @@
             color: #e6e6e6;
             border-color: var(--border-dark);
         }
-        body.bg-dark .form-control::placeholder { color: #9aa4ad; }
-        body.bg-dark .text-muted { color: #b0b0b0 !important; }
 
-        body.bg-dark .burger-menu-btn { color: #cbd3da; }
-        body.bg-dark .burger-menu-btn:hover { 
-            background: #303030; 
-            color: var(--primary-light); 
+        body.bg-dark .form-control::placeholder {
+            color: #9aa4ad;
         }
 
-        body.bg-dark .sidebar .nav-link { color: #f1f1f1; }
-        body.bg-dark .sidebar .nav-link:hover { 
-            background: rgba(13, 110, 253, 0.15); 
+        body.bg-dark .text-muted {
+            color: #b0b0b0 !important;
+        }
+
+        body.bg-dark .burger-menu-btn {
+            color: #cbd3da;
+        }
+
+        body.bg-dark .burger-menu-btn:hover {
+            background: #303030;
+            color: var(--primary-light);
+        }
+
+        body.bg-dark .sidebar .nav-link {
+            color: #f1f1f1;
+        }
+
+        body.bg-dark .sidebar .nav-link:hover {
+            background: rgba(13, 110, 253, 0.15);
         }
 
         /* Dark Mode Active State */
@@ -305,9 +396,11 @@
             background: rgba(13, 110, 253, 0.2);
             color: var(--primary-light) !important;
         }
+
         body.bg-dark .sidebar .nav-link.active i {
             color: var(--primary-light);
         }
+
         body.bg-dark .sidebar .nav-link.active::before {
             background: var(--primary-light);
         }
@@ -321,18 +414,22 @@
             color: #d6d6d6;
             border-color: var(--border-dark);
         }
+
         body.bg-dark .table thead th {
             background: #1a1f24 !important;
             color: #e6e6e6;
             border-color: var(--border-dark);
         }
+
         body.bg-dark .table tbody td {
             border-color: var(--border-dark);
         }
-        body.bg-dark .table-striped > tbody > tr:nth-of-type(odd) > * {
+
+        body.bg-dark .table-striped>tbody>tr:nth-of-type(odd)>* {
             --bs-table-accent-bg: var(--bs-table-striped-bg);
         }
-        body.bg-dark .table-hover > tbody > tr:hover > * {
+
+        body.bg-dark .table-hover>tbody>tr:hover>* {
             --bs-table-accent-bg: var(--bs-table-hover-bg);
         }
 
@@ -351,7 +448,7 @@
             padding: 0;
         }
 
-        .sidebar-dropdown > .nav-link {
+        .sidebar-dropdown>.nav-link {
             position: relative;
         }
 
@@ -446,23 +543,44 @@
 
         /* ---------- Responsive ---------- */
         @media (max-width: 991px) {
-            .sidebar { 
-                transform: translateX(-100%); 
-                width: var(--sidebar-width); 
+            .sidebar {
+                transform: translateX(-100%);
+                width: var(--sidebar-width);
             }
-            .sidebar.show { transform: translateX(0); }
-            .main-content { margin-left: 0 !important; }
-            .header { padding: 1rem; }
-            .header h4 { font-size: 1.1rem; }
-            .header .text-muted { font-size: .85rem; }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+            }
+
+            .header {
+                padding: 1rem;
+            }
+
+            .header h4 {
+                font-size: 1.1rem;
+            }
+
+            .header .text-muted {
+                font-size: .85rem;
+            }
         }
+
         @media (max-width: 576px) {
-            .header img { width: 32px !important; height: 32px !important; margin-right: 8px !important; }
+            .header img {
+                width: 32px !important;
+                height: 32px !important;
+                margin-right: 8px !important;
+            }
         }
 
         @yield('page-styles')
     </style>
 </head>
+
 <body>
     <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -489,7 +607,7 @@
         <header class="header">
             <div class="d-flex align-items-center">
                 <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo"
-                     style="width:40px;height:40px;margin-right:12px;">
+                    style="width:40px;height:40px;margin-right:12px;">
                 <div>
                     <h4 class="mb-0">@yield('page-title', 'Dashboard')</h4>
                     <p class="text-muted mb-0">@yield('page-description', 'Welcome!')</p>
@@ -498,26 +616,31 @@
 
             <div class="d-flex align-items-center gap-3">
                 <button class="btn btn-link text-muted" title="Notifications"><i class="fas fa-bell"></i></button>
-                <button class="btn btn-link text-muted" id="themeToggle" title="Toggle theme"><i class="fas fa-moon"></i></button>
+                <button class="btn btn-link text-muted" id="themeToggle" title="Toggle theme"><i
+                        class="fas fa-moon"></i></button>
 
                 <div class="dropdown">
-                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
+                        id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
-                             style="width:40px;height:40px; overflow: hidden;">
-                            @if(Auth::user()->profile_picture)
-                                <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                            style="width:40px;height:40px; overflow: hidden;">
+                            @if(\App\Helpers\AuthHelper::user()->profile_picture)
+                                <img src="{{ asset('storage/' . \App\Helpers\AuthHelper::user()->profile_picture) }}"
+                                    alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
                             @else
-                                {{ substr(Auth::user()->name, 0, 1) }}
+                                {{ substr(\App\Helpers\AuthHelper::user()->name, 0, 1) }}
                             @endif
                         </div>
-                        <div class="fw-bold me-2">{{ Auth::user()->name }}</div>
+                        <div class="fw-bold me-2">{{ \App\Helpers\AuthHelper::user()->name }}</div>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="dropdownUser1">
                         <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
                         <li>
                             <a class="dropdown-item" href="{{ route('logout') }}"
-                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                 Logout
                             </a>
                         </li>
@@ -536,34 +659,34 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @if(session('success') || session('status') || session('error') || session('warning') || session('info'))
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            });
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
 
-            @if(session('success') || session('status'))
-                Toast.fire({ icon: 'success', title: "{{ session('success') ?? session('status') }}" });
-            @endif
-            @if(session('error'))
-                Toast.fire({ icon: 'error', title: "{{ session('error') }}" });
-            @endif
-            @if(session('warning'))
-                Toast.fire({ icon: 'warning', title: "{{ session('warning') }}" });
-            @endif
-            @if(session('info'))
-                Toast.fire({ icon: 'info', title: "{{ session('info') }}" });
-            @endif
-        });
-    </script>
+                @if(session('success') || session('status'))
+                    Toast.fire({ icon: 'success', title: "{{ session('success') ?? session('status') }}" });
+                @endif
+                @if(session('error'))
+                    Toast.fire({ icon: 'error', title: "{{ session('error') }}" });
+                @endif
+                @if(session('warning'))
+                    Toast.fire({ icon: 'warning', title: "{{ session('warning') }}" });
+                @endif
+                @if(session('info'))
+                    Toast.fire({ icon: 'info', title: "{{ session('info') }}" });
+                @endif
+            });
+        </script>
     @endif
 
     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
@@ -572,14 +695,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const sidebar      = document.getElementById('sidebar');
-            const mainContent  = document.getElementById('mainContent');
-            const toggleBtn    = document.getElementById('toggleSidebarBtn');
-            const closeBtn     = document.getElementById('closeSidebarBtn');
-            const overlay      = document.getElementById('sidebarOverlay');
-            const themeToggle  = document.getElementById('themeToggle');
-            const sidebarKey   = 'sidebar-collapsed';
-            const themeKey     = 'app-theme';
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const toggleBtn = document.getElementById('toggleSidebarBtn');
+            const closeBtn = document.getElementById('closeSidebarBtn');
+            const overlay = document.getElementById('sidebarOverlay');
+            const themeToggle = document.getElementById('themeToggle');
+            const sidebarKey = 'sidebar-collapsed';
+            const themeKey = 'app-theme';
 
             const isDesktop = () => window.innerWidth >= 992;
 
@@ -658,8 +781,8 @@
 
             window.initPatientRegistrationForms = () => {
                 const map = {
-                    'Barangay 11': ['Purok 1','Purok 2','Purok 3','Purok 4','Purok 5'],
-                    'Barangay 12': ['Purok 1','Purok 2','Purok 3']
+                    'Barangay 11': ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
+                    'Barangay 12': ['Purok 1', 'Purok 2', 'Purok 3']
                 };
                 document.querySelectorAll('.patient-registration-form').forEach(form => {
                     const barangay = form.querySelector('[data-role="barangay"]');
@@ -705,13 +828,13 @@
 
             // NProgress Configuration
             NProgress.configure({ showSpinner: false });
-            
+
             // Show progress bar on link clicks
-            document.addEventListener('click', function(e) {
+            document.addEventListener('click', function (e) {
                 const link = e.target.closest('a');
-                if (link && 
-                    !link.getAttribute('target') && 
-                    !link.getAttribute('href').startsWith('#') && 
+                if (link &&
+                    !link.getAttribute('target') &&
+                    !link.getAttribute('href').startsWith('#') &&
                     !link.getAttribute('href').startsWith('javascript') &&
                     link.getAttribute('href') !== '#'
                 ) {
@@ -720,14 +843,14 @@
             });
 
             // Show progress bar on form submit
-            document.addEventListener('submit', function(e) {
+            document.addEventListener('submit', function (e) {
                 if (!e.defaultPrevented) {
                     NProgress.start();
                 }
             });
 
             // Stop progress bar when page finishes loading (in case of back button or cache)
-            window.addEventListener('pageshow', function() {
+            window.addEventListener('pageshow', function () {
                 NProgress.done();
             });
         });
@@ -735,4 +858,5 @@
 
     @stack('scripts')
 </body>
+
 </html>

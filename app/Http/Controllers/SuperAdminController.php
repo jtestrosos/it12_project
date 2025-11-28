@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
-use App\Models\User;
+use App\Models\Patient;
+use App\Models\Admin;
+use App\Models\SuperAdmin;
 use App\Models\Appointment;
 use App\Models\Inventory;
 use App\Models\SystemLog;
@@ -20,12 +22,12 @@ class SuperAdminController extends Controller
 {
     public function dashboard()
     {
-        $totalUsers = User::count();
+        $totalUsers = Patient::count() + Admin::count() + SuperAdmin::count();
         $totalAppointments = Appointment::count();
         $pendingAppointments = Appointment::pending()->count();
         $totalInventory = Inventory::count();
 
-        $recentUsers = User::latest()->limit(5)->get();
+        $recentUsers = Patient::latest()->limit(5)->get();
         $recentAppointments = Appointment::with('user')->latest()->limit(5)->get();
         $recentLogs = SystemLog::with('user')->latest()->limit(5)->get();
 
@@ -45,8 +47,7 @@ class SuperAdminController extends Controller
             ->get();
 
         // Patients by Barangay data
-        $patientsByBarangay = User::where('role', 'user')
-            ->whereNotNull('barangay')
+        $patientsByBarangay = Patient::whereNotNull('barangay')
             ->selectRaw('barangay, count(*) as count')
             ->groupBy('barangay')
             ->get();
@@ -78,12 +79,53 @@ class SuperAdminController extends Controller
 
     public function users(Request $request)
     {
-        $users = User::orderBy('created_at', 'desc')->paginate(15);
+        // Fetch all users from different tables
+        $patients = Patient::all()->map(function ($user) {
+            $user->role = 'user';
+            return $user;
+        });
+
+        $admins = Admin::all()->map(function ($user) {
+            $user->role = 'admin';
+            return $user;
+        });
+
+        $superAdmins = SuperAdmin::all()->map(function ($user) {
+            $user->role = 'superadmin';
+            return $user;
+        });
+
+        // Merge all users
+        $allUsers = $patients->concat($admins)->concat($superAdmins);
+
+        // Sort by created_at desc
+        $sortedUsers = $allUsers->sortByDesc('created_at');
+
+        // Manual Pagination
+        $page = $request->get('page', 1);
+        $perPage = 15;
+
+        $users = new \Illuminate\Pagination\LengthAwarePaginator(
+            $sortedUsers->forPage($page, $perPage),
+            $sortedUsers->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
         return view('superadmin.users', compact('users'));
     }
 
     public function createUser(Request $request)
     {
+        // Determine correct table for email uniqueness check based on role
+        $emailTable = match ($request->role) {
+            'user' => 'patients',
+            'admin' => 'admins',
+            'superadmin' => 'super_admins',
+            default => 'patients',
+        };
+
         $validated = $request->validate([
             'name' => [
                 'required',
@@ -91,7 +133,7 @@ class SuperAdminController extends Controller
                 'max:255',
                 'regex:/^[a-zA-Z\s\.\-\']+$/',
             ],
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => "required|string|email|max:255|unique:{$emailTable}",
             'gender' => 'required|in:male,female,other',
             'role' => 'required|in:user,admin,superadmin',
             'barangay' => [
@@ -151,35 +193,58 @@ class SuperAdminController extends Controller
             'birth_date.before' => 'Birth date must be in the past.',
         ]);
 
-        $age = null;
-        if ($validated['role'] === 'user' && !empty($validated['birth_date'])) {
-            $age = Carbon::parse($validated['birth_date'])->age;
+        if ($request->role === 'user') {
+            Patient::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'gender' => $validated['gender'],
+                'phone' => $validated['phone'],
+                'address' => $validated['address'],
+                'barangay' => $validated['barangay'],
+                'barangay_other' => $validated['barangay'] === 'Other' ? $validated['barangay_other'] : null,
+                'purok' => $validated['barangay'] === 'Other' ? null : $validated['purok'],
+                'birth_date' => $validated['birth_date'],
+                'age' => Carbon::parse($validated['birth_date'])->age,
+                'password' => Hash::make($validated['password']),
+            ]);
+        } elseif ($request->role === 'admin') {
+            Admin::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
+        } elseif ($request->role === 'superadmin') {
+            SuperAdmin::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
         }
-
-        User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'gender' => $validated['gender'],
-            'phone' => $validated['role'] === 'user' ? $validated['phone'] : null,
-            'address' => $validated['role'] === 'user' ? $validated['address'] : null,
-            'barangay' => $validated['role'] === 'user' ? $validated['barangay'] : null,
-            'barangay_other' => ($validated['role'] === 'user' && $validated['barangay'] === 'Other')
-                ? $validated['barangay_other']
-                : null,
-            'purok' => ($validated['role'] === 'user' && $validated['barangay'] !== 'Other')
-                ? ($validated['purok'] ?? null)
-                : null,
-            'birth_date' => $validated['role'] === 'user' ? $validated['birth_date'] : null,
-            'age' => $age,
-            'password' => Hash::make($validated['password']),
-            'role' => $validated['role']
-        ]);
 
         return redirect()->back()->with('success', 'User created successfully.');
     }
 
-    public function updateUser(Request $request, User $user)
+    private function getUserModel($type)
     {
+        return match ($type) {
+            'user', 'patient' => Patient::class,
+            'admin' => Admin::class,
+            'superadmin' => SuperAdmin::class,
+            default => null,
+        };
+    }
+
+    public function updateUser(Request $request, $type, $id)
+    {
+        $modelClass = $this->getUserModel($type);
+
+        if (!$modelClass) {
+            return redirect()->back()->with('error', 'Invalid user type.');
+        }
+
+        $user = $modelClass::findOrFail($id);
+        $emailTable = $user->getTable();
+
         $validated = $request->validate([
             'name' => [
                 'required',
@@ -187,39 +252,39 @@ class SuperAdminController extends Controller
                 'max:255',
                 'regex:/^[a-zA-Z\s\.\-\']+$/',
             ],
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:' . $emailTable . ',email,' . $id,
             'gender' => 'required|in:male,female,other',
-            'role' => 'required|in:user,admin,superadmin',
+            // Role validation removed as we don't support switching roles via update yet
             'barangay' => [
-                Rule::requiredIf(fn() => $request->role === 'user'),
+                Rule::requiredIf(fn() => $type === 'user'),
                 Rule::in(['Barangay 11', 'Barangay 12', 'Other']),
             ],
             'barangay_other' => [
                 'nullable',
                 'string',
                 'max:255',
-                Rule::requiredIf(fn() => $request->role === 'user' && $request->barangay === 'Other'),
+                Rule::requiredIf(fn() => $type === 'user' && $request->barangay === 'Other'),
             ],
             'purok' => [
                 'nullable',
-                Rule::requiredIf(fn() => $request->role === 'user' && in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
+                Rule::requiredIf(fn() => $type === 'user' && in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
                 Rule::when(
-                    $request->role === 'user' && $request->barangay === 'Barangay 11',
+                    $type === 'user' && $request->barangay === 'Barangay 11',
                     Rule::in(['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'])
                 ),
                 Rule::when(
-                    $request->role === 'user' && $request->barangay === 'Barangay 12',
+                    $type === 'user' && $request->barangay === 'Barangay 12',
                     Rule::in(['Purok 1', 'Purok 2', 'Purok 3'])
                 ),
             ],
             'birth_date' => [
-                Rule::requiredIf(fn() => $request->role === 'user'),
+                Rule::requiredIf(fn() => $type === 'user'),
                 'nullable',
                 'date',
                 'before:today',
             ],
             'phone' => [
-                Rule::requiredIf(fn() => $request->role === 'user'),
+                Rule::requiredIf(fn() => $type === 'user'),
                 'nullable',
                 'string',
                 'max:20',
@@ -233,7 +298,7 @@ class SuperAdminController extends Controller
                 'nullable',
                 'min:8',
                 'confirmed',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]).+$/',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{}|,.<>\/?]).+$/',
             ],
         ], [
             'name.regex' => 'The name field should not contain numbers. Only letters, spaces, periods, hyphens, and apostrophes are allowed.',
@@ -250,11 +315,10 @@ class SuperAdminController extends Controller
         $updateData = [
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'gender' => $validated['gender'],
-            'role' => $validated['role'],
         ];
 
-        if ($validated['role'] === 'user') {
+        if ($type === 'user' || $type === 'patient') {
+            $updateData['gender'] = $validated['gender'];
             $updateData['phone'] = $validated['phone'];
             $updateData['address'] = $validated['address'];
             $updateData['barangay'] = $validated['barangay'];
@@ -264,14 +328,6 @@ class SuperAdminController extends Controller
             $updateData['age'] = !empty($validated['birth_date'])
                 ? Carbon::parse($validated['birth_date'])->age
                 : null;
-        } else {
-            $updateData['phone'] = null;
-            $updateData['address'] = null;
-            $updateData['barangay'] = null;
-            $updateData['barangay_other'] = null;
-            $updateData['purok'] = null;
-            $updateData['birth_date'] = null;
-            $updateData['age'] = null;
         }
 
         if (!empty($validated['password'])) {
@@ -283,16 +339,13 @@ class SuperAdminController extends Controller
         return redirect()->back()->with('success', 'User updated successfully.');
     }
 
-    public function deleteUser(User $user)
+    public function deleteUser($type, $id)
     {
-        if ($user->id === Auth::id()) {
-            return redirect()->back()->with('error', 'Cannot archive your own account.');
-        }
+        $modelClass = $this->getUserModel($type);
+        if (!$modelClass)
+            return redirect()->back()->with('error', 'Invalid user type.');
 
-        if ($user->isSuperAdmin()) {
-            return redirect()->back()->with('error', 'Cannot archive a Super Admin account.');
-        }
-
+        $user = $modelClass::findOrFail($id);
         $user->delete();
 
         return redirect()->back()->with('success', 'User archived successfully.');
@@ -300,28 +353,57 @@ class SuperAdminController extends Controller
 
     public function archivedUsers()
     {
-        $users = User::onlyTrashed()->latest('deleted_at')->paginate(15);
+        // Fetch archived users from all tables
+        $patients = Patient::onlyTrashed()->get()->map(function ($user) {
+            $user->role = 'user';
+            return $user;
+        });
+
+        $admins = Admin::onlyTrashed()->get()->map(function ($user) {
+            $user->role = 'admin';
+            return $user;
+        });
+
+        // SuperAdmins don't have soft deletes in migration, but if they did:
+        // $superAdmins = SuperAdmin::onlyTrashed()->get()... 
+        // Migration says "No soft deletes for super admins"
+
+        $allUsers = $patients->concat($admins)->sortByDesc('deleted_at');
+
+        // Manual Pagination
+        $page = request()->get('page', 1);
+        $perPage = 15;
+
+        $users = new \Illuminate\Pagination\LengthAwarePaginator(
+            $allUsers->forPage($page, $perPage),
+            $allUsers->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
 
         return view('superadmin.users-archive', compact('users'));
     }
 
-    public function restoreUser(int $id)
+    public function restoreUser($type, $id)
     {
-        $user = User::onlyTrashed()->findOrFail($id);
+        $modelClass = $this->getUserModel($type);
+        if (!$modelClass)
+            return redirect()->back()->with('error', 'Invalid user type.');
 
+        $user = $modelClass::onlyTrashed()->findOrFail($id);
         $user->restore();
 
         return redirect()->route('superadmin.users.archive')->with('success', 'User restored successfully.');
     }
 
-    public function forceDeleteUser(int $id)
+    public function forceDeleteUser($type, $id)
     {
-        $user = User::onlyTrashed()->findOrFail($id);
+        $modelClass = $this->getUserModel($type);
+        if (!$modelClass)
+            return redirect()->back()->with('error', 'Invalid user type.');
 
-        if ($user->isSuperAdmin()) {
-            return redirect()->back()->with('error', 'Cannot permanently delete a Super Admin account.');
-        }
-
+        $user = $modelClass::onlyTrashed()->findOrFail($id);
         $user->forceDelete();
 
         return redirect()->route('superadmin.users.archive')->with('success', 'User permanently deleted.');
@@ -393,10 +475,10 @@ class SuperAdminController extends Controller
         ];
 
         $userStats = [
-            'total' => User::count(),
-            'this_month' => User::whereMonth('created_at', now()->month)->count(),
-            'admins' => User::where('role', 'admin')->count(),
-            'patients' => User::where('role', 'user')->count()
+            'total' => Patient::count() + Admin::count() + SuperAdmin::count(),
+            'this_month' => Patient::whereMonth('created_at', now()->month)->count(),
+            'admins' => Admin::count(),
+            'patients' => Patient::count()
         ];
 
         $inventoryStats = [
@@ -422,7 +504,7 @@ class SuperAdminController extends Controller
 
     public function backup()
     {
-        $backups = Backup::with('createdBy')->latest()->paginate(10);
+        $backups = Backup::with(['createdByAdmin', 'createdBySuperAdmin'])->latest()->paginate(10);
 
         // Get last backups
         $lastDatabase = Backup::completed()->byType('database')->latest()->first();
@@ -441,7 +523,7 @@ class SuperAdminController extends Controller
 
     public function createBackup(Request $request)
     {
-        \Log::info('Backup request received', ['type' => $request->type, 'user' => Auth::id()]);
+        \Log::info('Backup request received', ['type' => $request->type, 'user' => Auth::guard('super_admin')->id()]);
 
         $request->validate([
             'type' => 'required|in:database,files,full'
@@ -456,7 +538,7 @@ class SuperAdminController extends Controller
             $backup = Backup::create([
                 'type' => $type,
                 'status' => 'in_progress',
-                'created_by' => Auth::id()
+                'created_by' => Auth::guard('super_admin')->id()
             ]);
 
             // Determine filename based on type
@@ -510,7 +592,7 @@ class SuperAdminController extends Controller
 
             // Log the backup action
             SystemLog::create([
-                'user_id' => Auth::id(),
+                'user_id' => Auth::guard('super_admin')->id(),
                 'action' => 'backup_created',
                 'table_name' => 'backups',
                 'record_id' => $backup->id,
@@ -617,7 +699,7 @@ class SuperAdminController extends Controller
             $backupContent .= "System Information:\n";
             $backupContent .= "- Application Name: " . config('app.name') . "\n";
             $backupContent .= "- Environment: " . config('app.env') . "\n";
-            $backupContent .= "- Total Users: " . \App\Models\User::count() . "\n";
+            $backupContent .= "- Total Users: " . (Patient::count() + Admin::count() + SuperAdmin::count()) . "\n";
             $backupContent .= "- Total Appointments: " . \App\Models\Appointment::count() . "\n";
             $backupContent .= "- Total Inventory Items: " . \App\Models\Inventory::count() . "\n";
 
@@ -659,7 +741,7 @@ class SuperAdminController extends Controller
 
             // Log the download action
             SystemLog::create([
-                'user_id' => Auth::id(),
+                'user_id' => Auth::guard('super_admin')->id(),
                 'action' => 'backup_downloaded',
                 'table_name' => 'backups',
                 'record_id' => $backup->id,
@@ -684,7 +766,7 @@ class SuperAdminController extends Controller
 
         // Log the deletion
         SystemLog::create([
-            'user_id' => Auth::id(),
+            'user_id' => Auth::guard('super_admin')->id(),
             'action' => 'deleted',
             'table_name' => 'backups',
             'record_id' => $backup->id,
@@ -708,7 +790,7 @@ class SuperAdminController extends Controller
 
         // Log the backup scheduling action
         SystemLog::create([
-            'user_id' => Auth::id(),
+            'user_id' => Auth::guard('super_admin')->id(),
             'action' => 'backup_scheduled',
             'table_name' => 'backups',
             'record_id' => null,

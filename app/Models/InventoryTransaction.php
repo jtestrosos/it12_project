@@ -11,7 +11,8 @@ class InventoryTransaction extends Model
 
     protected $fillable = [
         'inventory_id',
-        'user_id',
+        'performable_type',
+        'performable_id',
         'transaction_type',
         'quantity',
         'notes'
@@ -22,9 +23,20 @@ class InventoryTransaction extends Model
         return $this->belongsTo(Inventory::class);
     }
 
+    /**
+     * Get the entity that performed the transaction (Admin or SuperAdmin).
+     */
+    public function performable()
+    {
+        return $this->morphTo();
+    }
+
+    /**
+     * Legacy accessor for backwards compatibility.
+     */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->performable();
     }
 
     public function scopeRestock($query)

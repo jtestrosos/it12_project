@@ -6,21 +6,30 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use App\Helpers\AuthHelper;
 
 class ProfileController extends Controller
 {
     public function edit()
     {
-        return view('profile.edit', ['user' => Auth::user()]);
+        return view('profile.edit', ['user' => AuthHelper::user()]);
     }
 
     public function update(Request $request)
     {
-        $user = Auth::user();
+        $user = AuthHelper::user();
+
+        // Determine correct table based on user type
+        $table = match (true) {
+            $user->isPatient() => 'patients',
+            $user->isAdmin() => 'admins',
+            $user->isSuperAdmin() => 'super_admins',
+            default => 'patients',
+        };
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => "required|string|email|max:255|unique:{$table},email,{$user->id}",
             'phone' => 'nullable|string|max:20',
             'date_of_birth' => 'nullable|date',
             'address' => 'nullable|string|max:500',
@@ -40,8 +49,11 @@ class ProfileController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
-        $user->birth_date = $request->date_of_birth;
-        $user->address = $request->address;
+
+        if ($user instanceof \App\Models\Patient) {
+            $user->birth_date = $request->date_of_birth;
+            $user->address = $request->address;
+        }
 
         if ($request->hasFile('profile_picture')) {
             // Delete old profile picture if exists

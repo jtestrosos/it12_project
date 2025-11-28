@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Models\Inventory;
 use App\Models\InventoryTransaction;
-use App\Models\User;
+use App\Models\Patient;
 use App\Helpers\AppointmentHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,7 +27,7 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        $totalPatients = User::where('role', 'user')->count();
+        $totalPatients = Patient::query()->count();
 
         // Today metrics
         $todayAppointments = Appointment::whereDate('appointment_date', today())->count();
@@ -60,11 +60,11 @@ class AdminController extends Controller
             : null;
 
         // Monthly patient growth metrics
-        $patientsThisMonth = User::where('role', 'user')
+        $patientsThisMonth = Patient::query()
             ->whereMonth('created_at', $now->month)
             ->whereYear('created_at', $now->year)
             ->count();
-        $patientsLastMonth = User::where('role', 'user')
+        $patientsLastMonth = Patient::query()
             ->whereMonth('created_at', $lastMonth->month)
             ->whereYear('created_at', $lastMonth->year)
             ->count();
@@ -76,7 +76,7 @@ class AdminController extends Controller
         $lowStockInventory = Inventory::whereColumn('current_stock', '<=', 'minimum_stock')->limit(5)->get();
 
         // Patients by Barangay data for the doughnut chart
-        $patientsByBarangay = User::where('role', 'user')
+        $patientsByBarangay = Patient::query()
             ->whereNotNull('barangay')
             ->selectRaw('barangay, count(*) as count')
             ->groupBy('barangay')
@@ -168,7 +168,7 @@ class AdminController extends Controller
 
     public function patients()
     {
-        $patients = User::where('role', 'user')
+        $patients = Patient::query()
             ->with('appointments')
             ->latest()
             ->paginate(10);
@@ -176,25 +176,24 @@ class AdminController extends Controller
         return view('admin.patients', compact('patients'));
     }
 
-    public function archivePatient(User $user)
+    public function archivePatient(Patient $patient)
     {
-        if ($user->role !== 'user') {
-            return redirect()->back()->with('error', 'Only patient accounts can be archived from this page.');
-        }
+        // Patients don't have a role field, they are all patients
+        // No need to check role
 
-        if ($user->id === Auth::id()) {
+        if ($patient->id === Auth::guard('admin')->id()) {
             return redirect()->back()->with('error', 'You cannot archive your own account.');
         }
 
-        $user->delete();
+        $patient->delete();
 
         return redirect()->back()->with('success', 'Patient archived successfully.');
     }
 
     public function archivedPatients()
     {
-        $patients = User::onlyTrashed()
-            ->where('role', 'user')
+        $patients = Patient::onlyTrashed()
+
             ->orderByDesc('deleted_at')
             ->paginate(10);
 
@@ -203,7 +202,7 @@ class AdminController extends Controller
 
     public function restorePatient($id)
     {
-        $patient = User::onlyTrashed()->where('role', 'user')->findOrFail($id);
+        $patient = Patient::onlyTrashed()->findOrFail($id);
         $patient->restore();
 
         return redirect()->route('admin.patients.archive')->with('success', 'Patient restored successfully.');
@@ -211,7 +210,7 @@ class AdminController extends Controller
 
     public function forceDeletePatient($id)
     {
-        $patient = User::onlyTrashed()->where('role', 'user')->findOrFail($id);
+        $patient = Patient::onlyTrashed()->findOrFail($id);
         $patient->forceDelete();
 
         return redirect()->route('admin.patients.archive')->with('success', 'Patient permanently deleted.');
@@ -226,7 +225,7 @@ class AdminController extends Controller
                 'max:255',
                 'regex:/^[a-zA-Z\s\.\-\']+$/',
             ],
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:patients',
             'gender' => 'required|in:male,female,other',
             'barangay' => [
                 'required',
@@ -275,7 +274,7 @@ class AdminController extends Controller
 
         $age = Carbon::parse($validated['birth_date'])->age;
 
-        User::create([
+        Patient::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'gender' => $validated['gender'],
@@ -292,7 +291,7 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Patient created successfully.');
     }
 
-    public function updatePatient(Request $request, User $user)
+    public function updatePatient(Request $request, Patient $patient)
     {
         $validated = $request->validate([
             'name' => [
@@ -301,7 +300,7 @@ class AdminController extends Controller
                 'max:255',
                 'regex:/^[a-zA-Z\s\.\-\']+$/',
             ],
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:patients,email,' . $patient->id,
             'gender' => 'required|in:male,female,other',
             'barangay' => [
                 'required',
@@ -366,14 +365,14 @@ class AdminController extends Controller
             $updateData['password'] = Hash::make($validated['password']);
         }
 
-        $user->update($updateData);
+        $patient->update($updateData);
 
         return redirect()->back()->with('success', 'Patient updated successfully.');
     }
 
     public function appointments(Request $request)
     {
-        $query = Appointment::with(['user', 'approvedBy']);
+        $query = Appointment::with(['patient', 'approvedByAdmin', 'approvedBySuperAdmin']);
 
         $sort = $request->get('sort');
         $direction = strtolower($request->get('direction', 'desc')) === 'asc' ? 'asc' : 'desc';
@@ -465,11 +464,11 @@ class AdminController extends Controller
         }
 
         // If user_id is provided, link to registered patient; otherwise link to admin
-        $userId = $request->filled('user_id') ? $request->user_id : Auth::id();
+        $userId = $request->filled('user_id') ? $request->user_id : Auth::guard('admin')->id();
         $isWalkIn = !$request->filled('user_id'); // Only walk-in if no user_id provided
 
         Appointment::create([
-            'user_id' => $userId,
+            'patient_id' => $userId,
             'patient_name' => $request->patient_name,
             'patient_phone' => $request->patient_phone ?: '',
             'patient_address' => $request->patient_address ?: 'N/A',
@@ -498,7 +497,7 @@ class AdminController extends Controller
         $update = [
             'status' => $request->status,
             'notes' => $request->notes,
-            'approved_by' => Auth::id(),
+            'approved_by' => Auth::guard('admin')->id(),
             'approved_at' => now()
         ];
         if ($request->status === 'rescheduled') {
@@ -643,7 +642,8 @@ class AdminController extends Controller
         // Create transaction record
         InventoryTransaction::create([
             'inventory_id' => $inventory->id,
-            'user_id' => Auth::id(),
+            'performable_type' => \App\Models\Admin::class,
+            'performable_id' => Auth::guard('admin')->id(),
             'transaction_type' => 'restock',
             'quantity' => $request->current_stock,
             'notes' => 'Initial stock'
@@ -673,7 +673,8 @@ class AdminController extends Controller
         if ($difference != 0) {
             InventoryTransaction::create([
                 'inventory_id' => $inventory->id,
-                'user_id' => Auth::id(),
+                'performable_type' => \App\Models\Admin::class,
+                'performable_id' => Auth::guard('admin')->id(),
                 'transaction_type' => $difference > 0 ? 'restock' : 'usage',
                 'quantity' => abs($difference),
                 'notes' => 'Stock adjustment'
@@ -700,7 +701,8 @@ class AdminController extends Controller
 
         InventoryTransaction::create([
             'inventory_id' => $inventory->id,
-            'user_id' => Auth::id(),
+            'performable_type' => \App\Models\Admin::class,
+            'performable_id' => Auth::guard('admin')->id(),
             'transaction_type' => 'restock',
             'quantity' => (int) $request->quantity,
             'notes' => $request->notes,
@@ -723,7 +725,8 @@ class AdminController extends Controller
 
         InventoryTransaction::create([
             'inventory_id' => $inventory->id,
-            'user_id' => Auth::id(),
+            'performable_type' => \App\Models\Admin::class,
+            'performable_id' => Auth::guard('admin')->id(),
             'transaction_type' => 'usage',
             'quantity' => $quantity,
             'notes' => $request->notes,
@@ -743,7 +746,7 @@ class AdminController extends Controller
         ]);
 
         Appointment::create([
-            'user_id' => Auth::id(), // link to admin user to satisfy FK
+            'user_id' => Auth::guard('admin')->id(), // link to admin user to satisfy FK
             'patient_name' => $request->patient_name,
             'patient_phone' => $request->patient_phone,
             'patient_address' => $request->patient_address,
@@ -753,7 +756,7 @@ class AdminController extends Controller
             'notes' => $request->notes,
             'is_walk_in' => true,
             'status' => 'approved',
-            'approved_by' => Auth::id(),
+            'approved_by' => Auth::guard('admin')->id(),
             'approved_at' => now()
         ]);
 
@@ -783,7 +786,7 @@ class AdminController extends Controller
             ->get();
 
         // --- Multi-timeframe Trend Data ---
-        
+
         $driver = DB::getDriverName();
 
         // 1. Weekly (Current Week: Sun-Sat)
@@ -834,38 +837,38 @@ class AdminController extends Controller
     public function patientReports()
     {
         // Patient statistics
-        $totalPatients = User::where('role', 'user')->count();
-        $maleCount = User::where('role', 'user')->where('gender', 'male')->count();
-        $femaleCount = User::where('role', 'user')->where('gender', 'female')->count();
-        $newPatientsThisMonth = User::where('role', 'user')
+        $totalPatients = Patient::query()->count();
+        $maleCount = Patient::query()->where('gender', 'male')->count();
+        $femaleCount = Patient::query()->where('gender', 'female')->count();
+        $newPatientsThisMonth = Patient::query()
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
 
         // Age distribution
         $ageGroups = [
-            '0-17' => User::where('role', 'user')->whereBetween('age', [0, 17])->count(),
-            '18-30' => User::where('role', 'user')->whereBetween('age', [18, 30])->count(),
-            '31-50' => User::where('role', 'user')->whereBetween('age', [31, 50])->count(),
-            '51-70' => User::where('role', 'user')->whereBetween('age', [51, 70])->count(),
-            '71+' => User::where('role', 'user')->where('age', '>', 70)->count(),
+            '0-17' => Patient::query()->whereBetween('age', [0, 17])->count(),
+            '18-30' => Patient::query()->whereBetween('age', [18, 30])->count(),
+            '31-50' => Patient::query()->whereBetween('age', [31, 50])->count(),
+            '51-70' => Patient::query()->whereBetween('age', [51, 70])->count(),
+            '71+' => Patient::query()->where('age', '>', 70)->count(),
         ];
 
         // Barangay distribution
-        $barangayDistribution = User::where('role', 'user')
+        $barangayDistribution = Patient::query()
             ->selectRaw('barangay, count(*) as count')
             ->groupBy('barangay')
             ->get();
 
         // Patients with most appointments
-        $topPatients = User::where('role', 'user')
+        $topPatients = Patient::query()
             ->withCount('appointments')
             ->orderByDesc('appointments_count')
             ->limit(5)
             ->get();
 
         // Recent registrations
-        $recentPatients = User::where('role', 'user')
+        $recentPatients = Patient::query()
             ->latest()
             ->limit(10)
             ->get();
@@ -1127,7 +1130,7 @@ class AdminController extends Controller
     // Patient Reports Export Methods
     public function exportPatientsExcel()
     {
-        $patients = User::where('role', 'user')->get();
+        $patients = Patient::query()->get();
 
         $export = new class ($patients) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
             protected $patients;
@@ -1162,7 +1165,7 @@ class AdminController extends Controller
 
     public function exportPatientsPdf()
     {
-        $patients = User::where('role', 'user')->get();
+        $patients = Patient::query()->get();
 
         $html = view('admin.reports.patients-pdf', compact('patients'))->render();
 

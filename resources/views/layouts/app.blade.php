@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <title>Malasakit</title>
@@ -11,19 +12,287 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"></noscript>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"
+        media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    </noscript>
 
     <style>
-        body{background:#f8f9fa;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;margin:0;padding:0;overflow-x:hidden}
+        body {
+            background: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden
+        }
+
         /* Critical Layout CSS for CLS Prevention */
-        .admin-layout{display:flex;min-height:100vh;width:100%}
-        .admin-sidebar{width:250px;background:#f8f9fa;color:#495057;position:fixed;height:100vh;left:0;top:0;z-index:1000;overflow-y:auto;border-right:1px solid #e9ecef}
-        .admin-main{flex:1;margin-left:250px;background:#f0f0f0;display:flex;flex-direction:column;min-height:100vh;width:calc(100% - 250px);overflow-x:hidden;contain:paint}
-        @media (max-width:768px){.admin-sidebar{transform:translateX(-100%)}.admin-main{margin-left:0;width:100%}}
-        
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+            width: 100%
+        }
+
+        .admin-sidebar {
+            width: 250px;
+            background: #f8f9fa;
+            color: #495057;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            border-right: 1px solid #e9ecef
+        }
+
+        .admin-main {
+            flex: 1;
+            margin-left: 250px;
+            background: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: calc(100% - 250px);
+            overflow-x: hidden;
+            contain: paint
+        }
+
+        @media (max-width:768px) {
+            .admin-sidebar {
+                transform: translateX(-100%)
+            }
+
+            .admin-main {
+                margin-left: 0;
+                width: 100%
+            }
+        }
+
         /* Remaining styles */
-        .admin-sidebar .sidebar-header{padding:1.5rem;border-bottom:1px solid rgba(255,255,255,.1)}.admin-sidebar .sidebar-header h4{color:#2c3e50;margin:0;font-weight:600}.admin-sidebar .sidebar-header p{color:#6c757d;margin:0;font-size:.9rem}.admin-sidebar .nav-link{color:#495057;padding:1rem 1.5rem;border:none;display:flex;align-items:center;transition:all .3s ease}.admin-sidebar .nav-link:hover{background:#e9ecef;color:#495057}.admin-sidebar .nav-link.active{background:#007bff;color:#fff}.admin-sidebar .nav-link i{margin-right:.75rem;width:20px}.admin-header{background:#fff;color:#212529;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e9ecef;box-shadow:none;width:100%}.admin-header .header-left{display:flex;align-items:center}.admin-header .header-left .logo{display:flex;align-items:center;margin-right:2rem}.admin-header .header-left .logo i{font-size:1.5rem;margin-right:.5rem}.admin-header .header-left h3{margin:0;font-weight:600}.admin-header .header-nav{display:flex;align-items:center}.admin-header .header-nav .nav-link{color:#495057;margin:0 1rem;padding:.5rem 1rem;border-radius:4px;transition:background .3s ease}.admin-header .header-nav .nav-link:hover{background:#f8f9fa;color:#212529}.admin-header .header-right{display:flex;align-items:center}.admin-header .header-right .user-info{display:flex;align-items:center;margin-left:1rem}.admin-header .header-right .user-avatar{width:40px;height:40px;border-radius:50%;background:#0d6efd;display:flex;align-items:center;justify-content:center;margin-right:.75rem;font-weight:600;color:#fff}.admin-header .header-right .user-details h6{margin:0;font-weight:600}.admin-header .header-right .user-details small{opacity:.8}.admin-content{padding:0;flex:1;display:flex;flex-direction:column;width:100%;max-width:100%}.public-layout header .navbar{background:#17a2b8!important;min-height:80px}.public-layout .navbar{background:#17a2b8;min-height:80px}.navbar-brand img{height:65px;width:auto;margin-right:1rem;object-fit:contain}.public-layout .navbar-brand img{height:65px;margin-right:1rem}.navbar-brand{display:flex;align-items:center;gap:.75rem}.navbar-brand span{font-size:1.75rem;font-weight:700;color:#fff;line-height:1.2}.public-layout .navbar-brand span{font-size:1.75rem;font-weight:700;color:#fff}.public-layout .navbar-nav .nav-link{color:#fff;font-weight:500;margin:0 1rem;padding:.5rem 1rem;border-radius:4px;transition:background .3s ease}.public-layout .navbar-nav .nav-link:hover{background:rgba(255,255,255,.1);color:#fff}.public-layout .navbar-nav .nav-link.active{background:rgba(255,255,255,.2);color:#fff}@media (max-width:768px){.admin-sidebar{transform:translateX(-100%);transition:transform .3s ease}.admin-sidebar.show{transform:translateX(0)}.admin-main{margin-left:0;width:100%}.admin-header{padding:1rem}.admin-content{padding:1rem}}footer{background:#e9ecef;color:#6c757d}
+        .admin-sidebar .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, .1)
+        }
+
+        .admin-sidebar .sidebar-header h4 {
+            color: #2c3e50;
+            margin: 0;
+            font-weight: 600
+        }
+
+        .admin-sidebar .sidebar-header p {
+            color: #6c757d;
+            margin: 0;
+            font-size: .9rem
+        }
+
+        .admin-sidebar .nav-link {
+            color: #495057;
+            padding: 1rem 1.5rem;
+            border: none;
+            display: flex;
+            align-items: center;
+            transition: all .3s ease
+        }
+
+        .admin-sidebar .nav-link:hover {
+            background: #e9ecef;
+            color: #495057
+        }
+
+        .admin-sidebar .nav-link.active {
+            background: #007bff;
+            color: #fff
+        }
+
+        .admin-sidebar .nav-link i {
+            margin-right: .75rem;
+            width: 20px
+        }
+
+        .admin-header {
+            background: #fff;
+            color: #212529;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e9ecef;
+            box-shadow: none;
+            width: 100%
+        }
+
+        .admin-header .header-left {
+            display: flex;
+            align-items: center
+        }
+
+        .admin-header .header-left .logo {
+            display: flex;
+            align-items: center;
+            margin-right: 2rem
+        }
+
+        .admin-header .header-left .logo i {
+            font-size: 1.5rem;
+            margin-right: .5rem
+        }
+
+        .admin-header .header-left h3 {
+            margin: 0;
+            font-weight: 600
+        }
+
+        .admin-header .header-nav {
+            display: flex;
+            align-items: center
+        }
+
+        .admin-header .header-nav .nav-link {
+            color: #495057;
+            margin: 0 1rem;
+            padding: .5rem 1rem;
+            border-radius: 4px;
+            transition: background .3s ease
+        }
+
+        .admin-header .header-nav .nav-link:hover {
+            background: #f8f9fa;
+            color: #212529
+        }
+
+        .admin-header .header-right {
+            display: flex;
+            align-items: center
+        }
+
+        .admin-header .header-right .user-info {
+            display: flex;
+            align-items: center;
+            margin-left: 1rem
+        }
+
+        .admin-header .header-right .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #0d6efd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: .75rem;
+            font-weight: 600;
+            color: #fff
+        }
+
+        .admin-header .header-right .user-details h6 {
+            margin: 0;
+            font-weight: 600
+        }
+
+        .admin-header .header-right .user-details small {
+            opacity: .8
+        }
+
+        .admin-content {
+            padding: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 100%
+        }
+
+        .public-layout header .navbar {
+            background: #17a2b8 !important;
+            min-height: 80px
+        }
+
+        .public-layout .navbar {
+            background: #17a2b8;
+            min-height: 80px
+        }
+
+        .navbar-brand img {
+            height: 65px;
+            width: auto;
+            margin-right: 1rem;
+            object-fit: contain
+        }
+
+        .public-layout .navbar-brand img {
+            height: 65px;
+            margin-right: 1rem
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: .75rem
+        }
+
+        .navbar-brand span {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2
+        }
+
+        .public-layout .navbar-brand span {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #fff
+        }
+
+        .public-layout .navbar-nav .nav-link {
+            color: #fff;
+            font-weight: 500;
+            margin: 0 1rem;
+            padding: .5rem 1rem;
+            border-radius: 4px;
+            transition: background .3s ease
+        }
+
+        .public-layout .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, .1);
+            color: #fff
+        }
+
+        .public-layout .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, .2);
+            color: #fff
+        }
+
+        @media (max-width:768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                transition: transform .3s ease
+            }
+
+            .admin-sidebar.show {
+                transform: translateX(0)
+            }
+
+            .admin-main {
+                margin-left: 0;
+                width: 100%
+            }
+
+            .admin-header {
+                padding: 1rem
+            }
+
+            .admin-content {
+                padding: 1rem
+            }
+        }
+
+        footer {
+            background: #e9ecef;
+            color: #6c757d
+        }
     </style>
 
     @stack('styles')
@@ -37,12 +306,15 @@
             <div class="admin-sidebar">
                 <div class="sidebar-header">
                     <div class="d-flex align-items-center">
-                        <img src="{{ asset('images/malasakit-logo-blue.webp') }}" alt="MALASAKIT Logo" loading="lazy" style="width: 40px; height: 40px; margin-right: 0.5rem;">
-                        <div><h4>MALASAKIT</h4></div>
+                        <img src="{{ asset('images/malasakit-logo-blue.webp') }}" alt="MALASAKIT Logo" loading="lazy"
+                            style="width: 40px; height: 40px; margin-right: 0.5rem;">
+                        <div>
+                            <h4>MALASAKIT</h4>
+                        </div>
                     </div>
                 </div>
                 <nav class="nav flex-column">
-                    @if(Auth::user()->isSuperAdmin())
+                    @if(\App\Helpers\AuthHelper::user()->isSuperAdmin())
                         <a class="nav-link {{ request()->routeIs('superadmin.dashboard') ? 'active' : '' }}" href="{{ route('superadmin.dashboard') }}">
                             <i class="fas fa-th-large"></i> Dashboard
                         </a>
@@ -59,73 +331,73 @@
                             <i class="fas fa-boxes"></i> Inventory
                         </a>
                     @else
-                        <a class="nav-link {{ request()->routeIs('patient.dashboard') ? 'active' : '' }}" href="{{ route('patient.dashboard') }}">
-                            <i class="fas fa-th-large"></i> Dashboard
-                        </a>
-                        <a class="nav-link {{ request()->routeIs('patient.appointments') ? 'active' : '' }}" href="{{ route('patient.appointments') }}">
-                            <i class="fas fa-calendar"></i> My Appointments
-                        </a>
-                        <a class="nav-link {{ request()->routeIs('patient.book-appointment') ? 'active' : '' }}" href="{{ route('patient.book-appointment') }}">
-                            <i class="fas fa-plus"></i> Book Appointment
-                        </a>
-                    @endif
-                </nav>
-            </div>
-
-            <!-- Main Content -->
-            <div class="admin-main">
-                <!-- Header -->
-                <div class="admin-header">
-                    <div class="header-left">
-                        <div class="logo"><h3></h3></div>
-                    </div>
-                    <div class="header-right">
-                        <i class="fas fa-bell me-3"></i>
-                        <div class="dropdown">
-                            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUserApp" data-bs-toggle="dropdown" aria-expanded="false">
-                                <div class="user-avatar" style="overflow: hidden;">
-                                    @if(Auth::user()->profile_picture)
-                                        <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
-                                    @else
-                                        {{ substr(Auth::user()->name, 0, 1) }}
-                                    @endif
-                                </div>
-                                <div class="fw-bold me-2">{{ Auth::user()->name }}</div>
+                            <a class="nav-link {{ request()->routeIs('patient.dashboard') ? 'active' : '' }}" href="{{ route('patient.dashboard') }}">
+                                <i class="fas fa-th-large"></i> Dashboard
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="dropdownUserApp">
-                                <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                        Logout
-                                    </a>
-                                </li>
-                            </ul>
+                            <a class="nav-link {{ request()->routeIs('patient.appointments') ? 'active' : '' }}" href="{{ route('patient.appointments') }}">
+                                <i class="fas fa-calendar"></i> My Appointments
+                            </a>
+                            <a class="nav-link {{ request()->routeIs('patient.book-appointment') ? 'active' : '' }}" href="{{ route('patient.book-appointment') }}">
+                                <i class="fas fa-plus"></i> Book Appointment
+                            </a>
+                        @endif
+                    </nav>
+                </div>
+
+                <!-- Main Content -->
+                <div class="admin-main">
+                    <!-- Header -->
+                    <div class="admin-header">
+                        <div class="header-left">
+                            <div class="logo"><h3></h3></div>
+                        </div>
+                        <div class="header-right">
+                            <i class="fas fa-bell me-3"></i>
+                            <div class="dropdown">
+                                <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUserApp" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="user-avatar" style="overflow: hidden;">
+                                        @if(\App\Helpers\AuthHelper::user()->profile_picture)
+                                            <img src="{{ asset('storage/' . \App\Helpers\AuthHelper::user()->profile_picture) }}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                                        @else
+                                            {{ substr(\App\Helpers\AuthHelper::user()->name, 0, 1) }}
+                                        @endif
+                                    </div>
+                                    <div class="fw-bold me-2">{{ \App\Helpers\AuthHelper::user()->name }}</div>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="dropdownUserApp">
+                                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('logout') }}"
+                                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                            Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="admin-content">
+                        @yield('content')
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="text-center text-muted py-4 mt-auto border-top">
+                        <div class="container small">
+                            Barangay Health Clinic &copy; {{ date('Y') }}. All rights reserved.
+                            <span class="mx-2">|</span>
+                            <a href="{{ url('/privacy') }}" class="text-decoration-none text-muted">Privacy Policy</a>
+                            <span class="mx-2">|</span>
+                            <a href="{{ url('/terms') }}" class="text-decoration-none text-muted">Terms of Service</a>
                         </div>
                     </div>
                 </div>
-
-                <!-- Content -->
-                <div class="admin-content">
-                    @yield('content')
-                </div>
-
-                <!-- Footer -->
-                <div class="text-center text-muted py-4 mt-auto border-top">
-                    <div class="container small">
-                        Barangay Health Clinic &copy; {{ date('Y') }}. All rights reserved.
-                        <span class="mx-2">|</span>
-                        <a href="{{ url('/privacy') }}" class="text-decoration-none text-muted">Privacy Policy</a>
-                        <span class="mx-2">|</span>
-                        <a href="{{ url('/terms') }}" class="text-decoration-none text-muted">Terms of Service</a>
-                    </div>
-                </div>
             </div>
-        </div>
 
-        <!-- Logout Form -->
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
+            <!-- Logout Form -->
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
     @else
         <!-- Public Layout -->
         <header>
@@ -144,12 +416,12 @@
                             <li class="nav-item"><a class="nav-link {{ request()->is('policy') ? 'active fw-bold' : '' }}" href="{{ url('/policy') }}">Booking Policy</a></li>
                             <li class="nav-item"><a class="nav-link {{ request()->is('contact') ? 'active fw-bold' : '' }}" href="{{ url('/contact') }}">Contact Us!</a></li>
 
-                            @guest
+                            @if(!\App\Helpers\AuthHelper::check())
                                 <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">Login</a></li>
                             @else
-                                @if(Auth::user()->isSuperAdmin())
+                                @if(\App\Helpers\AuthHelper::user()->isSuperAdmin())
                                     <li class="nav-item"><a class="nav-link" href="{{ route('superadmin.dashboard') }}">Super Admin</a></li>
-                                @elseif(Auth::user()->isAdmin())
+                                @elseif(\App\Helpers\AuthHelper::user()->isAdmin())
                                     <li class="nav-item"><a class="nav-link" href="{{ route('admin.dashboard') }}">Admin</a></li>
                                 @else
                                     <li class="nav-item"><a class="nav-link" href="{{ route('patient.dashboard') }}">Dashboard</a></li>
@@ -158,7 +430,7 @@
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                                     <a class="nav-link" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
                                 </li>
-                            @endguest
+                            @endif
                         </ul>
                     </div>
                 </div>
@@ -421,8 +693,8 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
     <script>
-        function requireLogin(){@if(Auth::check()) @if(Auth::user()->isPatient()) window.location.href="{{ route('patient.book-appointment') }}"; @else window.location.href="{{ Auth::user()->isSuperAdmin() ? route('superadmin.dashboard') : route('admin.dashboard') }}"; @endif @else window.location.href="{{ route('login') }}"; @endif}
-        document.addEventListener('DOMContentLoaded',function(){const feedbackModalEl=document.getElementById('feedbackModal');if(feedbackModalEl){const feedbackModal=new bootstrap.Modal(feedbackModalEl);feedbackModal.show();}@if($errors->has('email')||$errors->has('password')) const loginModalEl=document.getElementById('loginModal');if(loginModalEl){const loginModal=new bootstrap.Modal(loginModalEl);loginModal.show();}@endif const loginPasswordInput=document.getElementById('login-password');const loginShowPasswordBtn=document.getElementById('login-show-password-btn');const loginShowPasswordIcon=document.getElementById('login-show-password-icon');if(loginShowPasswordBtn&&loginPasswordInput){loginShowPasswordBtn.addEventListener('click',function(){const showing=loginPasswordInput.type==='text';const show=!showing;loginPasswordInput.type=show?'text':'password';if(loginShowPasswordIcon){if(show){loginShowPasswordIcon.classList.remove('fa-eye');loginShowPasswordIcon.classList.add('fa-eye-slash');}else{loginShowPasswordIcon.classList.remove('fa-eye-slash');loginShowPasswordIcon.classList.add('fa-eye');}}});}const barangayPurokMap={'Barangay 11':['Purok 1','Purok 2','Purok 3','Purok 4','Purok 5'],'Barangay 12':['Purok 1','Purok 2','Purok 3']};const registrationForms=document.querySelectorAll('.registration-form');registrationForms.forEach((form)=>{const barangaySelect=form.querySelector('[data-role="barangay"]');const barangayOtherGroup=form.querySelector('[data-role="barangay-other-group"]');const barangayOtherInput=form.querySelector('[data-role="barangay-other"]');const purokGroup=form.querySelector('[data-role="purok-group"]');const purokSelect=form.querySelector('[data-role="purok"]');const updatePurokOptions=(barangay)=>{if(!purokSelect)return;const previouslySelected=purokSelect.getAttribute('data-selected');purokSelect.innerHTML='<option value="">Select Purok</option>';if(!barangayPurokMap[barangay]){purokSelect.removeAttribute('required');purokSelect.setAttribute('data-selected','');return;}barangayPurokMap[barangay].forEach((purok)=>{const option=document.createElement('option');option.value=purok;option.textContent=purok;if(previouslySelected===purok){option.selected=true;}purokSelect.appendChild(option);});purokSelect.setAttribute('required','required');};const handleBarangayChange=()=>{const selectedBarangay=barangaySelect?barangaySelect.value:'';if(barangayOtherGroup&&barangayOtherInput){if(selectedBarangay==='Other'){barangayOtherGroup.classList.remove('d-none');barangayOtherInput.setAttribute('required','required');}else{barangayOtherGroup.classList.add('d-none');barangayOtherInput.removeAttribute('required');}}if(purokGroup&&purokSelect){if(barangayPurokMap[selectedBarangay]){purokGroup.classList.remove('d-none');updatePurokOptions(selectedBarangay);}else{purokGroup.classList.add('d-none');purokSelect.removeAttribute('required');purokSelect.value='';purokSelect.setAttribute('data-selected','');}}};if(barangaySelect){barangaySelect.addEventListener('change',()=>{if(purokSelect){purokSelect.setAttribute('data-selected','');}handleBarangayChange();});handleBarangayChange();}});});
+        function requireLogin(){@if(\App\Helpers\AuthHelper::check()) @if(\App\Helpers\AuthHelper::user()->isPatient()) window.location.href="{{ route('patient.book-appointment') }}"; @else window.location.href="{{ \App\Helpers\AuthHelper::user()->isSuperAdmin() ? route('superadmin.dashboard') : route('admin.dashboard') }}"; @endif @else window.location.href="{{ route('login') }}"; @endif}
+        document.addEventListener('DOMContentLoaded',function(){const feedbackModalEl=document.getElementById('feedbackModal');if(feedbackModalEl){const feedbackModal=new bootstrap.Modal(feedbackModalEl);feedbackModal.show();}@if($errors->has('email') || $errors->has('password')) const loginModalEl=document.getElementById('loginModal');if(loginModalEl){const loginModal=new bootstrap.Modal(loginModalEl);loginModal.show();}@endif const loginPasswordInput=document.getElementById('login-password');const loginShowPasswordBtn=document.getElementById('login-show-password-btn');const loginShowPasswordIcon=document.getElementById('login-show-password-icon');if(loginShowPasswordBtn&&loginPasswordInput){loginShowPasswordBtn.addEventListener('click',function(){const showing=loginPasswordInput.type==='text';const show=!showing;loginPasswordInput.type=show?'text':'password';if(loginShowPasswordIcon){if(show){loginShowPasswordIcon.classList.remove('fa-eye');loginShowPasswordIcon.classList.add('fa-eye-slash');}else{loginShowPasswordIcon.classList.remove('fa-eye-slash');loginShowPasswordIcon.classList.add('fa-eye');}}});}const barangayPurokMap={'Barangay 11':['Purok 1','Purok 2','Purok 3','Purok 4','Purok 5'],'Barangay 12':['Purok 1','Purok 2','Purok 3']};const registrationForms=document.querySelectorAll('.registration-form');registrationForms.forEach((form)=>{const barangaySelect=form.querySelector('[data-role="barangay"]');const barangayOtherGroup=form.querySelector('[data-role="barangay-other-group"]');const barangayOtherInput=form.querySelector('[data-role="barangay-other"]');const purokGroup=form.querySelector('[data-role="purok-group"]');const purokSelect=form.querySelector('[data-role="purok"]');const updatePurokOptions=(barangay)=>{if(!purokSelect)return;const previouslySelected=purokSelect.getAttribute('data-selected');purokSelect.innerHTML='<option value="">Select Purok</option>';if(!barangayPurokMap[barangay]){purokSelect.removeAttribute('required');purokSelect.setAttribute('data-selected','');return;}barangayPurokMap[barangay].forEach((purok)=>{const option=document.createElement('option');option.value=purok;option.textContent=purok;if(previouslySelected===purok){option.selected=true;}purokSelect.appendChild(option);});purokSelect.setAttribute('required','required');};const handleBarangayChange=()=>{const selectedBarangay=barangaySelect?barangaySelect.value:'';if(barangayOtherGroup&&barangayOtherInput){if(selectedBarangay==='Other'){barangayOtherGroup.classList.remove('d-none');barangayOtherInput.setAttribute('required','required');}else{barangayOtherGroup.classList.add('d-none');barangayOtherInput.removeAttribute('required');}}if(purokGroup&&purokSelect){if(barangayPurokMap[selectedBarangay]){purokGroup.classList.remove('d-none');updatePurokOptions(selectedBarangay);}else{purokGroup.classList.add('d-none');purokSelect.removeAttribute('required');purokSelect.value='';purokSelect.setAttribute('data-selected','');}}};if(barangaySelect){barangaySelect.addEventListener('change',()=>{if(purokSelect){purokSelect.setAttribute('data-selected','');}handleBarangayChange();});handleBarangayChange();}});});
                 }
                 const clearClientErrors = () => {
                     const clientErrors = form.querySelectorAll('.invalid-feedback.js-register-error');

@@ -11,22 +11,26 @@
         <div class="row py-5 align-items-center justify-content-md-start" style="min-height: 80vh;">
             <div class="col-md-7 col-lg-6">
                 <h1 class="fw-bold mb-3">Easy Online Booking for Your Healthcare Needs</h1>
-                <p class="lead mb-4">Skip the long queues and book your appointment online. Access quality healthcare services right in your barangay with just a few clicks.</p>
+                <p class="lead mb-4">Skip the long queues and book your appointment online. Access quality healthcare
+                    services right in your barangay with just a few clicks.</p>
 
 
-                
+
                 <!--  Button triggers login modal if not logged in -->
-                @auth
-                    @if(Auth::user()->isPatient())
-                        <a href="{{ route('patient.book-appointment') }}" class="btn btn-primary btn-lg me-2 mb-2">Book Appointment Now</a>
+                <!--  Button triggers login modal if not logged in -->
+                @if(\App\Helpers\AuthHelper::check())
+                    @if(\App\Helpers\AuthHelper::user()->isPatient())
+                        <a href="{{ route('patient.book-appointment') }}" class="btn btn-primary btn-lg me-2 mb-2">Book
+                            Appointment Now</a>
                     @else
-                        <a href="{{ Auth::user()->isSuperAdmin() ? route('superadmin.dashboard') : route('admin.dashboard') }}" class="btn btn-primary btn-lg me-2 mb-2">Go to Dashboard</a>
+                        <a href="{{ \App\Helpers\AuthHelper::user()->isSuperAdmin() ? route('superadmin.dashboard') : route('admin.dashboard') }}"
+                            class="btn btn-primary btn-lg me-2 mb-2">Go to Dashboard</a>
                     @endif
                 @else
                     <a href="{{ route('login') }}" class="btn btn-primary btn-lg me-2 mb-2">
                         Book Appointment Now
                     </a>
-                @endauth
+                @endif
 
                 <a href="{{ route('services') }}" class="btn btn-outline-primary btn-lg mb-2">View Services</a>
 
@@ -53,7 +57,8 @@
                     <div class="card-body">
                         <i class="bi bi-person-plus fs-1 text-primary mb-3"></i>
                         <h5 class="fw-bold mb-2">1. Create an Account</h5>
-                        <p class="text-muted">Sign up using your email to start booking appointments and manage your visits online.</p>
+                        <p class="text-muted">Sign up using your email to start booking appointments and manage your
+                            visits online.</p>
                     </div>
                 </div>
             </div>
@@ -64,7 +69,8 @@
                     <div class="card-body">
                         <i class="bi bi-heart-pulse fs-1 text-danger mb-3"></i>
                         <h5 class="fw-bold mb-2">2. Choose a Service</h5>
-                        <p class="text-muted">Select the medical service you need from our list of available healthcare offerings.</p>
+                        <p class="text-muted">Select the medical service you need from our list of available healthcare
+                            offerings.</p>
                     </div>
                 </div>
             </div>
@@ -75,7 +81,8 @@
                     <div class="card-body">
                         <i class="bi bi-calendar-check fs-1 text-success mb-3"></i>
                         <h5 class="fw-bold mb-2">3. Book & Confirm</h5>
-                        <p class="text-muted">Pick a convenient date and time — then receive instant confirmation of your appointment.</p>
+                        <p class="text-muted">Pick a convenient date and time — then receive instant confirmation of
+                            your appointment.</p>
                     </div>
                 </div>
             </div>
@@ -89,13 +96,14 @@
 
 <!-- Optional Custom Styling -->
 <style>
-.hover-scale {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.hover-scale:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-}
+    .hover-scale {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .hover-scale:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
 </style>
 
 <!--  Bootstrap Icons CDN -->
@@ -105,7 +113,7 @@
 <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js" defer></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         AOS.init({ duration: 800, once: true });
     });
 </script>

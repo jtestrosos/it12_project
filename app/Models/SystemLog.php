@@ -14,7 +14,8 @@ class SystemLog extends Model
 
     protected $fillable = [
         'id',
-        'user_id',
+        'loggable_type',
+        'loggable_id',
         'action',
         'table_name',
         'record_id',
@@ -49,7 +50,7 @@ class SystemLog extends Model
         $prefix = 'BHW';
         // Get all logs with the prefix and find the highest number
         $logs = static::where('id', 'like', $prefix . '%')->get();
-        
+
         $maxNumber = 0;
         foreach ($logs as $log) {
             if (preg_match('/' . preg_quote($prefix) . '(\d+)/', $log->id, $matches)) {
@@ -59,14 +60,25 @@ class SystemLog extends Model
                 }
             }
         }
-        
+
         $newNumber = $maxNumber + 1;
         return $prefix . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
     }
 
+    /**
+     * Get the entity that owns the log (Patient, Admin, or SuperAdmin).
+     */
+    public function loggable()
+    {
+        return $this->morphTo();
+    }
+
+    /**
+     * Legacy accessor for backwards compatibility.
+     */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->loggable();
     }
 
     public function scopeRecent($query, $days = 30)

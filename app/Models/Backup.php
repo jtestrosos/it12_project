@@ -16,7 +16,8 @@ class Backup extends Model
         'file_path',
         'size',
         'status',
-        'created_by',
+        'created_by_admin_id',
+        'created_by_super_admin_id',
         'notes',
         'completed_at'
     ];
@@ -27,9 +28,42 @@ class Backup extends Model
         'updated_at' => 'datetime'
     ];
 
+    /**
+     * Get the admin who created the backup.
+     */
+    public function createdByAdmin()
+    {
+        return $this->belongsTo(Admin::class, 'created_by_admin_id');
+    }
+
+    /**
+     * Get the super admin who created the backup.
+     */
+    public function createdBySuperAdmin()
+    {
+        return $this->belongsTo(SuperAdmin::class, 'created_by_super_admin_id');
+    }
+
+    /**
+     * Get the creator (either admin or super admin).
+     */
     public function createdBy()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->createdByAdmin ?? $this->createdBySuperAdmin;
+    }
+
+    /**
+     * Get the creator relationship dynamically.
+     */
+    public function getCreatorAttribute()
+    {
+        if ($this->created_by_admin_id) {
+            return $this->createdByAdmin;
+        }
+        if ($this->created_by_super_admin_id) {
+            return $this->createdBySuperAdmin;
+        }
+        return null;
     }
 
     public function scopeCompleted($query)
@@ -44,12 +78,13 @@ class Backup extends Model
 
     public function getSizeInBytes()
     {
-        if (!$this->size) return 0;
-        
+        if (!$this->size)
+            return 0;
+
         $size = trim($this->size);
         $unit = strtolower(substr($size, -2));
         $value = (float) substr($size, 0, -2);
-        
+
         switch ($unit) {
             case 'kb':
                 return $value * 1024;
