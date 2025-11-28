@@ -105,73 +105,33 @@
 @endpush
 
 @section('content')
-    <!-- Backup Actions -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="backup-card">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="backup-icon backup-info me-3">
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <div>
-                        <h5 class="mb-1">Database Backup</h5>
-                        <p class="text-muted mb-0">Create a complete backup of the database</p>
-                    </div>
-                </div>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-primary" onclick="createBackup('database', this)">
-                        <i class="fas fa-download me-2"></i> Backup Database
-                    </button>
-                    <button class="btn btn-outline-info" onclick="scheduleBackup('database')">
-                        <i class="fas fa-clock me-2"></i> Schedule
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="backup-card">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="backup-icon backup-warning me-3">
-                        <i class="fas fa-file-archive"></i>
-                    </div>
-                    <div>
-                        <h5 class="mb-1">File System Backup</h5>
-                        <p class="text-muted mb-0">Backup uploaded files and documents</p>
-                    </div>
-                </div>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-warning" onclick="createBackup('files', this)">
-                        <i class="fas fa-download me-2"></i> Backup Files
-                    </button>
-                    <button class="btn btn-outline-warning" onclick="scheduleBackup('files')">
-                        <i class="fas fa-clock me-2"></i> Schedule
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Full System Backup -->
+    <!-- Unified Backup Action -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="backup-card">
                 <div class="d-flex align-items-center mb-3">
-                    <div class="backup-icon backup-danger me-3">
+                    <div class="backup-icon backup-info me-3">
                         <i class="fas fa-server"></i>
                     </div>
-                    <div>
-                        <h5 class="mb-1">Full System Backup</h5>
-                        <p class="text-muted mb-0">Create a complete backup of the entire system (Database + Files +
-                            Configuration)</p>
+                    <div class="flex-grow-1">
+                        <h5 class="mb-1">System Backup</h5>
+                        <p class="text-muted mb-0">Create a complete backup including database (PostgreSQL dump) and all
+                            uploaded files</p>
                     </div>
                 </div>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-danger" onclick="createBackup('full', this)">
-                        <i class="fas fa-download me-2"></i> Full System Backup
+                    <button class="btn btn-primary btn-lg" onclick="createBackup(this)">
+                        <i class="fas fa-download me-2"></i> Create Backup
                     </button>
-                    <button class="btn btn-outline-danger" onclick="scheduleBackup('full')">
-                        <i class="fas fa-clock me-2"></i> Schedule Daily
+                    <button class="btn btn-outline-secondary" onclick="location.reload()">
+                        <i class="fas fa-sync me-2"></i> Refresh
                     </button>
+                </div>
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Backup includes: PostgreSQL database dump + uploaded files (storage & uploads)
+                    </small>
                 </div>
             </div>
         </div>
@@ -326,11 +286,11 @@
 
 @push('scripts')
     <script>
-        function createBackup(type, buttonElement) {
-            if (confirm(`Are you sure you want to create a ${type} backup?`)) {
+        function createBackup(buttonElement) {
+            if (confirm('Are you sure you want to create a system backup?')) {
                 const button = buttonElement || event.target;
                 const originalText = button.innerHTML;
-                button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Creating...';
+                button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Creating backup...';
                 button.disabled = true;
 
                 fetch('{{ route("superadmin.backup.create") }}', {
@@ -340,7 +300,7 @@
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({ type: type })
+                    body: JSON.stringify({})
                 })
                     .then(response => {
                         console.log('Response status:', response.status);
@@ -352,7 +312,7 @@
                     .then(data => {
                         console.log('Backup response:', data);
                         if (data.success) {
-                            alert(data.message || `${type.charAt(0).toUpperCase() + type.slice(1)} backup completed successfully!`);
+                            alert(data.message || 'Backup completed successfully!');
                             location.reload();
                         } else {
                             alert(data.message || 'Backup failed!');
@@ -362,7 +322,7 @@
                     })
                     .catch(error => {
                         console.error('Backup error:', error);
-                        alert('Error creating backup: ' + (error.message || JSON.stringify(error)));
+                        alert(error.message || 'An error occurred while creating the backup.');
                         button.innerHTML = originalText;
                         button.disabled = false;
                     });

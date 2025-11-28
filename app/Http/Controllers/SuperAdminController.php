@@ -566,13 +566,11 @@ class SuperAdminController extends Controller
 
     public function createBackup(Request $request)
     {
-        \Log::info('Backup request received', ['type' => $request->type, 'user' => Auth::guard('super_admin')->id()]);
+        \Log::info('Unified backup request received', ['user' => Auth::guard('super_admin')->id()]);
 
-        $request->validate([
-            'type' => 'required|in:database,files,full'
-        ]);
+        // No validation needed - always creates full backup
 
-        $type = $request->type;
+        $type = 'full'; // Always create full backup
         $backupDirectory = 'backups/' . $type;
 
         try {
@@ -581,7 +579,7 @@ class SuperAdminController extends Controller
             $backup = Backup::create([
                 'type' => $type,
                 'status' => 'in_progress',
-                'created_by' => Auth::guard('super_admin')->id()
+                'created_by_super_admin_id' => Auth::guard('super_admin')->id()
             ]);
 
             // Determine filename based on type
@@ -731,25 +729,147 @@ class SuperAdminController extends Controller
     private function backupFullSystem($filePath, $filename, $backup)
     {
         try {
-            $backup->update(['notes' => 'Creating full system backup...']);
+            $backup->update(['notes' => 'Creating database backup...']);
 
-            $backupContent = "-- Full System Backup\n";
-            $backupContent .= "-- Generated on: " . now()->format('Y-m-d H:i:s') . "\n\n";
-            $backupContent .= "This is a complete system backup including:\n";
-            $backupContent .= "1. Database backup\n";
-            $backupContent .= "2. Files backup\n";
-            $backupContent .= "3. Configuration files\n\n";
-            $backupContent .= "System Information:\n";
-            $backupContent .= "- Application Name: " . config('app.name') . "\n";
-            $backupContent .= "- Environment: " . config('app.env') . "\n";
-            $backupContent .= "- Total Users: " . (Patient::count() + Admin::count() + SuperAdmin::count()) . "\n";
-            $backupContent .= "- Total Appointments: " . \App\Models\Appointment::count() . "\n";
-            $backupContent .= "- Total Inventory Items: " . \App\Models\Inventory::count() . "\n";
+            $sqlFile = storage_path('app/backups/full/' . $filename . '.sql');
 
-            Storage::put('backups/full/' . $filename . '.txt', $backupContent);
+            // Ensure directory exists
+            if (!file_exists(storage_path('app/backups/full'))) {
+                mkdir(storage_path('app/backups/full'), 0755, true);
+            }
+
+            // Try pg_dump first, fallback to Laravel export if not available
+            $usedPgDump = false;
+
+            // Check if pg_dump is available
+            exec('pg_dump --version 2>&1', $versionOutput, $versionCode);
+
+            if ($versionCode === 0) {
+                // pg_dump is available, use it
+                try {
+                    $host = config('database.connections.pgsql.host');
+                    $port = config('database.connections.pgsql.port', 5432);
+                    $database = config('database.connections.pgsql.database');
+                    $username = config('database.connections.pgsql.username');
+                    $password = config('database.connections.pgsql.password');
+
+                    putenv("PGPASSWORD={$password}");
+
+                    $command = sprintf(
+                        'pg_dump -h %s -p %s -U %s -d %s -F p -f %s 2>&1',
+                        escapeshellarg($host),
+                        escapeshellarg($port),
+                        escapeshellarg($username),
+                        escapeshellarg($database),
+                        escapeshellarg($sqlFile)
+                    );
+
+                    exec($command, $output, $returnCode);
+                    putenv("PGPASSWORD");
+
+                    if ($returnCode === 0 && file_exists($sqlFile) && filesize($sqlFile) > 0) {
+                        $usedPgDump = true;
+                        $backup->update(['notes' => 'Database backup completed using pg_dump']);
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('pg_dump failed, using fallback: ' . $e->getMessage());
+                }
+            }
+
+            // Fallback to Laravel database export if pg_dump failed or not available
+            if (!$usedPgDump) {
+                $backup->update(['notes' => 'Creating database backup using Laravel export...']);
+
+                $sqlContent = "-- PostgreSQL Database Backup (Laravel Export)\n";
+                $sqlContent .= "-- Generated on: " . now()->format('Y-m-d H:i:s') . "\n\n";
+
+                // Get all tables
+                $tables = DB::select("SELECT tablename FROM pg_tables WHERE schemaname = 'public'");
+
+                foreach ($tables as $table) {
+                    $tableName = $table->tablename;
+                    $sqlContent .= "\n-- Table: $tableName\n";
+
+                    try {
+                        $records = DB::table($tableName)->get();
+
+                        if ($records->count() > 0) {
+                            foreach ($records as $record) {
+                                $columns = array_keys((array) $record);
+                                $values = array_values((array) $record);
+
+                                $columnsList = implode(', ', array_map(function ($col) {
+                                    return '"' . $col . '"';
+                                }, $columns));
+
+                                $valuesList = implode(', ', array_map(function ($val) {
+                                    if (is_null($val))
+                                        return 'NULL';
+                                    if (is_bool($val))
+                                        return $val ? 'true' : 'false';
+                                    if (is_numeric($val))
+                                        return $val;
+                                    return "'" . str_replace("'", "''", $val) . "'";
+                                }, $values));
+
+                                $sqlContent .= "INSERT INTO \"$tableName\" ($columnsList) VALUES ($valuesList);\n";
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        $sqlContent .= "-- Error exporting table $tableName: " . $e->getMessage() . "\n";
+                    }
+                }
+
+                file_put_contents($sqlFile, $sqlContent);
+                $backup->update(['notes' => 'Database backup completed using Laravel export (pg_dump not available)']);
+            }
+
+            // Create ZIP archive of files
+            $backup->update(['notes' => 'Creating files archive...']);
+            $zip = new \ZipArchive();
+            $zipFile = storage_path('app/backups/full/' . $filename . '_files.zip');
+
+            if ($zip->open($zipFile, \ZipArchive::CREATE) === true) {
+                // Add storage/app/public files
+                $publicDir = storage_path('app/public');
+                if (is_dir($publicDir)) {
+                    $this->addDirectoryToZip($zip, $publicDir, 'storage');
+                }
+
+                // Add public/uploads files
+                $uploadsDir = public_path('uploads');
+                if (is_dir($uploadsDir)) {
+                    $this->addDirectoryToZip($zip, $uploadsDir, 'uploads');
+                }
+
+                $zip->close();
+            }
+
+            $backup->update(['notes' => 'Backup completed successfully']);
+
         } catch (\Exception $e) {
             $backup->update(['notes' => 'Error: ' . $e->getMessage()]);
             throw $e;
+        }
+    }
+
+    private function addDirectoryToZip($zip, $directory, $localName = '')
+    {
+        if (!is_dir($directory)) {
+            return;
+        }
+
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($files as $file) {
+            if (!$file->isDir()) {
+                $filePath = $file->getRealPath();
+                $relativePath = $localName . '/' . substr($filePath, strlen($directory) + 1);
+                $zip->addFile($filePath, $relativePath);
+            }
         }
     }
 
