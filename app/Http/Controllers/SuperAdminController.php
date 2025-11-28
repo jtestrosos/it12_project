@@ -30,7 +30,10 @@ class SuperAdminController extends Controller
         $recentLogs = SystemLog::with('user')->latest()->limit(5)->get();
 
         // Weekly appointments data for the line chart
-        $weeklyAppointments = Appointment::selectRaw('DAYOFWEEK(created_at) as day_of_week, count(*) as count')
+        $driver = DB::getDriverName();
+        $dayOfWeekSql = $driver === 'pgsql' ? 'EXTRACT(DOW FROM created_at) + 1' : 'DAYOFWEEK(created_at)';
+
+        $weeklyAppointments = Appointment::selectRaw("$dayOfWeekSql as day_of_week, count(*) as count")
             ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
             ->groupBy('day_of_week')
             ->get();
@@ -52,7 +55,7 @@ class SuperAdminController extends Controller
         $todayCompleted = Appointment::where('status', 'completed')
             ->whereDate('appointment_date', today())
             ->count();
-        
+
         $todayPending = Appointment::where('status', 'pending')
             ->whereDate('appointment_date', today())
             ->count();
@@ -92,18 +95,18 @@ class SuperAdminController extends Controller
             'gender' => 'required|in:male,female,other',
             'role' => 'required|in:user,admin,superadmin',
             'barangay' => [
-                Rule::requiredIf(fn () => $request->role === 'user'),
+                Rule::requiredIf(fn() => $request->role === 'user'),
                 Rule::in(['Barangay 11', 'Barangay 12', 'Other']),
             ],
             'barangay_other' => [
                 'nullable',
                 'string',
                 'max:255',
-                Rule::requiredIf(fn () => $request->role === 'user' && $request->barangay === 'Other'),
+                Rule::requiredIf(fn() => $request->role === 'user' && $request->barangay === 'Other'),
             ],
             'purok' => [
                 'nullable',
-                Rule::requiredIf(fn () => $request->role === 'user' && in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
+                Rule::requiredIf(fn() => $request->role === 'user' && in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
                 Rule::when(
                     $request->role === 'user' && $request->barangay === 'Barangay 11',
                     Rule::in(['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'])
@@ -114,13 +117,13 @@ class SuperAdminController extends Controller
                 ),
             ],
             'birth_date' => [
-                Rule::requiredIf(fn () => $request->role === 'user'),
+                Rule::requiredIf(fn() => $request->role === 'user'),
                 'nullable',
                 'date',
                 'before:today',
             ],
             'phone' => [
-                Rule::requiredIf(fn () => $request->role === 'user'),
+                Rule::requiredIf(fn() => $request->role === 'user'),
                 'nullable',
                 'string',
                 'max:20',
@@ -188,18 +191,18 @@ class SuperAdminController extends Controller
             'gender' => 'required|in:male,female,other',
             'role' => 'required|in:user,admin,superadmin',
             'barangay' => [
-                Rule::requiredIf(fn () => $request->role === 'user'),
+                Rule::requiredIf(fn() => $request->role === 'user'),
                 Rule::in(['Barangay 11', 'Barangay 12', 'Other']),
             ],
             'barangay_other' => [
                 'nullable',
                 'string',
                 'max:255',
-                Rule::requiredIf(fn () => $request->role === 'user' && $request->barangay === 'Other'),
+                Rule::requiredIf(fn() => $request->role === 'user' && $request->barangay === 'Other'),
             ],
             'purok' => [
                 'nullable',
-                Rule::requiredIf(fn () => $request->role === 'user' && in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
+                Rule::requiredIf(fn() => $request->role === 'user' && in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
                 Rule::when(
                     $request->role === 'user' && $request->barangay === 'Barangay 11',
                     Rule::in(['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'])
@@ -210,13 +213,13 @@ class SuperAdminController extends Controller
                 ),
             ],
             'birth_date' => [
-                Rule::requiredIf(fn () => $request->role === 'user'),
+                Rule::requiredIf(fn() => $request->role === 'user'),
                 'nullable',
                 'date',
                 'before:today',
             ],
             'phone' => [
-                Rule::requiredIf(fn () => $request->role === 'user'),
+                Rule::requiredIf(fn() => $request->role === 'user'),
                 'nullable',
                 'string',
                 'max:20',
@@ -327,44 +330,44 @@ class SuperAdminController extends Controller
     public function systemLogs(Request $request)
     {
         $query = SystemLog::with('user');
-        
+
         // Search by action, table_name, or user name
         if ($request->has('search') && $request->search) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('action', 'like', "%{$search}%")
-                  ->orWhere('table_name', 'like', "%{$search}%")
-                  ->orWhereHas('user', function($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhere('table_name', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
             });
         }
-        
+
         // Filter by action
         if ($request->has('action') && $request->action) {
             $query->where('action', $request->action);
         }
-        
+
         // Filter by table
         if ($request->has('table') && $request->table) {
             $query->where('table_name', $request->table);
         }
-        
+
         // Filter by date range
         if ($request->has('date_from') && $request->date_from) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }
-        
+
         if ($request->has('date_to') && $request->date_to) {
             $query->whereDate('created_at', '<=', $request->date_to);
         }
-        
+
         $logs = $query->latest()->paginate(10)->withQueryString();
-        
+
         // Get unique actions and tables for filter dropdowns
         $actions = SystemLog::distinct()->pluck('action')->filter();
         $tables = SystemLog::distinct()->pluck('table_name')->filter();
-        
+
         return view('superadmin.system-logs', compact('logs', 'actions', 'tables'));
     }
 
@@ -403,7 +406,11 @@ class SuperAdminController extends Controller
         ];
 
         // Get appointment trend data for last 6 months
-        $monthlyTrend = Appointment::selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, count(*) as count')
+        $driver = DB::getDriverName();
+        $monthSql = $driver === 'pgsql' ? 'EXTRACT(MONTH FROM created_at)' : 'MONTH(created_at)';
+        $yearSql = $driver === 'pgsql' ? 'EXTRACT(YEAR FROM created_at)' : 'YEAR(created_at)';
+
+        $monthlyTrend = Appointment::selectRaw("$monthSql as month, $yearSql as year, count(*) as count")
             ->where('created_at', '>=', now()->subMonths(6))
             ->groupBy('year', 'month')
             ->orderBy('year', 'asc')
@@ -416,33 +423,33 @@ class SuperAdminController extends Controller
     public function backup()
     {
         $backups = Backup::with('createdBy')->latest()->paginate(10);
-        
+
         // Get last backups
         $lastDatabase = Backup::completed()->byType('database')->latest()->first();
         $lastFiles = Backup::completed()->byType('files')->latest()->first();
         $lastFull = Backup::completed()->byType('full')->latest()->first();
-        
+
         // Calculate storage used
-        $totalSize = Backup::completed()->get()->sum(function($backup) {
+        $totalSize = Backup::completed()->get()->sum(function ($backup) {
             return $backup->getSizeInBytes();
         });
         $storageUsed = $this->formatBytes($totalSize);
         $storageTotal = "10 GB"; // You can make this dynamic
-        
+
         return view('superadmin.backup', compact('backups', 'lastDatabase', 'lastFiles', 'lastFull', 'storageUsed', 'storageTotal'));
     }
 
     public function createBackup(Request $request)
     {
         \Log::info('Backup request received', ['type' => $request->type, 'user' => Auth::id()]);
-        
+
         $request->validate([
             'type' => 'required|in:database,files,full'
         ]);
 
         $type = $request->type;
         $backupDirectory = 'backups/' . $type;
-        
+
         try {
             \Log::info('Starting backup process', ['type' => $type]);
             // Create backup record
@@ -455,7 +462,7 @@ class SuperAdminController extends Controller
             // Determine filename based on type
             $filename = $this->generateBackupFilename($type);
             $filePath = $backupDirectory . '/' . $filename;
-            
+
             // Create directory if it doesn't exist
             if (!Storage::exists($backupDirectory)) {
                 Storage::makeDirectory($backupDirectory);
@@ -490,7 +497,7 @@ class SuperAdminController extends Controller
                     }
                 }
             }
-            
+
             // Update backup record
             $fileSize = Storage::exists($actualFilePath) ? Storage::size($actualFilePath) : 1024;
             $backup->update([
@@ -500,30 +507,30 @@ class SuperAdminController extends Controller
                 'status' => 'completed',
                 'completed_at' => now()
             ]);
-        
-        // Log the backup action
-        SystemLog::create([
-            'user_id' => Auth::id(),
-            'action' => 'backup_created',
+
+            // Log the backup action
+            SystemLog::create([
+                'user_id' => Auth::id(),
+                'action' => 'backup_created',
                 'table_name' => 'backups',
                 'record_id' => $backup->id,
                 'new_values' => ['type' => $type, 'status' => 'completed'],
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent()
-        ]);
-        
-        return response()->json([
-            'success' => true,
-            'message' => ucfirst($type) . ' backup completed successfully!',
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => ucfirst($type) . ' backup completed successfully!',
                 'backup_id' => $backup->id
             ]);
         } catch (\Exception $e) {
             \Log::error('Backup failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            
+
             if (isset($backup)) {
                 $backup->update(['status' => 'failed', 'notes' => $e->getMessage()]);
             }
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Backup failed: ' . $e->getMessage()
@@ -535,22 +542,22 @@ class SuperAdminController extends Controller
     {
         try {
             $backup->update(['notes' => 'Creating database backup...']);
-            
+
             // Create a simple SQL dump of the most important tables
             $tables = ['users', 'appointments', 'inventory', 'system_logs', 'inventory_transactions'];
             $sqlContent = "-- Database Backup\n";
             $sqlContent .= "-- Generated on: " . now()->format('Y-m-d H:i:s') . "\n\n";
-            
+
             foreach ($tables as $table) {
                 try {
                     $records = DB::table($table)->get();
                     if ($records->count() > 0) {
                         $sqlContent .= "\n-- Table: $table\n";
                         foreach ($records as $record) {
-                            $columns = implode(', ', array_keys((array)$record));
-                            $values = implode(', ', array_map(function($v) {
+                            $columns = implode(', ', array_keys((array) $record));
+                            $values = implode(', ', array_map(function ($v) {
                                 return "'" . addslashes($v) . "'";
-                            }, array_values((array)$record)));
+                            }, array_values((array) $record)));
                             $sqlContent .= "INSERT INTO `$table` ($columns) VALUES ($values);\n";
                         }
                     }
@@ -559,7 +566,7 @@ class SuperAdminController extends Controller
                     continue;
                 }
             }
-            
+
             Storage::put('backups/database/' . $filename . '.sql', $sqlContent);
         } catch (\Exception $e) {
             $backup->update(['notes' => 'Error: ' . $e->getMessage()]);
@@ -571,7 +578,7 @@ class SuperAdminController extends Controller
     {
         try {
             $backup->update(['notes' => 'Creating files backup...']);
-            
+
             // Create a simple text file listing what would be backed up
             $backupContent = "-- Files Backup\n";
             $backupContent .= "-- Generated on: " . now()->format('Y-m-d H:i:s') . "\n\n";
@@ -580,7 +587,7 @@ class SuperAdminController extends Controller
             $backupContent .= "- public/uploads/\n";
             $backupContent .= "- storage/app/public/\n\n";
             $backupContent .= "System files:\n";
-            
+
             // List some files as example
             if (Storage::exists('public')) {
                 $files = Storage::files('public');
@@ -588,7 +595,7 @@ class SuperAdminController extends Controller
                     $backupContent .= "- " . $file . "\n";
                 }
             }
-            
+
             Storage::put('backups/files/' . $filename . '.txt', $backupContent);
         } catch (\Exception $e) {
             $backup->update(['notes' => 'Error: ' . $e->getMessage()]);
@@ -600,7 +607,7 @@ class SuperAdminController extends Controller
     {
         try {
             $backup->update(['notes' => 'Creating full system backup...']);
-            
+
             $backupContent = "-- Full System Backup\n";
             $backupContent .= "-- Generated on: " . now()->format('Y-m-d H:i:s') . "\n\n";
             $backupContent .= "This is a complete system backup including:\n";
@@ -613,7 +620,7 @@ class SuperAdminController extends Controller
             $backupContent .= "- Total Users: " . \App\Models\User::count() . "\n";
             $backupContent .= "- Total Appointments: " . \App\Models\Appointment::count() . "\n";
             $backupContent .= "- Total Inventory Items: " . \App\Models\Inventory::count() . "\n";
-            
+
             Storage::put('backups/full/' . $filename . '.txt', $backupContent);
         } catch (\Exception $e) {
             $backup->update(['notes' => 'Error: ' . $e->getMessage()]);
@@ -629,13 +636,13 @@ class SuperAdminController extends Controller
     private function formatBytes($bytes, $precision = 2)
     {
         $units = array('B', 'KB', 'MB', 'GB', 'TB');
-        
+
         $bytes = max($bytes, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
-        
+
         $bytes /= (1 << (10 * $pow));
-        
+
         return round($bytes, $precision) . ' ' . $units[$pow];
     }
 
@@ -649,7 +656,7 @@ class SuperAdminController extends Controller
 
             // Get file extension for proper content type
             $extension = pathinfo($backup->filename, PATHINFO_EXTENSION);
-            
+
             // Log the download action
             SystemLog::create([
                 'user_id' => Auth::id(),
@@ -672,9 +679,9 @@ class SuperAdminController extends Controller
         if (Storage::exists($backup->file_path)) {
             Storage::delete($backup->file_path);
         }
-        
+
         $backup->delete();
-        
+
         // Log the deletion
         SystemLog::create([
             'user_id' => Auth::id(),
@@ -685,7 +692,7 @@ class SuperAdminController extends Controller
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent()
         ]);
-        
+
         return redirect()->back()->with('success', 'Backup deleted successfully.');
     }
 
@@ -698,7 +705,7 @@ class SuperAdminController extends Controller
 
         $type = $request->type;
         $schedule = $request->schedule;
-        
+
         // Log the backup scheduling action
         SystemLog::create([
             'user_id' => Auth::id(),
@@ -712,7 +719,7 @@ class SuperAdminController extends Controller
 
         // In a real application, you would implement actual scheduling logic here
         // This could use Laravel's Task Scheduling feature
-        
+
         return response()->json([
             'success' => true,
             'message' => ucfirst($type) . ' backup scheduled for ' . $schedule . '!'

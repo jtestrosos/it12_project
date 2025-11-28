@@ -85,16 +85,20 @@ class AdminController extends Controller
         // --- Chart Data Preparation ---
 
         // 1. Overview Chart Data (Appointments Count)
-        
+
+        $driver = DB::getDriverName();
+
         // Weekly (Current Week: Sun-Sat)
-        $weeklyOverview = Appointment::selectRaw('DAYOFWEEK(appointment_date) as label_key, count(*) as count')
+        $dayOfWeekSql = $driver === 'pgsql' ? 'EXTRACT(DOW FROM appointment_date) + 1' : 'DAYOFWEEK(appointment_date)';
+        $weeklyOverview = Appointment::selectRaw("$dayOfWeekSql as label_key, count(*) as count")
             ->whereBetween('appointment_date', [now()->startOfWeek(), now()->endOfWeek()])
             ->groupBy('label_key')
             ->pluck('count', 'label_key')
             ->toArray();
 
         // Monthly (Current Month: 1-31)
-        $monthlyOverview = Appointment::selectRaw('DAY(appointment_date) as label_key, count(*) as count')
+        $daySql = $driver === 'pgsql' ? 'EXTRACT(DAY FROM appointment_date)' : 'DAY(appointment_date)';
+        $monthlyOverview = Appointment::selectRaw("$daySql as label_key, count(*) as count")
             ->whereMonth('appointment_date', now()->month)
             ->whereYear('appointment_date', now()->year)
             ->groupBy('label_key')
@@ -102,7 +106,8 @@ class AdminController extends Controller
             ->toArray();
 
         // Yearly (Current Year: 1-12)
-        $yearlyOverview = Appointment::selectRaw('MONTH(appointment_date) as label_key, count(*) as count')
+        $monthSql = $driver === 'pgsql' ? 'EXTRACT(MONTH FROM appointment_date)' : 'MONTH(appointment_date)';
+        $yearlyOverview = Appointment::selectRaw("$monthSql as label_key, count(*) as count")
             ->whereYear('appointment_date', now()->year)
             ->groupBy('label_key')
             ->pluck('count', 'label_key')
@@ -231,11 +236,11 @@ class AdminController extends Controller
                 'nullable',
                 'string',
                 'max:255',
-                Rule::requiredIf(fn () => $request->barangay === 'Other'),
+                Rule::requiredIf(fn() => $request->barangay === 'Other'),
             ],
             'purok' => [
                 'nullable',
-                Rule::requiredIf(fn () => in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
+                Rule::requiredIf(fn() => in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
                 Rule::when(
                     $request->barangay === 'Barangay 11',
                     Rule::in(['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'])
@@ -306,11 +311,11 @@ class AdminController extends Controller
                 'nullable',
                 'string',
                 'max:255',
-                Rule::requiredIf(fn () => $request->barangay === 'Other'),
+                Rule::requiredIf(fn() => $request->barangay === 'Other'),
             ],
             'purok' => [
                 'nullable',
-                Rule::requiredIf(fn () => in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
+                Rule::requiredIf(fn() => in_array($request->barangay, ['Barangay 11', 'Barangay 12'], true)),
                 Rule::when(
                     $request->barangay === 'Barangay 11',
                     Rule::in(['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'])
@@ -489,7 +494,7 @@ class AdminController extends Controller
         ]);
 
         $oldStatus = $appointment->status;
-        
+
         $update = [
             'status' => $request->status,
             'notes' => $request->notes,
@@ -582,9 +587,20 @@ class AdminController extends Controller
 
         // Build category options from existing items
         $defaultCategories = [
-            'Medicines','Medical Supplies','Equipment','Vaccines','PPE',
-            'Syringes & Needles','Lab Supplies','Test Kits','Disinfectants',
-            'Consumables','Dressings','Nutritional Supplements','Oxygen Supplies','Other'
+            'Medicines',
+            'Medical Supplies',
+            'Equipment',
+            'Vaccines',
+            'PPE',
+            'Syringes & Needles',
+            'Lab Supplies',
+            'Test Kits',
+            'Disinfectants',
+            'Consumables',
+            'Dressings',
+            'Nutritional Supplements',
+            'Oxygen Supplies',
+            'Other'
         ];
 
         $categories = Inventory::select('category')
@@ -767,11 +783,14 @@ class AdminController extends Controller
             ->get();
 
         // --- Multi-timeframe Trend Data ---
+        
+        $driver = DB::getDriverName();
 
         // 1. Weekly (Current Week: Sun-Sat)
         $startOfWeek = now()->startOfWeek();
         $endOfWeek = now()->endOfWeek();
-        $weeklyData = Appointment::selectRaw('DAYOFWEEK(appointment_date) as day, count(*) as count')
+        $dayOfWeekSql = $driver === 'pgsql' ? 'EXTRACT(DOW FROM appointment_date) + 1' : 'DAYOFWEEK(appointment_date)';
+        $weeklyData = Appointment::selectRaw("$dayOfWeekSql as day, count(*) as count")
             ->whereBetween('appointment_date', [$startOfWeek, $endOfWeek])
             ->groupBy('day')
             ->pluck('count', 'day')
@@ -780,7 +799,8 @@ class AdminController extends Controller
         // 2. Monthly (Current Month: 1st-End)
         $startOfMonth = now()->startOfMonth();
         $endOfMonth = now()->endOfMonth();
-        $monthlyData = Appointment::selectRaw('DAY(appointment_date) as day, count(*) as count')
+        $daySql = $driver === 'pgsql' ? 'EXTRACT(DAY FROM appointment_date)' : 'DAY(appointment_date)';
+        $monthlyData = Appointment::selectRaw("$daySql as day, count(*) as count")
             ->whereBetween('appointment_date', [$startOfMonth, $endOfMonth])
             ->groupBy('day')
             ->pluck('count', 'day')
@@ -789,7 +809,8 @@ class AdminController extends Controller
         // 3. Yearly (Current Year: Jan-Dec)
         $startOfYear = now()->startOfYear();
         $endOfYear = now()->endOfYear();
-        $yearlyData = Appointment::selectRaw('MONTH(appointment_date) as month, count(*) as count')
+        $monthSql = $driver === 'pgsql' ? 'EXTRACT(MONTH FROM appointment_date)' : 'MONTH(appointment_date)';
+        $yearlyData = Appointment::selectRaw("$monthSql as month, count(*) as count")
             ->whereBetween('appointment_date', [$startOfYear, $endOfYear])
             ->groupBy('month')
             ->pluck('count', 'month')
@@ -1008,14 +1029,14 @@ class AdminController extends Controller
         $patients = $appointments
             ->pluck('user')
             ->filter()
-            ->unique(fn ($user) => $user->id ?? spl_object_id($user))
+            ->unique(fn($user) => $user->id ?? spl_object_id($user))
             ->values();
 
         $patientAppointments = $appointments
-            ->filter(fn ($appt) => $appt->user_id !== null)
+            ->filter(fn($appt) => $appt->user_id !== null)
             ->values();
         $walkInAppointments = $appointments
-            ->filter(fn ($appt) => $appt->user_id === null)
+            ->filter(fn($appt) => $appt->user_id === null)
             ->values();
 
         $html = view('admin.reports.appointments-pdf', [
@@ -1035,14 +1056,14 @@ class AdminController extends Controller
         $dompdf->setPaper('a4', 'landscape');
         $dompdf->render();
 
-        $filename = 'appointments_' . $request->start_date . '_to_' . $request->end_date . '.pdf';          
+        $filename = 'appointments_' . $request->start_date . '_to_' . $request->end_date . '.pdf';
         return response()->streamDownload(
             function () use ($dompdf) {
                 echo $dompdf->output();
             },
-            $filename,     
+            $filename,
             [
-                'Content-Type' => 'application/pdf',              
+                'Content-Type' => 'application/pdf',
             ]
         );
     }
@@ -1057,16 +1078,16 @@ class AdminController extends Controller
         ]);
 
         $date = $request->date;
-        
+
         // Debug: Check what appointments exist for this date
         $appointments = \App\Models\Appointment::whereDate('appointment_date', $date)
             ->whereIn('status', ['pending', 'approved', 'completed'])
             ->get();
-        
+
         \Log::info("Appointments for date {$date}: " . $appointments->toJson());
-        
+
         $slots = AppointmentHelper::getAvailableSlots($date);
-        
+
         \Log::info("Slots data for date {$date}: " . json_encode($slots));
 
         return response()->json([
@@ -1090,9 +1111,9 @@ class AdminController extends Controller
 
         $year = $request->year;
         $month = $request->month;
-        
+
         $calendarData = AppointmentHelper::getCalendarData($year, $month);
-        
+
         // Debug: Log calendar data
         \Log::info("Calendar data for {$year}-{$month}: " . json_encode($calendarData));
 
@@ -1107,16 +1128,18 @@ class AdminController extends Controller
     public function exportPatientsExcel()
     {
         $patients = User::where('role', 'user')->get();
-        
-        $export = new class($patients) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+
+        $export = new class ($patients) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
             protected $patients;
-            
-            public function __construct($patients) {
+
+            public function __construct($patients)
+            {
                 $this->patients = $patients;
             }
-            
-            public function collection() {
-                return $this->patients->map(function($patient) {
+
+            public function collection()
+            {
+                return $this->patients->map(function ($patient) {
                     return [
                         'Name' => $patient->name,
                         'Email' => $patient->email,
@@ -1127,30 +1150,31 @@ class AdminController extends Controller
                     ];
                 });
             }
-            
-            public function headings(): array {
+
+            public function headings(): array
+            {
                 return ['Name', 'Email', 'Gender', 'Age', 'Barangay', 'Registered'];
             }
         };
-        
+
         return Excel::download($export, 'patient_reports_' . now()->format('Y-m-d') . '.xlsx');
     }
 
     public function exportPatientsPdf()
     {
         $patients = User::where('role', 'user')->get();
-        
+
         $html = view('admin.reports.patients-pdf', compact('patients'))->render();
-        
+
         $options = new Options();
         $options->set('isRemoteEnabled', true);
         $options->set('defaultFont', 'DejaVu Sans');
-        
+
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html);
         $dompdf->setPaper('a4', 'portrait');
         $dompdf->render();
-        
+
         $filename = 'patient_reports_' . now()->format('Y-m-d') . '.pdf';
         return response()->streamDownload(
             function () use ($dompdf) {
@@ -1165,16 +1189,18 @@ class AdminController extends Controller
     public function exportInventoryExcel()
     {
         $inventory = Inventory::all();
-        
-        $export = new class($inventory) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+
+        $export = new class ($inventory) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
             protected $inventory;
-            
-            public function __construct($inventory) {
+
+            public function __construct($inventory)
+            {
                 $this->inventory = $inventory;
             }
-            
-            public function collection() {
-                return $this->inventory->map(function($item) {
+
+            public function collection()
+            {
+                return $this->inventory->map(function ($item) {
                     return [
                         'Item Name' => $item->item_name,
                         'Category' => $item->category,
@@ -1185,30 +1211,31 @@ class AdminController extends Controller
                     ];
                 });
             }
-            
-            public function headings(): array {
+
+            public function headings(): array
+            {
                 return ['Item Name', 'Category', 'Current Stock', 'Minimum Stock', 'Status', 'Expiry Date'];
             }
         };
-        
+
         return Excel::download($export, 'inventory_reports_' . now()->format('Y-m-d') . '.xlsx');
     }
 
     public function exportInventoryPdf()
     {
         $inventory = Inventory::all();
-        
+
         $html = view('admin.reports.inventory-pdf', compact('inventory'))->render();
-        
+
         $options = new Options();
         $options->set('isRemoteEnabled', true);
         $options->set('defaultFont', 'DejaVu Sans');
-        
+
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html);
         $dompdf->setPaper('a4', 'landscape');
         $dompdf->render();
-        
+
         $filename = 'inventory_reports_' . now()->format('Y-m-d') . '.pdf';
         return response()->streamDownload(
             function () use ($dompdf) {
