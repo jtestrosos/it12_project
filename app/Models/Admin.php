@@ -12,7 +12,7 @@ class Admin extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, SoftDeletes;
 
-    protected $table = 'admins';
+    protected $table = 'admin';
 
     /**
      * The attributes that are mass assignable.

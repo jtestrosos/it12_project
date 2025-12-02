@@ -17,8 +17,8 @@ return new class extends Migration {
             // Rename user_id to patient_id
             $table->renameColumn('user_id', 'patient_id');
 
-            // Add new foreign key to patients table
-            $table->foreign('patient_id')->references('id')->on('patients')->onDelete('cascade');
+            // Add new foreign key to patient table
+            $table->foreign('patient_id')->references('id')->on('patient')->onDelete('cascade');
 
             // Modify approved_by to handle both admins and super_admins
             // We'll use separate columns for clarity
@@ -28,8 +28,8 @@ return new class extends Migration {
             $table->unsignedBigInteger('approved_by_admin_id')->nullable()->after('is_walk_in');
             $table->unsignedBigInteger('approved_by_super_admin_id')->nullable()->after('approved_by_admin_id');
 
-            $table->foreign('approved_by_admin_id')->references('id')->on('admins')->onDelete('set null');
-            $table->foreign('approved_by_super_admin_id')->references('id')->on('super_admins')->onDelete('set null');
+            $table->foreign('approved_by_admin_id')->references('id')->on('admin')->onDelete('set null');
+            $table->foreign('approved_by_super_admin_id')->references('id')->on('super_admin')->onDelete('set null');
         });
     }
 

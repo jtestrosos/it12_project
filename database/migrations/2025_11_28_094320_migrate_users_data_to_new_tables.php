@@ -12,7 +12,7 @@ return new class extends Migration {
         // Migrate patients (role = 'user')
         $patients = DB::table('users')->where('role', 'user')->get();
         foreach ($patients as $user) {
-            DB::table('patients')->insert([
+            DB::table('patient')->insert([
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
@@ -37,7 +37,7 @@ return new class extends Migration {
         // Migrate admins (role = 'admin')
         $admins = DB::table('users')->where('role', 'admin')->get();
         foreach ($admins as $user) {
-            DB::table('admins')->insert([
+            DB::table('admin')->insert([
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
@@ -56,7 +56,7 @@ return new class extends Migration {
         // Migrate super admins (role = 'superadmin')
         $superAdmins = DB::table('users')->where('role', 'superadmin')->get();
         foreach ($superAdmins as $user) {
-            DB::table('super_admins')->insert([
+            DB::table('super_admin')->insert([
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
@@ -102,9 +102,9 @@ return new class extends Migration {
                     DB::table('inventory_transactions')
                         ->where('id', $transaction->id)
                         ->update([
-                                'performable_type' => $type,
-                                'performable_id' => $user->id,
-                            ]);
+                            'performable_type' => $type,
+                            'performable_id' => $user->id,
+                        ]);
                 }
             }
         }
@@ -125,9 +125,9 @@ return new class extends Migration {
                     DB::table('system_logs')
                         ->where('id', $log->id)
                         ->update([
-                                'loggable_type' => $type,
-                                'loggable_id' => $user->id,
-                            ]);
+                            'loggable_type' => $type,
+                            'loggable_id' => $user->id,
+                        ]);
                 }
             }
         }

@@ -228,6 +228,10 @@ Route::middleware(['patient'])->group(function () {
         Route::get('/appointment/{appointment}', [PatientController::class, 'showAppointment'])->name('appointment.show');
         Route::post('/appointment/{appointment}/cancel', [PatientController::class, 'cancelAppointment'])->name('appointment.cancel');
         Route::put('/appointment/{appointment}/cancel', [PatientController::class, 'cancelAppointment'])->name('cancel-appointment');
+
+        // Medical Profile Routes
+        Route::get('/medical-profile', [PatientController::class, 'medicalProfile'])->name('medical-profile');
+        Route::post('/medical-profile', [PatientController::class, 'updateMedicalProfile'])->name('medical-profile.update');
     });
 });
 
@@ -272,6 +276,10 @@ Route::middleware(['admin'])->group(function () {
         Route::get('/services/{service}/edit', [AdminController::class, 'editService'])->name('services.edit');
         Route::put('/services/{service}', [AdminController::class, 'updateService'])->name('services.update');
         Route::delete('/services/{service}', [AdminController::class, 'deleteService'])->name('services.destroy');
+
+        // Patient Medical Profile
+        Route::get('/patient/{patient}/medical-profile', [AdminController::class, 'viewPatientMedicalProfile'])->name('patient.medical-profile');
+        Route::post('/patient/{patient}/medical-profile', [AdminController::class, 'updatePatientMedicalProfile'])->name('patient.medical-profile.update');
     });
 });
 

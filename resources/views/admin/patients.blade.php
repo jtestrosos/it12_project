@@ -486,6 +486,12 @@
                                                     data-bs-target="#viewPatientModal{{ $patient->id }}">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
+                                                @if($patient->age >= 6)
+                                                    <a href="{{ route('admin.patient.medical-profile', $patient) }}"
+                                                        class="btn btn-outline-info btn-sm" title="View Medical Profile">
+                                                        <i class="fas fa-file-medical"></i>
+                                                    </a>
+                                                @endif
                                                 <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal"
                                                     data-bs-target="#createAppointmentModal" data-user-id="{{ $patient->id }}"
                                                     data-user-name="{{ $patient->name }}"
@@ -838,12 +844,12 @@
                                                     <td>{{ $appointment->service_type }}</td>
                                                     <td>
                                                         <span class="badge 
-                                                                    @if($appointment->status == 'pending') bg-warning
-                                                                    @elseif($appointment->status == 'approved') bg-success
-                                                                    @elseif($appointment->status == 'completed') bg-info
-                                                                    @elseif($appointment->status == 'cancelled') bg-danger
-                                                                    @else bg-secondary
-                                                                    @endif">
+                                                                                @if($appointment->status == 'pending') bg-warning
+                                                                                @elseif($appointment->status == 'approved') bg-success
+                                                                                @elseif($appointment->status == 'completed') bg-info
+                                                                                @elseif($appointment->status == 'cancelled') bg-danger
+                                                                                @else bg-secondary
+                                                                                @endif">
                                                             {{ ucfirst($appointment->status) }}
                                                         </span>
                                                     </td>
@@ -1482,9 +1488,9 @@
                     }
 
                     slotElement.innerHTML = `
-                            <div class="time">${slot.display}</div>
-                            <div class="status">${slot.available ? 'Available' : 'Occupied'}</div>
-                        `;
+                                <div class="time">${slot.display}</div>
+                                <div class="status">${slot.available ? 'Available' : 'Occupied'}</div>
+                            `;
 
                     timeSlotsGrid.appendChild(slotElement);
                 });

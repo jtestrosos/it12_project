@@ -12,7 +12,7 @@ class SuperAdmin extends Authenticatable implements MustVerifyEmail
     use HasFactory, Notifiable;
     // Note: No SoftDeletes for super admins
 
-    protected $table = 'super_admins';
+    protected $table = 'super_admin';
 
     /**
      * The attributes that are mass assignable.

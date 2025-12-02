@@ -21,8 +21,8 @@ return new class extends Migration {
             $table->unsignedBigInteger('created_by_admin_id')->nullable()->after('id');
             $table->unsignedBigInteger('created_by_super_admin_id')->nullable()->after('created_by_admin_id');
 
-            $table->foreign('created_by_admin_id')->references('id')->on('admins')->onDelete('set null');
-            $table->foreign('created_by_super_admin_id')->references('id')->on('super_admins')->onDelete('set null');
+            $table->foreign('created_by_admin_id')->references('id')->on('admin')->onDelete('set null');
+            $table->foreign('created_by_super_admin_id')->references('id')->on('super_admin')->onDelete('set null');
         });
     }
 

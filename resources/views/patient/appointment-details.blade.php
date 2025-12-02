@@ -17,6 +17,10 @@
         href="{{ route('patient.book-appointment') }}" data-tooltip="Book Appointment">
         <i class="fas fa-plus"></i> <span class="sidebar-content">Book Appointment</span>
     </a>
+    <a class="nav-link @if(request()->routeIs('patient.medical-profile')) active @endif"
+        href="{{ route('patient.medical-profile') }}" data-tooltip="Medical Profile">
+        <i class="fas fa-file-medical"></i> <span class="sidebar-content">Medical Profile</span>
+    </a>
 @endsection
 
 @section('user-initials')
