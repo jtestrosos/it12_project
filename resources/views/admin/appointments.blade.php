@@ -5,7 +5,7 @@
 @section('page-description', 'View and manage all patient appointments')
 
 @section('page-styles')
-<style>
+    <style>
         .appointment-card {
             background: #ffffff;
             border-radius: 14px;
@@ -15,41 +15,50 @@
             border: 1px solid #edf1f7;
             transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
         }
+
         .appointment-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 30px rgba(15, 23, 42, 0.10);
             border-color: #d0e2ff;
         }
+
         .status-badge {
             padding: 0.5rem 1rem;
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
         }
+
         .status-pending {
             background-color: #fff3cd;
             color: #856404;
         }
+
         .status-approved {
             background-color: #d4edda;
             color: #155724;
         }
+
         .status-completed {
             background-color: #d1ecf1;
             color: #0c5460;
         }
+
         .status-cancelled {
             background-color: #f8d7da;
             color: #721c24;
         }
+
         .status-no_show {
             background-color: #e2e3e5;
             color: #383d41;
         }
+
         .table-modern {
             border-collapse: separate;
             border-spacing: 0;
         }
+
         .table-modern thead th {
             background-color: #f9fafb;
             border: none;
@@ -60,38 +69,95 @@
             font-size: 0.75rem;
             letter-spacing: .04em;
         }
+
         .table-modern tbody td {
             border: none;
             padding: 0.85rem 1rem;
             border-bottom: 1px solid #edf2f7;
         }
+
         .table-modern tbody tr:hover {
             background-color: #f8f9fa;
         }
+
         /* Ensure dropdowns inside responsive tables are not clipped */
-        .table-responsive { overflow: visible; }
+        .table-responsive {
+            overflow: visible;
+        }
+
         /* Keep actions column flexible */
-        .actions-col { white-space: nowrap; }
+        .actions-col {
+            white-space: nowrap;
+        }
+
         /* Dark mode modal + form fields (booking drawer/modal) */
-        body.bg-dark .offcanvas, body.bg-dark .modal-content { background: #1e2124; color: #e6e6e6; border-color: #2a2f35; }
-        body.bg-dark .offcanvas .form-label, body.bg-dark .modal-content .form-label { color: #e6e6e6; }
+        body.bg-dark .offcanvas,
+        body.bg-dark .modal-content {
+            background: #1e2124;
+            color: #e6e6e6;
+            border-color: #2a2f35;
+        }
+
+        body.bg-dark .offcanvas .form-label,
+        body.bg-dark .modal-content .form-label {
+            color: #e6e6e6;
+        }
+
         body.bg-dark .offcanvas .form-control,
         body.bg-dark .offcanvas .form-select,
         body.bg-dark .modal-content .form-control,
-        body.bg-dark .modal-content .form-select { background-color: #0f1316; color: #e6e6e6; border-color: #2a2f35; }
+        body.bg-dark .modal-content .form-select {
+            background-color: #0f1316;
+            color: #e6e6e6;
+            border-color: #2a2f35;
+        }
+
         body.bg-dark .offcanvas .form-control::placeholder,
-        body.bg-dark .modal-content .form-control::placeholder { color: #9aa4ad; }
-        body.bg-dark .offcanvas .input-group-text { background: #1a1f24; color: #cbd3da; border-color: #2a2f35; }
+        body.bg-dark .modal-content .form-control::placeholder {
+            color: #9aa4ad;
+        }
+
+        body.bg-dark .offcanvas .input-group-text {
+            background: #1a1f24;
+            color: #cbd3da;
+            border-color: #2a2f35;
+        }
+
         /* Dark mode dropdown */
-        body.bg-dark .dropdown-menu { background: #1e2124; border-color: #2a2f35; }
-        body.bg-dark .dropdown-item { color: #e6e6e6; }
-        body.bg-dark .dropdown-item:hover, body.bg-dark .dropdown-item.active { background-color: #2a2f35; color: #fff; }
-        body.bg-dark .table-modern thead th { background-color: #1a1f24; color: #e6e6e6; }
-        body.bg-dark .table-modern tbody td { border-bottom-color: #2a2f35; color: #d6d6d6; }
-        body.bg-dark .table-modern tbody tr:hover { background-color: #2a2f35; }
+        body.bg-dark .dropdown-menu {
+            background: #1e2124;
+            border-color: #2a2f35;
+        }
+
+        body.bg-dark .dropdown-item {
+            color: #e6e6e6;
+        }
+
+        body.bg-dark .dropdown-item:hover,
+        body.bg-dark .dropdown-item.active {
+            background-color: #2a2f35;
+            color: #fff;
+        }
+
+        body.bg-dark .table-modern thead th {
+            background-color: #1a1f24;
+            color: #e6e6e6;
+        }
+
+        body.bg-dark .table-modern tbody td {
+            border-bottom-color: #2a2f35;
+            color: #d6d6d6;
+        }
+
+        body.bg-dark .table-modern tbody tr:hover {
+            background-color: #2a2f35;
+        }
 
         /* Match Inventory's darker sidebar color in dark mode */
-        body.bg-dark .sidebar { background: #131516; border-right-color: #2a2f35; }
+        body.bg-dark .sidebar {
+            background: #131516;
+            border-right-color: #2a2f35;
+        }
 
         /* Calendar Styles */
         .calendar-grid {
@@ -100,6 +166,7 @@
             gap: 2px;
             font-size: 0.8rem;
         }
+
         .calendar-header {
             text-align: center;
             font-weight: 600;
@@ -107,6 +174,7 @@
             background-color: #f8f9fa;
             border: 1px solid #dee2e6;
         }
+
         .calendar-day {
             aspect-ratio: 1;
             display: flex;
@@ -117,33 +185,40 @@
             transition: all 0.2s ease;
             position: relative;
         }
+
         .calendar-day:hover {
             background-color: #e9ecef;
         }
+
         .calendar-day.selected {
             background-color: #007bff;
             color: white;
             border-color: #007bff;
         }
+
         .calendar-day.occupied {
             background-color: #dc3545;
             color: white;
             border-color: #dc3545;
         }
+
         .calendar-day.partially-occupied {
             background-color: #ffc107;
             color: #212529;
             border-color: #ffc107;
         }
+
         .calendar-day.weekend {
             background-color: #f8f9fa;
             color: #6c757d;
         }
+
         .calendar-day.past {
             background-color: #e9ecef;
             color: #adb5bd;
             cursor: not-allowed;
         }
+
         .calendar-day .day-number {
             font-weight: 600;
             font-size: 0.9rem;
@@ -154,13 +229,14 @@
             justify-content: center;
             height: 70%;
         }
+
         .calendar-day .slot-indicator {
             position: absolute;
             bottom: 2px;
             left: 50%;
             transform: translateX(-50%);
             font-size: 0.55rem;
-            background: rgba(0,0,0,0.15);
+            background: rgba(0, 0, 0, 0.15);
             color: #666;
             padding: 1px 4px;
             border-radius: 3px;
@@ -170,11 +246,13 @@
             width: auto;
             white-space: nowrap;
         }
+
         .time-slots-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 0.5rem;
         }
+
         .time-slot {
             padding: 0.75rem;
             border: 1px solid #dee2e6;
@@ -183,67 +261,81 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
+
         .time-slot.available {
             background-color: #d4edda;
             border-color: #c3e6cb;
             color: #155724;
         }
+
         .time-slot.available:hover {
             background-color: #c3e6cb;
         }
+
         .time-slot.occupied {
             background-color: #f8d7da;
             border-color: #f5c6cb;
             color: #721c24;
             cursor: not-allowed;
         }
+
         .time-slot.selected {
             background-color: #007bff;
             border-color: #007bff;
             color: white;
         }
+
         .time-slot .time {
             font-weight: 600;
             font-size: 0.9rem;
         }
+
         .time-slot .status {
             font-size: 0.75rem;
             margin-top: 0.25rem;
         }
+
         body.bg-dark .calendar-header {
             background-color: #2a2f35;
             color: #e6e6e6;
             border-color: #2a2f35;
         }
+
         body.bg-dark .calendar-day {
             border-color: #2a2f35;
             color: #e6e6e6;
         }
+
         body.bg-dark .calendar-day:hover {
             background-color: #2a2f35;
         }
+
         body.bg-dark .calendar-day.weekend {
             background-color: #1e2124;
             color: #6c757d;
         }
+
         body.bg-dark .calendar-day.past {
             background-color: #1e2124;
             color: #6c757d;
         }
+
         body.bg-dark .time-slot {
             border-color: #2a2f35;
         }
+
         body.bg-dark .time-slot.available {
             background-color: #1e3a1f;
             border-color: #2a5f2e;
             color: #90ee90;
         }
+
         body.bg-dark .time-slot.occupied {
             background-color: #3d1a1a;
             border-color: #5c2a2a;
             color: #ff6b6b;
         }
-        
+
         /* Skeleton Loading */
         .skeleton {
             background: #eee;
@@ -252,60 +344,103 @@
             background-size: 200% 100%;
             animation: 1.5s shine linear infinite;
         }
+
         body.bg-dark .skeleton {
             background: #2a2f35;
             background: linear-gradient(110deg, #2a2f35 8%, #32383e 18%, #2a2f35 33%);
             background-size: 200% 100%;
         }
+
         @keyframes shine {
-            to { background-position-x: -200%; }
+            to {
+                background-position-x: -200%;
+            }
         }
+
         .calendar-skeleton {
             height: 300px;
             width: 100%;
         }
-        
+
         /* Row Status Colors */
-        tr[data-status="pending"] { background-color: rgba(255, 243, 205, 0.3); }
-        tr[data-status="approved"] { background-color: rgba(212, 237, 218, 0.3); }
-        tr[data-status="completed"] { background-color: rgba(209, 236, 241, 0.3); }
-        tr[data-status="cancelled"] { background-color: rgba(248, 215, 218, 0.3); }
-        tr[data-status="no_show"] { background-color: rgba(226, 227, 229, 0.3); }
-        tr[data-status="rescheduled"] { background-color: rgba(255, 243, 205, 0.3); }
+        tr[data-status="pending"] {
+            background-color: rgba(255, 243, 205, 0.3);
+        }
+
+        tr[data-status="approved"] {
+            background-color: rgba(212, 237, 218, 0.3);
+        }
+
+        tr[data-status="completed"] {
+            background-color: rgba(209, 236, 241, 0.3);
+        }
+
+        tr[data-status="cancelled"] {
+            background-color: rgba(248, 215, 218, 0.3);
+        }
+
+        tr[data-status="no_show"] {
+            background-color: rgba(226, 227, 229, 0.3);
+        }
+
+        tr[data-status="rescheduled"] {
+            background-color: rgba(255, 243, 205, 0.3);
+        }
 
         /* Dark Mode Row Status Colors */
-        body.bg-dark tr[data-status="pending"] { background-color: rgba(133, 100, 4, 0.15); }
-        body.bg-dark tr[data-status="approved"] { background-color: rgba(21, 87, 36, 0.15); }
-        body.bg-dark tr[data-status="completed"] { background-color: rgba(12, 84, 96, 0.15); }
-        body.bg-dark tr[data-status="cancelled"] { background-color: rgba(114, 28, 36, 0.15); }
-        body.bg-dark tr[data-status="no_show"] { background-color: rgba(56, 61, 65, 0.15); }
-        body.bg-dark tr[data-status="rescheduled"] { background-color: rgba(133, 100, 4, 0.15); }
+        body.bg-dark tr[data-status="pending"] {
+            background-color: rgba(133, 100, 4, 0.15);
+        }
+
+        body.bg-dark tr[data-status="approved"] {
+            background-color: rgba(21, 87, 36, 0.15);
+        }
+
+        body.bg-dark tr[data-status="completed"] {
+            background-color: rgba(12, 84, 96, 0.15);
+        }
+
+        body.bg-dark tr[data-status="cancelled"] {
+            background-color: rgba(114, 28, 36, 0.15);
+        }
+
+        body.bg-dark tr[data-status="no_show"] {
+            background-color: rgba(56, 61, 65, 0.15);
+        }
+
+        body.bg-dark tr[data-status="rescheduled"] {
+            background-color: rgba(133, 100, 4, 0.15);
+        }
     </style>
     <style>
         /* Dark Mode Overrides */
         body.bg-dark .appointment-card {
             background: #1e2124;
             border-color: #2a2f35;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
+
         body.bg-dark .text-muted {
             color: #adb5bd !important;
         }
+
         body.bg-dark .fw-bold {
             color: #e6e6e6 !important;
         }
-        
+
         /* Dark Mode Pagination */
         body.bg-dark .page-link {
             background-color: #1e2124;
             border-color: #2a2f35;
             color: #e6e6e6;
         }
+
         body.bg-dark .page-item.disabled .page-link {
             background-color: #1a1d20;
             border-color: #2a2f35;
             color: #6c757d;
         }
+
         body.bg-dark .page-item.active .page-link {
             background-color: #007bff;
             border-color: #007bff;
@@ -318,86 +453,103 @@
             color: #e6e6e6;
             border-color: #2a2f35;
         }
+
         body.bg-dark .calendar-day {
             border-color: #2a2f35;
             color: #e6e6e6;
         }
+
         body.bg-dark .calendar-day:hover {
             background-color: #2a2f35;
         }
+
         body.bg-dark .calendar-day.weekend {
             background-color: #1e2124;
             color: #6c757d;
         }
+
         body.bg-dark .calendar-day.past {
             background-color: #1e2124;
             color: #6c757d;
         }
+
         body.bg-dark .time-slot {
             border-color: #2a2f35;
         }
+
         body.bg-dark .time-slot.available {
             background-color: #1e3a1f;
             border-color: #2a5f2e;
             color: #90ee90;
         }
+
         body.bg-dark .time-slot.occupied {
             background-color: #3d1a1a;
             border-color: #5c2a2a;
             color: #ff6b6b;
         }
+
         body.bg-dark .time-slot.selected {
             background-color: #007bff;
             border-color: #007bff;
             color: #fff;
         }
-        
+
         /* Dark Mode Modal & Forms */
         body.bg-dark .modal-content {
             background-color: #1e2124;
             border-color: #2a2f35;
             color: #e6e6e6;
         }
+
         body.bg-dark .modal-header {
             border-bottom-color: #2a2f35;
         }
+
         body.bg-dark .modal-footer {
             border-top-color: #2a2f35;
         }
+
         body.bg-dark .modal-content .card {
             background-color: #16191c;
             border-color: #2a2f35;
         }
+
         body.bg-dark .modal-content .card-header {
             background-color: #1f2327;
             border-bottom-color: #2a2f35;
             color: #e6e6e6;
         }
+
         body.bg-dark .form-control,
         body.bg-dark .form-select {
             background-color: #0f1316;
             border-color: #2a2f35;
             color: #e6e6e6;
         }
+
         body.bg-dark .form-control:focus,
         body.bg-dark .form-select:focus {
             background-color: #161b20;
             border-color: #007bff;
             color: #e6e6e6;
         }
+
         body.bg-dark .btn-close {
             filter: invert(1) grayscale(100%) brightness(200%);
         }
-        
+
         /* Dark Mode Table */
         body.bg-dark .table-modern thead th {
             background-color: #1a1f24;
             color: #e6e6e6;
         }
+
         body.bg-dark .table-modern tbody td {
             border-bottom-color: #2a2f35;
             color: #d6d6d6;
         }
+
         body.bg-dark .table-modern tbody tr:hover {
             background-color: #2a2f35;
         }
@@ -405,358 +557,374 @@
 @endsection
 
 @section('content')
-                        <!-- Add Appointment Button -->
+    <!-- Add Appointment Button -->
 
-                        <!-- Top Actions -->
-                        <div class="d-flex flex-wrap justify-content-end align-items-center mb-3 gap-2">
-                            <div class="d-flex align-items-center gap-2">
-                                <!-- Bulk Actions (hidden by default) -->
-                                <div id="bulkActions" class="d-none d-flex align-items-center gap-2">
-                                    <span class="text-muted" id="selectedCount">0 selected</span>
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-outline-success" id="bulkApprove">
-                                            <i class="fas fa-check me-1"></i> Approve
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" id="bulkCancel">
-                                            <i class="fas fa-times me-1"></i> Cancel
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-outline-info" id="bulkComplete">
-                                            <i class="fas fa-check-circle me-1"></i> Complete
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">
-                                    <i class="fas fa-plus me-2"></i> Add New Appointment
-                                </button>
-                            </div>
-                        </div>
+    <!-- Top Actions -->
+    <div class="d-flex flex-wrap justify-content-end align-items-center mb-3 gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <!-- Bulk Actions (hidden by default) -->
+            <div id="bulkActions" class="d-none d-flex align-items-center gap-2">
+                <span class="text-muted" id="selectedCount">0 selected</span>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-outline-success" id="bulkApprove">
+                        <i class="fas fa-check me-1"></i> Approve
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" id="bulkCancel">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-info" id="bulkComplete">
+                        <i class="fas fa-check-circle me-1"></i> Complete
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">
+                <i class="fas fa-plus me-2"></i> Add New Appointment
+            </button>
+        </div>
+    </div>
 
-                        <!-- Filters -->
-                        <div class="filter-card mb-3">
-                            <div class="row g-3 align-items-end">
-                                <div class="col-md-3">
-                                    <label class="form-label">Status</label>
-                                    <select class="form-select" id="appointmentStatusFilter">
-                                        <option value="">All</option>
-                                        <option value="pending">Pending</option>
-                                        <option value="approved">Confirmed</option>
-                                        <option value="completed">Completed</option>
-                                        <option value="cancelled">Cancelled</option>
-                                        <option value="rescheduled">Rescheduled</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">Service</label>
-                                    <select class="form-select" id="appointmentServiceFilter">
-                                        <option value="">All</option>
-                                        @foreach(($services ?? []) as $service)
-                                            <option value="{{ strtolower($service) }}">{{ $service }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">Search</label>
-                                    <input type="text" id="appointmentSearch" class="form-control" placeholder="Search by patient, email, or phone">
-                                </div>
-                                <div class="col-md-2 d-flex align-items-center">
-                                    <button type="button" class="btn btn-outline-secondary w-100" id="appointmentFiltersReset">
-                                        <i class="fas fa-undo me-1"></i> Clear
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="mt-2 small text-muted" id="appointmentsFilterSummary">
-                                Showing {{ $appointments->count() }} appointments
-                            </div>
-                        </div>
+    <!-- Filters -->
+    <div class="filter-card mb-3">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select class="form-select" id="appointmentStatusFilter">
+                    <option value="">All</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Confirmed</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="rescheduled">Rescheduled</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Service</label>
+                <select class="form-select" id="appointmentServiceFilter">
+                    <option value="">All</option>
+                    @foreach(($services ?? []) as $service)
+                        <option value="{{ strtolower($service) }}">{{ $service }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Search</label>
+                <input type="text" id="appointmentSearch" class="form-control"
+                    placeholder="Search by patient, email, or phone">
+            </div>
+            <div class="col-md-2 d-flex align-items-center">
+                <button type="button" class="btn btn-outline-secondary w-100" id="appointmentFiltersReset">
+                    <i class="fas fa-undo me-1"></i> Clear
+                </button>
+            </div>
+        </div>
+        <div class="mt-2 small text-muted" id="appointmentsFilterSummary">
+            Showing {{ $appointments->count() }} appointments
+        </div>
+    </div>
 
-                        <!-- Appointments Table -->
-                        <div class="table-card p-0">
-                                <div class="table-responsive d-none d-md-block">
+    <!-- Appointments Table -->
+    <div class="table-card p-0">
+        <div class="table-responsive d-none d-md-block">
+            @php
+                $currentSort = request('sort');
+                $currentDirection = strtolower(request('direction', 'desc')) === 'asc' ? 'asc' : 'desc';
+                $nextDirection = $currentSort === 'date' && $currentDirection === 'asc' ? 'desc' : 'asc';
+            @endphp
+            <table class="table table-modern table-hover mb-0 align-middle">
+                <thead class="table-light position-sticky top-0" style="z-index:1;">
+                    <tr>
+                        <th style="width:30px"><input type="checkbox" id="selectAll"></th>
+                        <th>
+                            <a href="{{ request()->fullUrlWithQuery(['sort' => 'date', 'direction' => $nextDirection]) }}"
+                                class="text-decoration-none d-inline-flex align-items-center gap-1">
+                                Date
+                                @if($currentSort === 'date')
+                                    <i class="fas fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} fa-sm ms-1"></i>
+                                @else
+                                    <i class="fas fa-sort fa-sm ms-1 text-muted"></i>
+                                @endif
+                            </a>
+                        </th>
+                        <th>Patient</th>
+                        <th>Service</th>
+
+                        <th>Status</th>
+                        <th class="actions-col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="appointmentsTableBody">
+                    @forelse($appointments as $appointment)
+                        <tr data-status="{{ strtolower($appointment->status) }}"
+                            data-service="{{ strtolower($appointment->service_type) }}"
+                            data-patient="{{ strtolower($appointment->patient_name) }}"
+                            data-email="{{ strtolower($appointment->user->email ?? '') }}"
+                            data-phone="{{ strtolower($appointment->patient_phone ?? '') }}">
+                            <td><input type="checkbox" class="row-check" value="{{ $appointment->id }}"
+                                    data-appointment-id="{{ $appointment->id }}"></td>
+                            <td>
+                                <div class="fw-bold">{{ $appointment->appointment_date->format('M d, Y') }}</div>
+                                <small
+                                    class="text-muted">{{ \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A') }}</small>
+                            </td>
+                            <td>
+                                <div class="fw-bold">{{ $appointment->patient_name }}</div>
+                                <small class="text-muted">{{ $appointment->user->email ?? $appointment->patient_phone }}</small>
+                            </td>
+                            <td>{{ $appointment->service_type }}</td>
+
+                            <td>
                                 @php
-                                    $currentSort = request('sort');
-                                    $currentDirection = strtolower(request('direction', 'desc')) === 'asc' ? 'asc' : 'desc';
-                                    $nextDirection = $currentSort === 'date' && $currentDirection === 'asc' ? 'desc' : 'asc';
+                                    $statusDisplay = [
+                                        'pending' => 'Pending',
+                                        'approved' => 'Confirmed',
+                                        'rescheduled' => 'Rescheduled',
+                                        'cancelled' => 'Cancelled',
+                                        'completed' => 'Completed',
+                                        'no_show' => 'No Show'
+                                    ][$appointment->status] ?? ucfirst($appointment->status);
                                 @endphp
-                                <table class="table table-modern table-hover mb-0 align-middle">
-                                    <thead class="table-light position-sticky top-0" style="z-index:1;">
-                                            <tr>
-                                            <th style="width:30px"><input type="checkbox" id="selectAll"></th>
-                                            <th>
-                                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'date', 'direction' => $nextDirection]) }}" class="text-decoration-none d-inline-flex align-items-center gap-1">
-                                                    Date
-                                                    @if($currentSort === 'date')
-                                                        <i class="fas fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} fa-sm ms-1"></i>
-                                                    @else
-                                                        <i class="fas fa-sort fa-sm ms-1 text-muted"></i>
-                                                    @endif
-                                                </a>
-                                            </th>
-                                                <th>Patient</th>
-                                                <th>Service</th>
-                                            
-                                                <th>Status</th>
-                                            <th class="actions-col">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="appointmentsTableBody">
-                                        @forelse($appointments as $appointment)
-                                        <tr
-                                            data-status="{{ strtolower($appointment->status) }}"
-                                            data-service="{{ strtolower($appointment->service_type) }}"
-                                            data-patient="{{ strtolower($appointment->patient_name) }}"
-                                            data-email="{{ strtolower($appointment->user->email ?? '') }}"
-                                            data-phone="{{ strtolower($appointment->patient_phone ?? '') }}"
-                                        >
-                                            <td><input type="checkbox" class="row-check" value="{{ $appointment->id }}" data-appointment-id="{{ $appointment->id }}"></td>
-                                            <td>
-                                                <div class="fw-bold">{{ $appointment->appointment_date->format('M d, Y') }} {{ $appointment->appointment_time }}</div>
-                                                <div class="progress" style="height:6px;">
-                                                    <div class="progress-bar bg-{{ ($appointment->capacity_fill ?? 0) > 80 ? 'danger' : (($appointment->capacity_fill ?? 0) > 50 ? 'warning' : 'success') }}" role="progressbar" style="width: {{ $appointment->capacity_fill ?? 0 }}%"></div>
-                                                </div>
-                                            </td>
-                                                <td>
-                                                    <div class="fw-bold">{{ $appointment->patient_name }}</div>
-                                                <small class="text-muted">{{ $appointment->user->email ?? $appointment->patient_phone }}</small>
-                                                </td>
-                                                <td>{{ $appointment->service_type }}</td>
-                                            
-                                                <td>
-                                                @php
-                                                    $statusDisplay = [
-                                                        'pending' => 'Pending',
-                                                        'approved' => 'Confirmed',
-                                                        'rescheduled' => 'Rescheduled',
-                                                        'cancelled' => 'Cancelled',
-                                                        'completed' => 'Completed',
-                                                        'no_show' => 'No Show'
-                                                    ][$appointment->status] ?? ucfirst($appointment->status);
-                                                @endphp
-                                                <span class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
-                                                </td>
-                                            <td class="actions-col">
-                                                <div class="d-flex gap-1">
-                                                    <!-- View Button -->
-                                                    <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewAppointmentModal{{ $appointment->id }}" title="View Details">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                    
-                                                    <!-- Approve Button (only show if pending) -->
-                                                    @if($appointment->status === 'pending')
-                                                    <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
-                                                        @csrf
-                                                        <input type="hidden" name="status" value="approved">
-                                                        <button type="submit" class="btn btn-outline-success btn-sm" title="Approve">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-                                                    </form>
-                                                    @endif
-                                                    
-                                                    <!-- Cancel Button -->
-                                                    @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
-                                                    <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline cancel-form">
-                                                        @csrf
-                                                        <input type="hidden" name="status" value="cancelled">
-                                                        <button type="button" class="btn btn-outline-danger btn-sm" title="Cancel" onclick="confirmCancel(this)">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
-                                                    </form>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            </tr>
+                                <span class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
+                            </td>
+                            <td class="actions-col">
+                                <div class="d-flex gap-1">
+                                    <!-- View Button -->
+                                    <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#viewAppointmentModal{{ $appointment->id }}" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
 
-                                        <!-- View Modal -->
-                                        <div class="modal fade" id="viewAppointmentModal{{ $appointment->id }}" tabindex="-1">
-                                            <div class="modal-dialog modal-lg modal-dialog-centered">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">Appointment Details</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    <!-- Approve Button (only show if pending) -->
+                                    @if($appointment->status === 'pending')
+                                        <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
+                                            class="d-inline">
+                                            @csrf
+                                            <input type="hidden" name="status" value="approved">
+                                            <button type="submit" class="btn btn-outline-success btn-sm" title="Approve">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    <!-- Cancel Button -->
+                                    @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
+                                        <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
+                                            class="d-inline cancel-form">
+                                            @csrf
+                                            <input type="hidden" name="status" value="cancelled">
+                                            <button type="button" class="btn btn-outline-danger btn-sm" title="Cancel"
+                                                onclick="confirmCancel(this)">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- View Modal -->
+                        <div class="modal fade" id="viewAppointmentModal{{ $appointment->id }}" tabindex="-1">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Appointment Details</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row g-4">
+                                            <!-- Left Column: Patient Info -->
+                                            <div class="col-md-6 border-end">
+                                                <h6 class="text-uppercase text-muted small fw-bold mb-3">Patient Information
+                                                </h6>
+                                                <div class="mb-3">
+                                                    <label class="small text-muted d-block">Name</label>
+                                                    <div class="fw-bold">{{ $appointment->patient_name }}</div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="small text-muted d-block">Contact</label>
+                                                    <div>{{ $appointment->patient_phone }}</div>
+                                                    <div class="small">{{ $appointment->user->email ?? 'No email linked' }}
                                                     </div>
-                                                    <div class="modal-body">
-                                                        <div class="row g-4">
-                                                            <!-- Left Column: Patient Info -->
-                                                            <div class="col-md-6 border-end">
-                                                                <h6 class="text-uppercase text-muted small fw-bold mb-3">Patient Information</h6>
-                                                                <div class="mb-3">
-                                                                    <label class="small text-muted d-block">Name</label>
-                                                                    <div class="fw-bold">{{ $appointment->patient_name }}</div>
-                                                                </div>
-                                                                <div class="mb-3">
-                                                                    <label class="small text-muted d-block">Contact</label>
-                                                                    <div>{{ $appointment->patient_phone }}</div>
-                                                                    <div class="small">{{ $appointment->user->email ?? 'No email linked' }}</div>
-                                                                </div>
-                                                                <div class="mb-3">
-                                                                    <label class="small text-muted d-block">Address</label>
-                                                                    <div>{{ $appointment->patient_address ?? 'N/A' }}</div>
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            <!-- Right Column: Appointment Info -->
-                                                            <div class="col-md-6">
-                                                                <h6 class="text-uppercase text-muted small fw-bold mb-3">Appointment Information</h6>
-                                                                <div class="mb-3">
-                                                                    <label class="small text-muted d-block">Service</label>
-                                                                    <div class="fw-bold text-primary">{{ $appointment->service_type }}</div>
-                                                                </div>
-                                                                <div class="mb-3">
-                                                                    <label class="small text-muted d-block">Date & Time</label>
-                                                                    <div class="fw-bold">
-                                                                        <i class="fas fa-calendar-alt me-1 text-muted"></i> {{ $appointment->appointment_date->format('F d, Y') }}
-                                                                    </div>
-                                                                    <div>
-                                                                        <i class="fas fa-clock me-1 text-muted"></i> {{ $appointment->appointment_time }}
-                                                                    </div>
-                                                                </div>
-                                                                <div class="mb-3">
-                                                                    <label class="small text-muted d-block">Status</label>
-                                                                    @php
-                                                                        $statusDisplay = [
-                                                                            'pending' => 'Pending',
-                                                                            'approved' => 'Confirmed',
-                                                                            'rescheduled' => 'Rescheduled',
-                                                                            'cancelled' => 'Cancelled',
-                                                                            'completed' => 'Completed',
-                                                                            'no_show' => 'No Show'
-                                                                        ][$appointment->status] ?? ucfirst($appointment->status);
-                                                                    @endphp
-                                                                    <span class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
-                                                                </div>
-                                                                @if($appointment->notes)
-                                                                    <div class="mb-3">
-                                                                        <label class="small text-muted d-block">Notes</label>
-                                                                        <div class="p-2 bg-light rounded border">{{ $appointment->notes }}</div>
-                                                                    </div>
-                                                                @endif
-                                                                
-                                                                <div class="row mt-4 pt-3 border-top">
-                                                                    <div class="col-6">
-                                                                        <label class="small text-muted d-block">Created At</label>
-                                                                        <small>{{ $appointment->created_at->format('M d, Y h:i A') }}</small>
-                                                                    </div>
-                                                                    <div class="col-6">
-                                                                        <label class="small text-muted d-block">Last Updated</label>
-                                                                        <small>{{ $appointment->updated_at->format('M d, Y h:i A') }}</small>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="small text-muted d-block">Address</label>
+                                                    <div>{{ $appointment->patient_address ?? 'N/A' }}</div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Right Column: Appointment Info -->
+                                            <div class="col-md-6">
+                                                <h6 class="text-uppercase text-muted small fw-bold mb-3">Appointment Information
+                                                </h6>
+                                                <div class="mb-3">
+                                                    <label class="small text-muted d-block">Service</label>
+                                                    <div class="fw-bold text-primary">{{ $appointment->service_type }}</div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="small text-muted d-block">Date & Time</label>
+                                                    <div class="fw-bold">
+                                                        <i class="fas fa-calendar-alt me-1 text-muted"></i>
+                                                        {{ $appointment->appointment_date->format('F d, Y') }}
                                                     </div>
-                                                    <div class="modal-footer d-flex justify-content-between bg-light">
-                                                        <div class="d-flex gap-2">
-                                                            <!-- Reschedule -->
-                                                            @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
-                                                            <button type="button" class="btn btn-warning btn-sm reschedule-btn" 
-                                                                    data-appointment-id="{{ $appointment->id }}"
-                                                                    data-action-url="{{ route('admin.appointment.update', $appointment) }}"
-                                                                    data-bs-dismiss="modal">
-                                                                <i class="fas fa-calendar-alt me-1"></i> Reschedule
-                                                            </button>
-                                                            @endif
-                                                            
-                                                            <!-- Mark Completed -->
-                                                            @if($appointment->status === 'approved')
-                                                            <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
-                                                                @csrf
-                                                                <input type="hidden" name="status" value="completed">
-                                                                <button type="submit" class="btn btn-success btn-sm">
-                                                                    <i class="fas fa-check-circle me-1"></i> Complete
-                                                                </button>
-                                                            </form>
-                                                            @endif
-                                                            
-                                                            <!-- Mark No-show -->
-                                                            @if($appointment->status === 'approved')
-                                                            <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline">
-                                                                @csrf
-                                                                <input type="hidden" name="status" value="no_show">
-                                                                <button type="submit" class="btn btn-secondary btn-sm">
-                                                                    <i class="fas fa-user-slash me-1"></i> No-show
-                                                                </button>
-                                                            </form>
-                                                            @endif
-                                                        </div>
-                                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <div>
+                                                        <i class="fas fa-clock me-1 text-muted"></i>
+                                                        {{ $appointment->appointment_time }}
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="small text-muted d-block">Status</label>
+                                                    @php
+                                                        $statusDisplay = [
+                                                            'pending' => 'Pending',
+                                                            'approved' => 'Confirmed',
+                                                            'rescheduled' => 'Rescheduled',
+                                                            'cancelled' => 'Cancelled',
+                                                            'completed' => 'Completed',
+                                                            'no_show' => 'No Show'
+                                                        ][$appointment->status] ?? ucfirst($appointment->status);
+                                                    @endphp
+                                                    <span
+                                                        class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
+                                                </div>
+                                                @if($appointment->notes)
+                                                    <div class="mb-3">
+                                                        <label class="small text-muted d-block">Notes</label>
+                                                        <div class="p-2 bg-light rounded border">{{ $appointment->notes }}</div>
+                                                    </div>
+                                                @endif
+
+                                                <div class="row mt-4 pt-3 border-top">
+                                                    <div class="col-6">
+                                                        <label class="small text-muted d-block">Created At</label>
+                                                        <small>{{ $appointment->created_at->format('M d, Y h:i A') }}</small>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label class="small text-muted d-block">Last Updated</label>
+                                                        <small>{{ $appointment->updated_at->format('M d, Y h:i A') }}</small>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-
-                                        @empty
-                                        <tr>
-                                            <td colspan="6" class="text-center py-5">
-                                                <div class="mb-2">No appointments match your filters.</div>
-                                                <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">Add an appointment</a>
-                                            </td>
-                                        </tr>
-                                        @endforelse
-                                        </tbody>
-                                    </table>
-                            </div>
-
-                            <!-- Mobile Card View (Visible on small screens) -->
-                            <div class="d-md-none p-3">
-                                @forelse($appointments as $appointment)
-                                <div class="appointment-card mb-3 p-3 border rounded shadow-sm bg-white" 
-                                     data-status="{{ strtolower($appointment->status) }}"
-                                     data-service="{{ strtolower($appointment->service_type) }}"
-                                     data-patient="{{ strtolower($appointment->patient_name) }}">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div>
-                                            <div class="fw-bold">{{ $appointment->patient_name }}</div>
-                                            <div class="small text-muted">{{ $appointment->service_type }}</div>
-                                        </div>
-                                        @php
-                                            $statusDisplay = [
-                                                'pending' => 'Pending',
-                                                'approved' => 'Confirmed',
-                                                'rescheduled' => 'Rescheduled',
-                                                'cancelled' => 'Cancelled',
-                                                'completed' => 'Completed',
-                                                'no_show' => 'No Show'
-                                            ][$appointment->status] ?? ucfirst($appointment->status);
-                                        @endphp
-                                        <span class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
                                     </div>
-                                    <div class="mb-3">
-                                        <div class="d-flex align-items-center text-muted small mb-1">
-                                            <i class="fas fa-calendar-alt me-2" style="width:16px"></i>
-                                            {{ $appointment->appointment_date->format('M d, Y') }}
+                                    <div class="modal-footer d-flex justify-content-between bg-light">
+                                        <div class="d-flex gap-2">
+                                            <!-- Reschedule -->
+                                            @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
+                                                <button type="button" class="btn btn-warning btn-sm reschedule-btn"
+                                                    data-appointment-id="{{ $appointment->id }}"
+                                                    data-action-url="{{ route('admin.appointment.update', $appointment) }}"
+                                                    data-bs-dismiss="modal">
+                                                    <i class="fas fa-calendar-alt me-1"></i> Reschedule
+                                                </button>
+                                            @endif
+
+                                            <!-- Mark Completed -->
+                                            @if($appointment->status === 'approved')
+                                                <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
+                                                    class="d-inline">
+                                                    @csrf
+                                                    <input type="hidden" name="status" value="completed">
+                                                    <button type="submit" class="btn btn-success btn-sm">
+                                                        <i class="fas fa-check-circle me-1"></i> Complete
+                                                    </button>
+                                                </form>
+                                            @endif
+
+                                            <!-- Mark No-show -->
+                                            @if($appointment->status === 'approved')
+                                                <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
+                                                    class="d-inline">
+                                                    @csrf
+                                                    <input type="hidden" name="status" value="no_show">
+                                                    <button type="submit" class="btn btn-secondary btn-sm">
+                                                        <i class="fas fa-user-slash me-1"></i> No-show
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
-                                        <div class="d-flex align-items-center text-muted small">
-                                            <i class="fas fa-clock me-2" style="width:16px"></i>
-                                            {{ $appointment->appointment_time }}
-                                        </div>
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-outline-info btn-sm flex-grow-1" data-bs-toggle="modal" data-bs-target="#viewAppointmentModal{{ $appointment->id }}">
-                                            View Details
-                                        </button>
-                                        @if($appointment->status === 'pending')
-                                        <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}" class="d-inline flex-grow-1">
-                                            @csrf
-                                            <input type="hidden" name="status" value="approved">
-                                            <button type="submit" class="btn btn-outline-success btn-sm w-100">Approve</button>
-                                        </form>
-                                        @endif
+                                        <button type="button" class="btn btn-outline-secondary"
+                                            data-bs-dismiss="modal">Close</button>
                                     </div>
                                 </div>
-                                @empty
-                                <div class="text-center py-5 text-muted">
-                                    <i class="fas fa-calendar-times fa-3x mb-3"></i>
-                                    <p>No appointments found.</p>
-                                </div>
-                                @endforelse
                             </div>
                         </div>
 
-                        <!-- Pagination -->
-                        <div class="d-flex justify-content-center mt-3">
-                            {{ $appointments->links('pagination::bootstrap-5') }}
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="mb-2">No appointments match your filters.</div>
+                                <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">Add an
+                                    appointment</a>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mobile Card View (Visible on small screens) -->
+        <div class="d-md-none p-3">
+            @forelse($appointments as $appointment)
+                <div class="appointment-card mb-3 p-3 border rounded shadow-sm bg-white"
+                    data-status="{{ strtolower($appointment->status) }}"
+                    data-service="{{ strtolower($appointment->service_type) }}"
+                    data-patient="{{ strtolower($appointment->patient_name) }}">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <div class="fw-bold">{{ $appointment->patient_name }}</div>
+                            <div class="small text-muted">{{ $appointment->service_type }}</div>
                         </div>
+                        @php
+                            $statusDisplay = [
+                                'pending' => 'Pending',
+                                'approved' => 'Confirmed',
+                                'rescheduled' => 'Rescheduled',
+                                'cancelled' => 'Cancelled',
+                                'completed' => 'Completed',
+                                'no_show' => 'No Show'
+                            ][$appointment->status] ?? ucfirst($appointment->status);
+                        @endphp
+                        <span class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center text-muted small mb-1">
+                            <i class="fas fa-calendar-alt me-2" style="width:16px"></i>
+                            {{ $appointment->appointment_date->format('M d, Y') }}
+                        </div>
+                        <div class="d-flex align-items-center text-muted small">
+                            <i class="fas fa-clock me-2" style="width:16px"></i>
+                            {{ $appointment->appointment_time }}
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-info btn-sm flex-grow-1" data-bs-toggle="modal"
+                            data-bs-target="#viewAppointmentModal{{ $appointment->id }}">
+                            View Details
+                        </button>
+                        @if($appointment->status === 'pending')
+                            <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
+                                class="d-inline flex-grow-1">
+                                @csrf
+                                <input type="hidden" name="status" value="approved">
+                                <button type="submit" class="btn btn-outline-success btn-sm w-100">Approve</button>
+                            </form>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                    <p>No appointments found.</p>
+                </div>
+            @endforelse
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center mt-3">
+        {{ $appointments->links('pagination::bootstrap-5') }}
+    </div>
 
     <!-- Add Appointment Modal -->
     <div class="modal fade" id="addAppointmentModal" tabindex="-1">
@@ -772,13 +940,15 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="patient_name" class="form-label">Patient Name <span class="text-danger">*</span></label>
+                                    <label for="patient_name" class="form-label">Patient Name <span
+                                            class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="patient_name" name="patient_name" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="patient_phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                    <label for="patient_phone" class="form-label">Phone Number <span
+                                            class="text-danger">*</span></label>
                                     <input type="tel" class="form-control" id="patient_phone" name="patient_phone" required>
                                 </div>
                             </div>
@@ -786,13 +956,16 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="patient_address" class="form-label">Address <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="patient_address" name="patient_address" required>
+                                    <label for="patient_address" class="form-label">Address <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="patient_address" name="patient_address"
+                                        required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="service_type" class="form-label">Service Type <span class="text-danger">*</span></label>
+                                    <label for="service_type" class="form-label">Service Type <span
+                                            class="text-danger">*</span></label>
                                     <select class="form-select" id="service_type" name="service_type" required>
                                         <option value="" disabled selected>Select Service</option>
                                         <option value="General Checkup">General Checkup</option>
@@ -828,7 +1001,8 @@
                                             <h6 class="mb-0">Time Slots</h6>
                                         </div>
                                         <div class="card-body" style="max-height: 400px; overflow-y: auto;">
-                                            <div id="selectedDateDisplay" class="mb-3 text-muted">Select a date to view available time slots</div>
+                                            <div id="selectedDateDisplay" class="mb-3 text-muted">Select a date to view
+                                                available time slots</div>
                                             <div id="timeSlotsGrid" class="time-slots-grid">
                                                 <div class="text-center text-muted">
                                                     <i class="fas fa-clock fa-2x mb-2"></i>
@@ -894,7 +1068,8 @@
                                             <h6 class="mb-0">Time Slots</h6>
                                         </div>
                                         <div class="card-body" style="max-height: 400px; overflow-y: auto;">
-                                            <div id="reschedSelectedDateDisplay" class="mb-3 text-muted">Select a date to view available time slots</div>
+                                            <div id="reschedSelectedDateDisplay" class="mb-3 text-muted">Select a date to
+                                                view available time slots</div>
                                             <div id="reschedTimeSlotsGrid" class="time-slots-grid">
                                                 <div class="text-center text-muted">
                                                     <i class="fas fa-clock fa-2x mb-2"></i>
@@ -909,7 +1084,7 @@
                             <input type="hidden" id="resched_new_date" name="new_date" required>
                             <input type="hidden" id="resched_new_time" name="new_time" required>
                         </div>
-                        
+
 
                         <div class="mt-3">
                             <label class="form-label">Notes (optional)</label>
@@ -925,321 +1100,534 @@
         </div>
     </div>
 @endsection
- 
+
 
 @push('scripts')
-<script>
-console.log('Admin calendar script loading...');
+    <script>
+        console.log('Admin calendar script loading...');
 
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Admin DOM loaded, initializing calendar...');
-        const statusFilter = document.getElementById('appointmentStatusFilter');
-        
-        // SweetAlert2 Confirmation for Cancel
-        window.confirmCancel = function(btn) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You are about to cancel this appointment. This action cannot be undone!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, cancel it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    btn.closest('form').submit();
-                }
-            });
-        };
-        const serviceFilter = document.getElementById('appointmentServiceFilter');
-        const searchInput = document.getElementById('appointmentSearch');
-        const resetButton = document.getElementById('appointmentFiltersReset');
-        const tableBody = document.getElementById('appointmentsTableBody');
-        const summary = document.getElementById('appointmentsFilterSummary');
-        const tableRows = tableBody ? Array.from(tableBody.querySelectorAll('tr[data-status]')) : [];
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('Admin DOM loaded, initializing calendar...');
+            const statusFilter = document.getElementById('appointmentStatusFilter');
 
-        const normalize = (value) => (value ?? '').toString().trim().toLowerCase();
-
-        const applyAppointmentFilters = () => {
-            const statusValue = normalize(statusFilter ? statusFilter.value : '');
-            const serviceValue = normalize(serviceFilter ? serviceFilter.value : '');
-            const searchValue = normalize(searchInput ? searchInput.value : '');
-
-            let visibleCount = 0;
-
-            tableRows.forEach((row) => {
-                const rowStatus = normalize(row.dataset.status);
-                const rowService = normalize(row.dataset.service);
-                const rowSearchTargets = normalize(
-                    [row.dataset.patient, row.dataset.email, row.dataset.phone, row.dataset.service]
-                        .filter(Boolean)
-                        .join(' ')
-                );
-
-                let showRow = true;
-
-                if (statusValue && rowStatus !== statusValue) {
-                    showRow = false;
-                }
-
-                if (serviceValue && rowService !== serviceValue) {
-                    showRow = false;
-                }
-
-                if (searchValue && !rowSearchTargets.includes(searchValue)) {
-                    showRow = false;
-                }
-
-                row.style.display = showRow ? '' : 'none';
-                if (showRow) {
-                    visibleCount++;
-                }
-            });
-
-            if (summary) {
-                summary.textContent = `Showing ${visibleCount} of ${tableRows.length} appointments`;
-            }
-        };
-
-        const debounce = (fn, delay = 300) => {
-            let timer;
-            return (...args) => {
-                clearTimeout(timer);
-                timer = setTimeout(() => fn(...args), delay);
+            // SweetAlert2 Confirmation for Cancel
+            window.confirmCancel = function (btn) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You are about to cancel this appointment. This action cannot be undone!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, cancel it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        btn.closest('form').submit();
+                    }
+                });
             };
-        };
+            const serviceFilter = document.getElementById('appointmentServiceFilter');
+            const searchInput = document.getElementById('appointmentSearch');
+            const resetButton = document.getElementById('appointmentFiltersReset');
+            const tableBody = document.getElementById('appointmentsTableBody');
+            const summary = document.getElementById('appointmentsFilterSummary');
+            const tableRows = tableBody ? Array.from(tableBody.querySelectorAll('tr[data-status]')) : [];
 
-        const debouncedApplyFilters = debounce(applyAppointmentFilters, 250);
+            const normalize = (value) => (value ?? '').toString().trim().toLowerCase();
 
-        if (statusFilter) {
-            statusFilter.addEventListener('change', applyAppointmentFilters);
-        }
+            const applyAppointmentFilters = () => {
+                const statusValue = normalize(statusFilter ? statusFilter.value : '');
+                const serviceValue = normalize(serviceFilter ? serviceFilter.value : '');
+                const searchValue = normalize(searchInput ? searchInput.value : '');
 
-        if (serviceFilter) {
-            serviceFilter.addEventListener('change', applyAppointmentFilters);
-        }
+                let visibleCount = 0;
 
-        if (searchInput) {
-            searchInput.addEventListener('input', debouncedApplyFilters);
-        }
+                tableRows.forEach((row) => {
+                    const rowStatus = normalize(row.dataset.status);
+                    const rowService = normalize(row.dataset.service);
+                    const rowSearchTargets = normalize(
+                        [row.dataset.patient, row.dataset.email, row.dataset.phone, row.dataset.service]
+                            .filter(Boolean)
+                            .join(' ')
+                    );
 
-        if (resetButton) {
-            resetButton.addEventListener('click', () => {
-                if (statusFilter) statusFilter.value = '';
-                if (serviceFilter) serviceFilter.value = '';
-                if (searchInput) searchInput.value = '';
-                applyAppointmentFilters();
-            });
-        }
+                    let showRow = true;
 
-        applyAppointmentFilters();
+                    if (statusValue && rowStatus !== statusValue) {
+                        showRow = false;
+                    }
 
-        const selectAllCheckbox = document.getElementById('selectAll');
-        const rowCheckboxes = document.querySelectorAll('.row-check');
-        const bulkActions = document.getElementById('bulkActions');
-        const selectedCount = document.getElementById('selectedCount');
-        const bulkApproveBtn = document.getElementById('bulkApprove');
-        const bulkCancelBtn = document.getElementById('bulkCancel');
-        const bulkCompleteBtn = document.getElementById('bulkComplete');
+                    if (serviceValue && rowService !== serviceValue) {
+                        showRow = false;
+                    }
 
-        // Select All functionality
-        if (selectAllCheckbox) {
-            selectAllCheckbox.addEventListener('change', function() {
-                rowCheckboxes.forEach(checkbox => {
-                    checkbox.checked = this.checked;
+                    if (searchValue && !rowSearchTargets.includes(searchValue)) {
+                        showRow = false;
+                    }
+
+                    row.style.display = showRow ? '' : 'none';
+                    if (showRow) {
+                        visibleCount++;
+                    }
                 });
-                updateBulkActions();
-            });
-        }
 
-        // Individual checkbox change
-        rowCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                updateSelectAll();
-                updateBulkActions();
-            });
-        });
+                if (summary) {
+                    summary.textContent = `Showing ${visibleCount} of ${tableRows.length} appointments`;
+                }
+            };
 
-        function updateSelectAll() {
+            const debounce = (fn, delay = 300) => {
+                let timer;
+                return (...args) => {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => fn(...args), delay);
+                };
+            };
+
+            const debouncedApplyFilters = debounce(applyAppointmentFilters, 250);
+
+            if (statusFilter) {
+                statusFilter.addEventListener('change', applyAppointmentFilters);
+            }
+
+            if (serviceFilter) {
+                serviceFilter.addEventListener('change', applyAppointmentFilters);
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('input', debouncedApplyFilters);
+            }
+
+            if (resetButton) {
+                resetButton.addEventListener('click', () => {
+                    if (statusFilter) statusFilter.value = '';
+                    if (serviceFilter) serviceFilter.value = '';
+                    if (searchInput) searchInput.value = '';
+                    applyAppointmentFilters();
+                });
+            }
+
+            applyAppointmentFilters();
+
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const rowCheckboxes = document.querySelectorAll('.row-check');
+            const bulkActions = document.getElementById('bulkActions');
+            const selectedCount = document.getElementById('selectedCount');
+            const bulkApproveBtn = document.getElementById('bulkApprove');
+            const bulkCancelBtn = document.getElementById('bulkCancel');
+            const bulkCompleteBtn = document.getElementById('bulkComplete');
+
+            // Select All functionality
             if (selectAllCheckbox) {
-                const allChecked = Array.from(rowCheckboxes).every(cb => cb.checked);
-                const someChecked = Array.from(rowCheckboxes).some(cb => cb.checked);
-                selectAllCheckbox.checked = allChecked;
-                selectAllCheckbox.indeterminate = someChecked && !allChecked;
+                selectAllCheckbox.addEventListener('change', function () {
+                    rowCheckboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                    updateBulkActions();
+                });
             }
-        }
 
-        function updateBulkActions() {
-            const checkedBoxes = Array.from(rowCheckboxes).filter(cb => cb.checked);
-            const count = checkedBoxes.length;
-
-            if (count > 0) {
-                bulkActions.classList.remove('d-none');
-                selectedCount.textContent = count + ' selected';
-            } else {
-                bulkActions.classList.add('d-none');
-            }
-        }
-
-        // Bulk Approve
-        if (bulkApproveBtn) {
-            bulkApproveBtn.addEventListener('click', function() {
-                const selectedIds = getSelectedIds();
-                if (selectedIds.length > 0 && confirm('Are you sure you want to approve ' + selectedIds.length + ' appointment(s)?')) {
-                    bulkUpdateStatus(selectedIds, 'approved');
-                }
-            });
-        }
-
-        // Bulk Cancel
-        if (bulkCancelBtn) {
-            bulkCancelBtn.addEventListener('click', function() {
-                const selectedIds = getSelectedIds();
-                if (selectedIds.length > 0 && confirm('Are you sure you want to cancel ' + selectedIds.length + ' appointment(s)?')) {
-                    bulkUpdateStatus(selectedIds, 'cancelled');
-                }
-            });
-        }
-
-        // Bulk Complete
-        if (bulkCompleteBtn) {
-            bulkCompleteBtn.addEventListener('click', function() {
-                const selectedIds = getSelectedIds();
-                if (selectedIds.length > 0 && confirm('Are you sure you want to mark ' + selectedIds.length + ' appointment(s) as completed?')) {
-                    bulkUpdateStatus(selectedIds, 'completed');
-                }
-            });
-        }
-
-        function getSelectedIds() {
-            return Array.from(rowCheckboxes)
-                .filter(cb => cb.checked)
-                .map(cb => cb.getAttribute('data-appointment-id'));
-        }
-
-        function bulkUpdateStatus(ids, status) {
-            // Update appointments one by one using fetch API
-            let completed = 0;
-            const total = ids.length;
-            
-            ids.forEach((id, index) => {
-                const formData = new FormData();
-                formData.append('_token', '{{ csrf_token() }}');
-                formData.append('status', status);
-                
-                fetch(`/admin/appointment/${id}/update`, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => {
-                    completed++;
-                    if (completed === total) {
-                        // All requests completed, reload the page
-                        window.location.reload();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error updating appointment:', error);
-                    completed++;
-                    if (completed === total) {
-                        window.location.reload();
-                    }
+            // Individual checkbox change
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    updateSelectAll();
+                    updateBulkActions();
                 });
             });
-        }
 
-        // Restrict date inputs to today up to 1 month from now
-        const today = new Date();
-        const minDate = today.toISOString().split('T')[0];
-        const oneMonthFromNow = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
-        const maxDate = oneMonthFromNow.toISOString().split('T')[0];
-
-        const dateInputs = document.querySelectorAll('input[type="date"]');
-        dateInputs.forEach(input => {
-            input.min = minDate;
-            input.max = maxDate;
-        });
-
-        // Calendar functionality
-        class AppointmentCalendar {
-            constructor(config) {
-                console.log('AppointmentCalendar constructor called', config);
-                this.config = config;
-                this.currentDate = new Date();
-                this.selectedDate = null;
-                this.calendarData = [];
-                this.init();
-            }
-
-            init() {
-                this.attachEventListeners();
-                this.loadCalendar();
-            }
-
-            attachEventListeners() {
-                const prevBtn = document.getElementById(this.config.prevBtnId);
-                const nextBtn = document.getElementById(this.config.nextBtnId);
-
-                if (prevBtn) {
-                    prevBtn.addEventListener('click', () => {
-                        this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-                        this.loadCalendar();
-                    });
-                }
-
-                if (nextBtn) {
-                    nextBtn.addEventListener('click', () => {
-                        this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-                        this.loadCalendar();
-                    });
+            function updateSelectAll() {
+                if (selectAllCheckbox) {
+                    const allChecked = Array.from(rowCheckboxes).every(cb => cb.checked);
+                    const someChecked = Array.from(rowCheckboxes).some(cb => cb.checked);
+                    selectAllCheckbox.checked = allChecked;
+                    selectAllCheckbox.indeterminate = someChecked && !allChecked;
                 }
             }
 
-            async loadCalendar() {
-                const year = this.currentDate.getFullYear();
-                const month = this.currentDate.getMonth() + 1;
-                
-                console.log(`Loading calendar for: ${year} ${month}`);
+            function updateBulkActions() {
+                const checkedBoxes = Array.from(rowCheckboxes).filter(cb => cb.checked);
+                const count = checkedBoxes.length;
 
-                try {
-                    const response = await fetch(`/admin/appointments/calendar?year=${year}&month=${month}`, {
+                if (count > 0) {
+                    bulkActions.classList.remove('d-none');
+                    selectedCount.textContent = count + ' selected';
+                } else {
+                    bulkActions.classList.add('d-none');
+                }
+            }
+
+            // Bulk Approve
+            if (bulkApproveBtn) {
+                bulkApproveBtn.addEventListener('click', function () {
+                    const selectedIds = getSelectedIds();
+                    if (selectedIds.length > 0 && confirm('Are you sure you want to approve ' + selectedIds.length + ' appointment(s)?')) {
+                        bulkUpdateStatus(selectedIds, 'approved');
+                    }
+                });
+            }
+
+            // Bulk Cancel
+            if (bulkCancelBtn) {
+                bulkCancelBtn.addEventListener('click', function () {
+                    const selectedIds = getSelectedIds();
+                    if (selectedIds.length > 0 && confirm('Are you sure you want to cancel ' + selectedIds.length + ' appointment(s)?')) {
+                        bulkUpdateStatus(selectedIds, 'cancelled');
+                    }
+                });
+            }
+
+            // Bulk Complete
+            if (bulkCompleteBtn) {
+                bulkCompleteBtn.addEventListener('click', function () {
+                    const selectedIds = getSelectedIds();
+                    if (selectedIds.length > 0 && confirm('Are you sure you want to mark ' + selectedIds.length + ' appointment(s) as completed?')) {
+                        bulkUpdateStatus(selectedIds, 'completed');
+                    }
+                });
+            }
+
+            function getSelectedIds() {
+                return Array.from(rowCheckboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.getAttribute('data-appointment-id'));
+            }
+
+            function bulkUpdateStatus(ids, status) {
+                // Update appointments one by one using fetch API
+                let completed = 0;
+                const total = ids.length;
+
+                ids.forEach((id, index) => {
+                    const formData = new FormData();
+                    formData.append('_token', '{{ csrf_token() }}');
+                    formData.append('status', status);
+
+                    fetch(`/admin/appointment/${id}/update`, {
+                        method: 'POST',
+                        body: formData,
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'
                         }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`Failed to load calendar data: ${response.status} ${response.statusText}`);
-                    }
-                    
-                    const data = await response.json();
-                    this.calendarData = data.calendar;
-                    this.renderCalendar();
-                    this.updateMonthDisplay();
-                } catch (error) {
-                    console.error('Error loading calendar:', error);
-                    const grid = document.getElementById(this.config.calendarGridId);
-                    if (grid) {
-                        grid.innerHTML = `<div class="col-12"><div class="skeleton calendar-skeleton"></div></div>`;
-                        // After a timeout, show error if it persists or just keep skeleton? 
-                        // Better to show error eventually.
-                        setTimeout(() => {
-                             grid.innerHTML = `<div class="col-12 text-center text-danger">Error loading calendar: ${error.message}</div>`;
-                        }, 1000);
-                    }
-                }
+                    })
+                        .then(response => {
+                            completed++;
+                            if (completed === total) {
+                                // All requests completed, reload the page
+                                window.location.reload();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error updating appointment:', error);
+                            completed++;
+                            if (completed === total) {
+                                window.location.reload();
+                            }
+                        });
+                });
             }
 
-            renderCalendar() {
+            // Restrict date inputs to today up to 1 month from now
+            const today = new Date();
+            const minDate = today.toISOString().split('T')[0];
+            const oneMonthFromNow = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+            const maxDate = oneMonthFromNow.toISOString().split('T')[0];
+
+            const dateInputs = document.querySelectorAll('input[type="date"]');
+            dateInputs.forEach(input => {
+                input.min = minDate;
+                input.max = maxDate;
+            });
+
+            // Calendar functionality
+            class AppointmentCalendar {
+                constructor(config) {
+                    console.log('AppointmentCalendar constructor called', config);
+                    this.config = config;
+                    this.currentDate = new Date();
+                    this.selectedDate = null;
+                    this.calendarData = [];
+                    this.init();
+                }
+
+                init() {
+                    this.attachEventListeners();
+                    this.loadCalendar();
+                }
+
+                attachEventListeners() {
+                    const prevBtn = document.getElementById(this.config.prevBtnId);
+                    const nextBtn = document.getElementById(this.config.nextBtnId);
+
+                    if (prevBtn) {
+                        prevBtn.addEventListener('click', () => {
+                            this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                            this.loadCalendar();
+                        });
+                    }
+
+                    if (nextBtn) {
+                        nextBtn.addEventListener('click', () => {
+                            this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                            this.loadCalendar();
+                        });
+                    }
+                }
+
+                async loadCalendar() {
+                    const year = this.currentDate.getFullYear();
+                    const month = this.currentDate.getMonth() + 1;
+
+                    console.log(`Loading calendar for: ${year} ${month}`);
+
+                    try {
+                        const response = await fetch(`/admin/appointments/calendar?year=${year}&month=${month}`, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`Failed to load calendar data: ${response.status} ${response.statusText}`);
+                        }
+
+                        const data = await response.json();
+                        this.calendarData = data.calendar;
+                        this.renderCalendar();
+                        this.updateMonthDisplay();
+                    } catch (error) {
+                        console.error('Error loading calendar:', error);
+                        const grid = document.getElementById(this.config.calendarGridId);
+                        if (grid) {
+                            grid.innerHTML = `<div class="col-12"><div class="skeleton calendar-skeleton"></div></div>`;
+                            // After a timeout, show error if it persists or just keep skeleton? 
+                            // Better to show error eventually.
+                            setTimeout(() => {
+                                grid.innerHTML = `<div class="col-12 text-center text-danger">Error loading calendar: ${error.message}</div>`;
+                            }, 1000);
+                        }
+                    }
+                }
+
+                renderCalendar() {
+                    const calendarGrid = document.getElementById(this.config.calendarGridId);
+                    if (!calendarGrid) return;
+
+                    calendarGrid.innerHTML = '';
+
+                    // Add day headers
+                    const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    dayHeaders.forEach(day => {
+                        const header = document.createElement('div');
+                        header.className = 'calendar-header';
+                        header.textContent = day;
+                        calendarGrid.appendChild(header);
+                    });
+
+                    // Add empty cells for days before month starts
+                    const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1).getDay();
+                    for (let i = 0; i < firstDay; i++) {
+                        const emptyDay = document.createElement('div');
+                        calendarGrid.appendChild(emptyDay);
+                    }
+
+                    // Add calendar days
+                    this.calendarData.forEach(dayData => {
+                        const dayElement = document.createElement('div');
+                        dayElement.className = 'calendar-day';
+
+                        // Create a span for the day number
+                        const dayNumber = document.createElement('span');
+                        dayNumber.className = 'day-number';
+                        dayNumber.textContent = dayData.day;
+                        dayElement.appendChild(dayNumber);
+
+                        if (dayData.is_weekend) {
+                            dayElement.classList.add('weekend');
+                        }
+
+                        if (dayData.is_past) {
+                            dayElement.classList.add('past');
+                        } else if (dayData.is_fully_occupied) {
+                            dayElement.classList.add('occupied');
+                        } else if (dayData.occupied_slots > 0) {
+                            dayElement.classList.add('partially-occupied');
+                        }
+
+                        // Add slot indicator at the bottom
+                        const indicator = document.createElement('span');
+                        indicator.className = 'slot-indicator';
+                        indicator.textContent = `${dayData.occupied_slots}/${dayData.total_slots}`;
+                        dayElement.appendChild(indicator);
+
+                        if (!dayData.is_past) {
+                            dayElement.addEventListener('click', () => {
+                                this.selectDate(dayData.date);
+                            });
+                        }
+
+                        calendarGrid.appendChild(dayElement);
+                    });
+                }
+
+                updateMonthDisplay() {
+                    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                        'July', 'August', 'September', 'October', 'November', 'December'];
+                    const displayEl = document.getElementById(this.config.currentMonthId);
+                    if (displayEl) {
+                        displayEl.textContent = `${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
+                    }
+                }
+
+                async selectDate(date) {
+                    // Remove previous selection in this calendar
+                    const calendarGrid = document.getElementById(this.config.calendarGridId);
+                    if (calendarGrid) {
+                        calendarGrid.querySelectorAll('.calendar-day.selected').forEach(el => {
+                            el.classList.remove('selected');
+                        });
+
+                        // Add selection to clicked date
+                        calendarGrid.querySelectorAll('.calendar-day').forEach(el => {
+                            // Find the day element that matches the date (we didn't store date in dataset in render, let's fix that logic or rely on closure)
+                            // Actually, in renderCalendar we added click listener to the specific element. 
+                            // But to highlight, we need to find it again or just add class in the click handler?
+                            // The click handler calls this.selectDate(dayData.date).
+                            // Let's match by text content or better, add data-date in render.
+                            // For now, let's assume we add data-date in render or just iterate.
+                            // Wait, I didn't add data-date in renderCalendar above. Let's just rely on the fact that we can't easily find it without data attribute.
+                            // I will add data-date to the element in renderCalendar in the next iteration or just fix it here.
+                            // Actually, let's fix renderCalendar to add data-date.
+                        });
+                    }
+
+                    // Re-implementing selection logic to be robust
+                    const allDays = document.getElementById(this.config.calendarGridId)?.querySelectorAll('.calendar-day') || [];
+                    allDays.forEach(el => {
+                        // We need a way to identify the date. 
+                        // Let's assume I will add data-date in renderCalendar.
+                        if (el.dataset.date === date) {
+                            el.classList.add('selected');
+                        }
+                    });
+
+                    this.selectedDate = date;
+
+                    // Update display
+                    const selectedDateObj = new Date(date);
+                    const formattedDate = selectedDateObj.toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+
+                    const dateDisplay = document.getElementById(this.config.selectedDateDisplayId);
+                    if (dateDisplay) {
+                        dateDisplay.textContent = formattedDate;
+                    }
+
+                    // Load time slots for selected date
+                    await this.loadTimeSlots(date);
+                }
+
+                async loadTimeSlots(date) {
+                    try {
+                        const response = await fetch(`/admin/appointments/slots?date=${date}`, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`Failed to load time slots`);
+                        }
+
+                        const data = await response.json();
+                        this.renderTimeSlots(data.slots);
+                    } catch (error) {
+                        console.error('Error loading time slots:', error);
+                        const slotsGrid = document.getElementById(this.config.timeSlotsGridId);
+                        if (slotsGrid) {
+                            slotsGrid.innerHTML = `<div class="col-12"><div class="skeleton" style="height: 100px; width: 100%;"></div></div>`;
+                            setTimeout(() => {
+                                slotsGrid.innerHTML = `<div class="col-12 text-center text-danger">Error loading time slots: ${error.message}</div>`;
+                            }, 1000);
+                        }
+                    }
+                }
+
+                renderTimeSlots(slots) {
+                    const timeSlotsGrid = document.getElementById(this.config.timeSlotsGridId);
+                    if (!timeSlotsGrid) return;
+
+                    timeSlotsGrid.innerHTML = '';
+
+                    if (!slots || slots.length === 0) {
+                        timeSlotsGrid.innerHTML = '<div class="text-center text-muted">No time slots available</div>';
+                        return;
+                    }
+
+                    slots.forEach(slot => {
+                        const slotElement = document.createElement('div');
+                        slotElement.className = `time-slot ${slot.available ? 'available' : 'occupied'}`;
+
+                        if (slot.available) {
+                            slotElement.addEventListener('click', () => {
+                                this.selectTimeSlot(slot.time, slot.display);
+                            });
+                        }
+
+                        const timeElement = document.createElement('div');
+                        timeElement.className = 'time';
+                        timeElement.textContent = slot.display;
+
+                        const statusElement = document.createElement('div');
+                        statusElement.className = 'status';
+                        statusElement.textContent = slot.available ? 'Available' : `Occupied (${slot.occupied_count})`;
+
+                        slotElement.appendChild(timeElement);
+                        slotElement.appendChild(statusElement);
+
+                        timeSlotsGrid.appendChild(slotElement);
+                    });
+                }
+
+                selectTimeSlot(time, display) {
+                    const timeSlotsGrid = document.getElementById(this.config.timeSlotsGridId);
+                    if (timeSlotsGrid) {
+                        timeSlotsGrid.querySelectorAll('.time-slot.selected').forEach(el => {
+                            el.classList.remove('selected');
+                        });
+
+                        timeSlotsGrid.querySelectorAll('.time-slot').forEach(el => {
+                            const timeEl = el.querySelector('.time');
+                            if (timeEl && timeEl.textContent === display) {
+                                el.classList.add('selected');
+                            }
+                        });
+                    }
+
+                    this.selectedTime = time;
+
+                    // Update hidden input
+                    const timeInput = document.getElementById(this.config.timeInputId);
+                    const dateInput = document.getElementById(this.config.dateInputId);
+
+                    if (timeInput) timeInput.value = time;
+                    if (dateInput) dateInput.value = this.selectedDate;
+                }
+
+                // Helper to fix the missing data-date in renderCalendar
+                // I'll override the renderCalendar method above to include data-date
+            }
+
+            // Patch renderCalendar to include data-date
+            AppointmentCalendar.prototype.renderCalendar = function () {
                 const calendarGrid = document.getElementById(this.config.calendarGridId);
                 if (!calendarGrid) return;
-                
+
                 calendarGrid.innerHTML = '';
 
-                // Add day headers
                 const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
                 dayHeaders.forEach(day => {
                     const header = document.createElement('div');
@@ -1248,37 +1636,27 @@ console.log('Admin calendar script loading...');
                     calendarGrid.appendChild(header);
                 });
 
-                // Add empty cells for days before month starts
                 const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1).getDay();
                 for (let i = 0; i < firstDay; i++) {
                     const emptyDay = document.createElement('div');
                     calendarGrid.appendChild(emptyDay);
                 }
 
-                // Add calendar days
                 this.calendarData.forEach(dayData => {
                     const dayElement = document.createElement('div');
                     dayElement.className = 'calendar-day';
-                    
-                    // Create a span for the day number
+                    dayElement.dataset.date = dayData.date; // Added this line
+
                     const dayNumber = document.createElement('span');
                     dayNumber.className = 'day-number';
                     dayNumber.textContent = dayData.day;
                     dayElement.appendChild(dayNumber);
-                    
-                    if (dayData.is_weekend) {
-                        dayElement.classList.add('weekend');
-                    }
-                    
-                    if (dayData.is_past) {
-                        dayElement.classList.add('past');
-                    } else if (dayData.is_fully_occupied) {
-                        dayElement.classList.add('occupied');
-                    } else if (dayData.occupied_slots > 0) {
-                        dayElement.classList.add('partially-occupied');
-                    }
 
-                    // Add slot indicator at the bottom
+                    if (dayData.is_weekend) dayElement.classList.add('weekend');
+                    if (dayData.is_past) dayElement.classList.add('past');
+                    else if (dayData.is_fully_occupied) dayElement.classList.add('occupied');
+                    else if (dayData.occupied_slots > 0) dayElement.classList.add('partially-occupied');
+
                     const indicator = document.createElement('span');
                     indicator.className = 'slot-indicator';
                     indicator.textContent = `${dayData.occupied_slots}/${dayData.total_slots}`;
@@ -1292,297 +1670,94 @@ console.log('Admin calendar script loading...');
 
                     calendarGrid.appendChild(dayElement);
                 });
-            }
+            };
 
-            updateMonthDisplay() {
-                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                    'July', 'August', 'September', 'October', 'November', 'December'];
-                const displayEl = document.getElementById(this.config.currentMonthId);
-                if (displayEl) {
-                    displayEl.textContent = `${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
-                }
-            }
+            // Initialize Add Appointment Calendar
+            const addAppointmentModal = document.getElementById('addAppointmentModal');
+            let addCalendar = null;
 
-            async selectDate(date) {
-                // Remove previous selection in this calendar
-                const calendarGrid = document.getElementById(this.config.calendarGridId);
-                if (calendarGrid) {
-                    calendarGrid.querySelectorAll('.calendar-day.selected').forEach(el => {
-                        el.classList.remove('selected');
-                    });
-
-                    // Add selection to clicked date
-                    calendarGrid.querySelectorAll('.calendar-day').forEach(el => {
-                        // Find the day element that matches the date (we didn't store date in dataset in render, let's fix that logic or rely on closure)
-                        // Actually, in renderCalendar we added click listener to the specific element. 
-                        // But to highlight, we need to find it again or just add class in the click handler?
-                        // The click handler calls this.selectDate(dayData.date).
-                        // Let's match by text content or better, add data-date in render.
-                        // For now, let's assume we add data-date in render or just iterate.
-                        // Wait, I didn't add data-date in renderCalendar above. Let's just rely on the fact that we can't easily find it without data attribute.
-                        // I will add data-date to the element in renderCalendar in the next iteration or just fix it here.
-                        // Actually, let's fix renderCalendar to add data-date.
-                    });
-                }
-                
-                // Re-implementing selection logic to be robust
-                const allDays = document.getElementById(this.config.calendarGridId)?.querySelectorAll('.calendar-day') || [];
-                allDays.forEach(el => {
-                     // We need a way to identify the date. 
-                     // Let's assume I will add data-date in renderCalendar.
-                     if (el.dataset.date === date) {
-                         el.classList.add('selected');
-                     }
-                });
-
-                this.selectedDate = date;
-
-                // Update display
-                const selectedDateObj = new Date(date);
-                const formattedDate = selectedDateObj.toLocaleDateString('en-US', {
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                });
-                
-                const dateDisplay = document.getElementById(this.config.selectedDateDisplayId);
-                if (dateDisplay) {
-                    dateDisplay.textContent = formattedDate;
-                }
-
-                // Load time slots for selected date
-                await this.loadTimeSlots(date);
-            }
-
-            async loadTimeSlots(date) {
-                try {
-                    const response = await fetch(`/admin/appointments/slots?date=${date}`, {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`Failed to load time slots`);
-                    }
-                    
-                    const data = await response.json();
-                    this.renderTimeSlots(data.slots);
-                } catch (error) {
-                    console.error('Error loading time slots:', error);
-                    const slotsGrid = document.getElementById(this.config.timeSlotsGridId);
-                    if (slotsGrid) {
-                         slotsGrid.innerHTML = `<div class="col-12"><div class="skeleton" style="height: 100px; width: 100%;"></div></div>`;
-                         setTimeout(() => {
-                            slotsGrid.innerHTML = `<div class="col-12 text-center text-danger">Error loading time slots: ${error.message}</div>`;
-                         }, 1000);
-                    }
-                }
-            }
-
-            renderTimeSlots(slots) {
-                const timeSlotsGrid = document.getElementById(this.config.timeSlotsGridId);
-                if (!timeSlotsGrid) return;
-                
-                timeSlotsGrid.innerHTML = '';
-
-                if (!slots || slots.length === 0) {
-                    timeSlotsGrid.innerHTML = '<div class="text-center text-muted">No time slots available</div>';
-                    return;
-                }
-
-                slots.forEach(slot => {
-                    const slotElement = document.createElement('div');
-                    slotElement.className = `time-slot ${slot.available ? 'available' : 'occupied'}`;
-                    
-                    if (slot.available) {
-                        slotElement.addEventListener('click', () => {
-                            this.selectTimeSlot(slot.time, slot.display);
+            if (addAppointmentModal) {
+                addAppointmentModal.addEventListener('shown.bs.modal', function () {
+                    if (!addCalendar) {
+                        addCalendar = new AppointmentCalendar({
+                            prevBtnId: 'prevMonth',
+                            nextBtnId: 'nextMonth',
+                            currentMonthId: 'currentMonth',
+                            calendarGridId: 'calendarGrid',
+                            selectedDateDisplayId: 'selectedDateDisplay',
+                            timeSlotsGridId: 'timeSlotsGrid',
+                            dateInputId: 'appointment_date',
+                            timeInputId: 'appointment_time'
                         });
                     }
-                    
-                    const timeElement = document.createElement('div');
-                    timeElement.className = 'time';
-                    timeElement.textContent = slot.display;
-                    
-                    const statusElement = document.createElement('div');
-                    statusElement.className = 'status';
-                    statusElement.textContent = slot.available ? 'Available' : `Occupied (${slot.occupied_count})`;
-                    
-                    slotElement.appendChild(timeElement);
-                    slotElement.appendChild(statusElement);
-                    
-                    timeSlotsGrid.appendChild(slotElement);
+                });
+
+                addAppointmentModal.addEventListener('hidden.bs.modal', function () {
+                    if (addCalendar) {
+                        addCalendar.selectedDate = null;
+                        addCalendar.selectedTime = null;
+                        // Reset UI
+                        document.getElementById('selectedDateDisplay').textContent = 'Select a date to view available time slots';
+                        document.getElementById('timeSlotsGrid').innerHTML = '<div class="text-center text-muted"><i class="fas fa-clock fa-2x mb-2"></i><p>Select a date to view time slots</p></div>';
+                        document.getElementById('appointment_date').value = '';
+                        document.getElementById('appointment_time').value = '';
+                        // Remove selection classes
+                        document.querySelectorAll('#calendarGrid .selected').forEach(el => el.classList.remove('selected'));
+                    }
                 });
             }
 
-            selectTimeSlot(time, display) {
-                const timeSlotsGrid = document.getElementById(this.config.timeSlotsGridId);
-                if (timeSlotsGrid) {
-                    timeSlotsGrid.querySelectorAll('.time-slot.selected').forEach(el => {
-                        el.classList.remove('selected');
-                    });
+            // Initialize Reschedule Appointment Calendar
+            const rescheduleModal = document.getElementById('rescheduleAppointmentModal');
+            let rescheduleCalendar = null;
 
-                    timeSlotsGrid.querySelectorAll('.time-slot').forEach(el => {
-                        const timeEl = el.querySelector('.time');
-                        if (timeEl && timeEl.textContent === display) {
-                            el.classList.add('selected');
-                        }
-                    });
-                }
+            if (rescheduleModal) {
+                rescheduleModal.addEventListener('shown.bs.modal', function () {
+                    if (!rescheduleCalendar) {
+                        rescheduleCalendar = new AppointmentCalendar({
+                            prevBtnId: 'reschedPrevMonth',
+                            nextBtnId: 'reschedNextMonth',
+                            currentMonthId: 'reschedCurrentMonth',
+                            calendarGridId: 'reschedCalendarGrid',
+                            selectedDateDisplayId: 'reschedSelectedDateDisplay',
+                            timeSlotsGridId: 'reschedTimeSlotsGrid',
+                            dateInputId: 'resched_new_date',
+                            timeInputId: 'resched_new_time'
+                        });
+                    }
+                });
 
-                this.selectedTime = time;
-
-                // Update hidden input
-                const timeInput = document.getElementById(this.config.timeInputId);
-                const dateInput = document.getElementById(this.config.dateInputId);
-                
-                if (timeInput) timeInput.value = time;
-                if (dateInput) dateInput.value = this.selectedDate;
-            }
-            
-            // Helper to fix the missing data-date in renderCalendar
-            // I'll override the renderCalendar method above to include data-date
-        }
-        
-        // Patch renderCalendar to include data-date
-        AppointmentCalendar.prototype.renderCalendar = function() {
-            const calendarGrid = document.getElementById(this.config.calendarGridId);
-            if (!calendarGrid) return;
-            
-            calendarGrid.innerHTML = '';
-
-            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            dayHeaders.forEach(day => {
-                const header = document.createElement('div');
-                header.className = 'calendar-header';
-                header.textContent = day;
-                calendarGrid.appendChild(header);
-            });
-
-            const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1).getDay();
-            for (let i = 0; i < firstDay; i++) {
-                const emptyDay = document.createElement('div');
-                calendarGrid.appendChild(emptyDay);
+                rescheduleModal.addEventListener('hidden.bs.modal', function () {
+                    if (rescheduleCalendar) {
+                        rescheduleCalendar.selectedDate = null;
+                        rescheduleCalendar.selectedTime = null;
+                        // Reset UI
+                        document.getElementById('reschedSelectedDateDisplay').textContent = 'Select a date to view available time slots';
+                        document.getElementById('reschedTimeSlotsGrid').innerHTML = '<div class="text-center text-muted"><i class="fas fa-clock fa-2x mb-2"></i><p>Select a date to view time slots</p></div>';
+                        document.getElementById('resched_new_date').value = '';
+                        document.getElementById('resched_new_time').value = '';
+                        document.querySelectorAll('#reschedCalendarGrid .selected').forEach(el => el.classList.remove('selected'));
+                    }
+                });
             }
 
-            this.calendarData.forEach(dayData => {
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day';
-                dayElement.dataset.date = dayData.date; // Added this line
-                
-                const dayNumber = document.createElement('span');
-                dayNumber.className = 'day-number';
-                dayNumber.textContent = dayData.day;
-                dayElement.appendChild(dayNumber);
-                
-                if (dayData.is_weekend) dayElement.classList.add('weekend');
-                if (dayData.is_past) dayElement.classList.add('past');
-                else if (dayData.is_fully_occupied) dayElement.classList.add('occupied');
-                else if (dayData.occupied_slots > 0) dayElement.classList.add('partially-occupied');
+            // Handle Reschedule Button Clicks
+            document.addEventListener('click', function (e) {
+                if (e.target && e.target.classList.contains('reschedule-btn')) {
+                    const btn = e.target;
+                    const appointmentId = btn.dataset.appointmentId;
+                    const actionUrl = btn.dataset.actionUrl;
 
-                const indicator = document.createElement('span');
-                indicator.className = 'slot-indicator';
-                indicator.textContent = `${dayData.occupied_slots}/${dayData.total_slots}`;
-                dayElement.appendChild(indicator);
+                    const form = document.getElementById('rescheduleForm');
+                    if (form) {
+                        form.action = actionUrl;
+                    }
 
-                if (!dayData.is_past) {
-                    dayElement.addEventListener('click', () => {
-                        this.selectDate(dayData.date);
-                    });
-                }
-
-                calendarGrid.appendChild(dayElement);
-            });
-        };
-
-        // Initialize Add Appointment Calendar
-        const addAppointmentModal = document.getElementById('addAppointmentModal');
-        let addCalendar = null;
-        
-        if (addAppointmentModal) {
-            addAppointmentModal.addEventListener('shown.bs.modal', function () {
-                if (!addCalendar) {
-                    addCalendar = new AppointmentCalendar({
-                        prevBtnId: 'prevMonth',
-                        nextBtnId: 'nextMonth',
-                        currentMonthId: 'currentMonth',
-                        calendarGridId: 'calendarGrid',
-                        selectedDateDisplayId: 'selectedDateDisplay',
-                        timeSlotsGridId: 'timeSlotsGrid',
-                        dateInputId: 'appointment_date',
-                        timeInputId: 'appointment_time'
-                    });
+                    // Open the modal
+                    const modal = new bootstrap.Modal(document.getElementById('rescheduleAppointmentModal'));
+                    modal.show();
                 }
             });
-            
-            addAppointmentModal.addEventListener('hidden.bs.modal', function () {
-                if (addCalendar) {
-                    addCalendar.selectedDate = null;
-                    addCalendar.selectedTime = null;
-                    // Reset UI
-                    document.getElementById('selectedDateDisplay').textContent = 'Select a date to view available time slots';
-                    document.getElementById('timeSlotsGrid').innerHTML = '<div class="text-center text-muted"><i class="fas fa-clock fa-2x mb-2"></i><p>Select a date to view time slots</p></div>';
-                    document.getElementById('appointment_date').value = '';
-                    document.getElementById('appointment_time').value = '';
-                    // Remove selection classes
-                    document.querySelectorAll('#calendarGrid .selected').forEach(el => el.classList.remove('selected'));
-                }
-            });
-        }
-
-        // Initialize Reschedule Appointment Calendar
-        const rescheduleModal = document.getElementById('rescheduleAppointmentModal');
-        let rescheduleCalendar = null;
-
-        if (rescheduleModal) {
-            rescheduleModal.addEventListener('shown.bs.modal', function () {
-                if (!rescheduleCalendar) {
-                    rescheduleCalendar = new AppointmentCalendar({
-                        prevBtnId: 'reschedPrevMonth',
-                        nextBtnId: 'reschedNextMonth',
-                        currentMonthId: 'reschedCurrentMonth',
-                        calendarGridId: 'reschedCalendarGrid',
-                        selectedDateDisplayId: 'reschedSelectedDateDisplay',
-                        timeSlotsGridId: 'reschedTimeSlotsGrid',
-                        dateInputId: 'resched_new_date',
-                        timeInputId: 'resched_new_time'
-                    });
-                }
-            });
-
-            rescheduleModal.addEventListener('hidden.bs.modal', function () {
-                if (rescheduleCalendar) {
-                    rescheduleCalendar.selectedDate = null;
-                    rescheduleCalendar.selectedTime = null;
-                    // Reset UI
-                    document.getElementById('reschedSelectedDateDisplay').textContent = 'Select a date to view available time slots';
-                    document.getElementById('reschedTimeSlotsGrid').innerHTML = '<div class="text-center text-muted"><i class="fas fa-clock fa-2x mb-2"></i><p>Select a date to view time slots</p></div>';
-                    document.getElementById('resched_new_date').value = '';
-                    document.getElementById('resched_new_time').value = '';
-                    document.querySelectorAll('#reschedCalendarGrid .selected').forEach(el => el.classList.remove('selected'));
-                }
-            });
-        }
-
-        // Handle Reschedule Button Clicks
-        document.addEventListener('click', function(e) {
-            if (e.target && e.target.classList.contains('reschedule-btn')) {
-                const btn = e.target;
-                const appointmentId = btn.dataset.appointmentId;
-                const actionUrl = btn.dataset.actionUrl;
-                
-                const form = document.getElementById('rescheduleForm');
-                if (form) {
-                    form.action = actionUrl;
-                }
-                
-                // Open the modal
-                const modal = new bootstrap.Modal(document.getElementById('rescheduleAppointmentModal'));
-                modal.show();
-            }
         });
-    });
-</script>
+    </script>
 @endpush

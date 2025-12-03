@@ -558,16 +558,17 @@ class AdminController extends Controller
     {
         $query = Inventory::query()->with('transactions')->latest();
         if ($request->filled('category')) {
-            $query->where('category', $request->category);
+            $query->whereRaw('LOWER(category) = ?', [strtolower($request->category)]);
         }
 
         if ($request->filled('search')) {
             $q = trim($request->search);
             $query->where(function ($sub) use ($q) {
-                $sub->where('item_name', 'like', "%{$q}%")
-                    ->orWhere('category', 'like', "%{$q}%")
-                    ->orWhere('location', 'like', "%{$q}%")
-                    ->orWhere('unit', 'like', "%{$q}%");
+                $term = "%" . strtolower($q) . "%";
+                $sub->whereRaw('LOWER(item_name) LIKE ?', [$term])
+                    ->orWhereRaw('LOWER(category) LIKE ?', [$term])
+                    ->orWhereRaw('LOWER(location) LIKE ?', [$term])
+                    ->orWhereRaw('LOWER(unit) LIKE ?', [$term]);
 
                 if (is_numeric($q)) {
                     $sub->orWhere('id', (int) $q);

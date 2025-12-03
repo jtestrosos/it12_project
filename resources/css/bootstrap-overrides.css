@@ -1,0 +1,270 @@
+/**
+ * Bootstrap Button Overrides
+ * Custom button styles using theme colors
+ */
+
+/* Primary Button - Trust Blue */
+.btn-primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-hover);
+    border-color: var(--color-primary-dark);
+    color: white;
+}
+
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+    box-shadow: 0 0 0 0.2rem rgba(var(--color-primary-rgb), 0.5);
+}
+
+.btn-outline-primary {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+}
+
+/* Secondary Button - Vitality Teal */
+.btn-secondary {
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-secondary-hover);
+    border-color: var(--color-secondary-dark);
+    color: white;
+}
+
+.btn-secondary:focus,
+.btn-secondary:active {
+    background-color: var(--color-secondary-dark);
+    border-color: var(--color-secondary-dark);
+    box-shadow: 0 0 0 0.2rem rgba(var(--color-secondary-rgb), 0.5);
+}
+
+.btn-outline-secondary {
+    color: var(--color-secondary);
+    border-color: var(--color-secondary);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary);
+    color: white;
+}
+
+/* Accent Button - Energy Coral */
+.btn-accent {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: white;
+}
+
+.btn-accent:hover {
+    background-color: var(--color-accent-hover);
+    border-color: var(--color-accent-dark);
+    color: white;
+}
+
+.btn-accent:focus,
+.btn-accent:active {
+    background-color: var(--color-accent-dark);
+    border-color: var(--color-accent-dark);
+    box-shadow: 0 0 0 0.2rem rgba(var(--color-accent-rgb), 0.5);
+}
+
+.btn-outline-accent {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+.btn-outline-accent:hover {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: white;
+}
+
+/* Success Button - Uses Secondary (Teal) */
+.btn-success {
+    background-color: var(--color-success);
+    border-color: var(--color-success);
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: var(--color-success-dark);
+    border-color: var(--color-success-dark);
+    color: white;
+}
+
+.btn-outline-success {
+    color: var(--color-success);
+    border-color: var(--color-success);
+}
+
+.btn-outline-success:hover {
+    background-color: var(--color-success);
+    border-color: var(--color-success);
+    color: white;
+}
+
+/* Warning Button - Uses Accent (Coral) */
+.btn-warning {
+    background-color: var(--color-warning);
+    border-color: var(--color-warning);
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: var(--color-warning-dark);
+    border-color: var(--color-warning-dark);
+    color: white;
+}
+
+.btn-outline-warning {
+    color: var(--color-warning);
+    border-color: var(--color-warning);
+}
+
+.btn-outline-warning:hover {
+    background-color: var(--color-warning);
+    border-color: var(--color-warning);
+    color: white;
+}
+
+/* Info Button - Uses Primary (Blue) */
+.btn-info {
+    background-color: var(--color-info);
+    border-color: var(--color-info);
+    color: white;
+}
+
+.btn-info:hover {
+    background-color: var(--color-info-dark);
+    border-color: var(--color-info-dark);
+    color: white;
+}
+
+.btn-outline-info {
+    color: var(--color-info);
+    border-color: var(--color-info);
+}
+
+.btn-outline-info:hover {
+    background-color: var(--color-info);
+    border-color: var(--color-info);
+    color: white;
+}
+
+/* Danger Button */
+.btn-danger {
+    background-color: var(--color-danger);
+    border-color: var(--color-danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: var(--color-danger-dark);
+    border-color: var(--color-danger-dark);
+    color: white;
+}
+
+.btn-outline-danger {
+    color: var(--color-danger);
+    border-color: var(--color-danger);
+}
+
+.btn-outline-danger:hover {
+    background-color: var(--color-danger);
+    border-color: var(--color-danger);
+    color: white;
+}
+
+/* Badge Overrides */
+.badge.bg-primary {
+    background-color: var(--color-primary) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--color-secondary) !important;
+}
+
+.badge.bg-success {
+    background-color: var(--color-success) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--color-warning) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--color-danger) !important;
+}
+
+.badge.bg-info {
+    background-color: var(--color-info) !important;
+}
+
+/* Progress Bar Overrides */
+.progress-bar.bg-primary {
+    background-color: var(--color-primary) !important;
+}
+
+.progress-bar.bg-secondary {
+    background-color: var(--color-secondary) !important;
+}
+
+.progress-bar.bg-success {
+    background-color: var(--color-success) !important;
+}
+
+.progress-bar.bg-warning {
+    background-color: var(--color-warning) !important;
+}
+
+.progress-bar.bg-danger {
+    background-color: var(--color-danger) !important;
+}
+
+/* Alert Overrides */
+.alert-primary {
+    background-color: rgba(var(--color-primary-rgb), 0.1);
+    border-color: var(--color-primary-light);
+    color: var(--color-primary-dark);
+}
+
+.alert-secondary {
+    background-color: rgba(var(--color-secondary-rgb), 0.1);
+    border-color: var(--color-secondary-light);
+    color: var(--color-secondary-dark);
+}
+
+.alert-success {
+    background-color: rgba(var(--color-secondary-rgb), 0.1);
+    border-color: var(--color-secondary-light);
+    color: var(--color-secondary-dark);
+}
+
+.alert-warning {
+    background-color: rgba(var(--color-accent-rgb), 0.1);
+    border-color: var(--color-accent-light);
+    color: var(--color-accent-dark);
+}
+
+.alert-info {
+    background-color: rgba(var(--color-primary-rgb), 0.1);
+    border-color: var(--color-primary-light);
+    color: var(--color-primary-dark);
+}

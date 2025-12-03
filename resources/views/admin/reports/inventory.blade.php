@@ -19,7 +19,7 @@
     <!-- Overview Cards -->
     <div class="row g-3 mb-4">
         <div class="col-md-3">
-            <div class="card-surface p-3">
+            <div class="card-surface p-3 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <small class="text-muted">Total Items</small>
                     <i class="fas fa-box text-primary"></i>
@@ -28,7 +28,7 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card-surface p-3">
+            <div class="card-surface p-3 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <small class="text-muted">Low Stock</small>
                     <i class="fas fa-exclamation-triangle text-warning"></i>
@@ -37,7 +37,7 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card-surface p-3">
+            <div class="card-surface p-3 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <small class="text-muted">Out of Stock</small>
                     <i class="fas fa-times-circle text-danger"></i>
@@ -46,13 +46,12 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card-surface p-3">
+            <div class="card-surface p-3 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <small class="text-muted">Expiring Soon</small>
+                    <small class="text-muted">Expiring Soon (90d)</small>
                     <i class="fas fa-clock text-info"></i>
                 </div>
                 <h3 class="mb-0">{{ number_format($expiringSoonCount) }}</h3>
-                <small class="text-muted">Within 90 days</small>
             </div>
         </div>
     </div>

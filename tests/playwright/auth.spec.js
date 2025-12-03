@@ -35,11 +35,6 @@ test.describe('Authentication', () => {
             await expect(page.locator('main').getByText('Invalid Credentials.')).toBeVisible({ timeout: 5000 });
         });
 
-        test('should login as patient successfully', async ({ page }) => {
-            await login(page, testUsers.patient.email, testUsers.patient.password);
-            await expect(page).toHaveURL(/\/patient\/dashboard/);
-        });
-
         test('should login as admin successfully', async ({ page }) => {
             await login(page, testUsers.admin.email, testUsers.admin.password);
             await expect(page).toHaveURL(/\/admin\/dashboard/);

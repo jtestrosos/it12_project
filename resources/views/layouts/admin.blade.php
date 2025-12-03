@@ -46,14 +46,33 @@
             --text-light: #111;
             --text-dark: #e6e6e6;
             --sidebar-bg-light: #ffffff;
-            --sidebar-bg-dark: #212121;
+            --sidebar-bg-dark: #131516;
             --header-bg-light: #ffffff;
             --header-bg-dark: #1b1e20;
             --card-bg-light: #ffffff;
             --card-bg-dark: #1e2124;
             --border-dark: #2a2f35;
-            --primary: #0d6efd;
-            --primary-light: #6ea8fe;
+
+            /* Theme Colors - Trust Blue, Vitality Teal, Energy Coral */
+            --color-primary: hsl(210, 100%, 45%);
+            --color-primary-dark: hsl(210, 100%, 35%);
+            --color-primary-light: hsl(210, 100%, 65%);
+            --color-primary-hover: hsl(210, 100%, 40%);
+            --color-primary-rgb: 0, 102, 230;
+
+            --color-secondary: hsl(174, 62%, 47%);
+            --color-secondary-dark: hsl(174, 62%, 37%);
+            --color-secondary-light: hsl(174, 62%, 67%);
+            --color-secondary-rgb: 45, 196, 186;
+
+            --color-accent: hsl(14, 90%, 60%);
+            --color-accent-dark: hsl(14, 90%, 50%);
+            --color-accent-light: hsl(14, 90%, 75%);
+            --color-accent-rgb: 250, 114, 76;
+
+            /* Legacy variables for compatibility */
+            --primary: var(--color-primary);
+            --primary-light: var(--color-primary-light);
         }
 
         body {
@@ -173,18 +192,18 @@
 
         /* Hover State */
         .sidebar .nav-link:hover {
-            background: rgba(13, 110, 253, 0.08);
+            background: rgba(var(--color-primary-rgb), 0.08);
         }
 
-        /* Active State - FIXED & IMPROVED */
+        /* Active State - Using Theme Colors */
         .sidebar .nav-link.active {
-            background: rgba(13, 110, 253, 0.1);
-            color: var(--primary) !important;
+            background: rgba(var(--color-primary-rgb), 0.1);
+            color: var(--color-primary) !important;
             font-weight: 500;
         }
 
         .sidebar .nav-link.active i {
-            color: var(--primary);
+            color: var(--color-primary);
         }
 
         .sidebar .nav-link.active::before {
@@ -195,7 +214,7 @@
             transform: translateY(-50%);
             width: 3px;
             height: 24px;
-            background: var(--primary);
+            background: var(--color-primary);
             border-radius: 0 2px 2px 0;
         }
 
@@ -388,21 +407,21 @@
         }
 
         body.bg-dark .sidebar .nav-link:hover {
-            background: rgba(13, 110, 253, 0.15);
+            background: rgba(var(--color-primary-rgb), 0.15);
         }
 
-        /* Dark Mode Active State */
+        /* Dark Mode Active State - Using Theme Colors */
         body.bg-dark .sidebar .nav-link.active {
-            background: rgba(13, 110, 253, 0.2);
-            color: var(--primary-light) !important;
+            background: rgba(var(--color-primary-rgb), 0.2);
+            color: var(--color-primary-light) !important;
         }
 
         body.bg-dark .sidebar .nav-link.active i {
-            color: var(--primary-light);
+            color: var(--color-primary-light);
         }
 
         body.bg-dark .sidebar .nav-link.active::before {
-            background: var(--primary-light);
+            background: var(--color-primary-light);
         }
 
         /* ---------- Dark Mode – Tables ---------- */
@@ -532,13 +551,33 @@
             color: #e0e0e0;
         }
 
+        /* Light mode submenu hover */
+        .submenu-link:hover {
+            background: rgba(var(--color-primary-rgb), 0.08);
+        }
+
         body.bg-dark .submenu-link:hover {
-            background: rgba(13, 110, 253, 0.12);
+            background: rgba(var(--color-primary-rgb), 0.12);
+        }
+
+        /* Submenu Active State - CONSISTENT with nav-link */
+        .submenu-link.active {
+            background: rgba(var(--color-primary-rgb), 0.1);
+            color: var(--color-primary) !important;
+            font-weight: 500;
+        }
+
+        .submenu-link.active i {
+            color: var(--color-primary);
         }
 
         body.bg-dark .submenu-link.active {
-            background: rgba(13, 110, 253, 0.18);
-            color: var(--primary-light) !important;
+            background: rgba(var(--color-primary-rgb), 0.2);
+            color: var(--color-primary-light) !important;
+        }
+
+        body.bg-dark .submenu-link.active i {
+            color: var(--color-primary-light);
         }
 
         /* ---------- Responsive ---------- */
@@ -583,9 +622,12 @@
 
 <body>
     <!-- Sidebar Overlay -->
+    @if(!View::hasSection('hide-sidebar'))
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    @endif
 
     <!-- Sidebar -->
+    @if(!View::hasSection('hide-sidebar'))
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <button class="burger-menu-btn" id="toggleSidebarBtn" aria-label="Toggle sidebar">
@@ -600,9 +642,10 @@
             @yield('sidebar-menu')
         </nav>
     </aside>
+    @endif
 
     <!-- Main Content -->
-    <div class="main-content" id="mainContent">
+    <div class="main-content" id="mainContent" @if(View::hasSection('hide-sidebar')) style="margin-left: 0" @endif>
         <!-- Header -->
         <header class="header">
             <div class="d-flex align-items-center">
@@ -685,7 +728,7 @@
                 @if(session('info'))
                     Toast.fire({ icon: 'info', title: "{{ session('info') }}" });
                 @endif
-            });
+                        });
         </script>
     @endif
 

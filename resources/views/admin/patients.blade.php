@@ -433,7 +433,7 @@
                                     <th>Email</th>
                                     <th>Status</th>
                                     <th>Registered</th>
-                                    <th>Appointments</th>
+                                    <th class="text-center">Appointments</th>
                                     <th>Last Visit</th>
                                     <th>Actions</th>
                                 </tr>
@@ -470,7 +470,7 @@
                                             </span>
                                         </td>
                                         <td>{{ $patient->created_at->format('M d, Y') }}</td>
-                                        <td>
+                                        <td class="text-center">
                                             <span class="badge bg-primary">{{ $patient->appointments->count() }}</span>
                                         </td>
                                         <td>
@@ -482,28 +482,28 @@
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                                                <button class="btn btn-outline-primary btn-sm d-inline-flex align-items-center justify-content-center" data-bs-toggle="modal"
                                                     data-bs-target="#viewPatientModal{{ $patient->id }}">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
                                                 @if($patient->age >= 6)
                                                     <a href="{{ route('admin.patient.medical-profile', $patient) }}"
-                                                        class="btn btn-outline-info btn-sm" title="View Medical Profile">
+                                                        class="btn btn-outline-info btn-sm d-inline-flex align-items-center justify-content-center" title="View Medical Profile">
                                                         <i class="fas fa-file-medical"></i>
                                                     </a>
                                                 @endif
-                                                <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal"
+                                                <button class="btn btn-outline-success btn-sm d-inline-flex align-items-center justify-content-center" data-bs-toggle="modal"
                                                     data-bs-target="#createAppointmentModal" data-user-id="{{ $patient->id }}"
                                                     data-user-name="{{ $patient->name }}"
                                                     data-user-phone="{{ $patient->phone ?? '' }}"
                                                     data-user-address="{{ $patient->address ?? $patient->barangay ?? '' }}">
                                                     <i class="fas fa-calendar-plus"></i>
                                                 </button>
-                                                <button class="btn btn-outline-warning btn-sm" data-bs-toggle="modal"
+                                                <button class="btn btn-outline-warning btn-sm d-inline-flex align-items-center justify-content-center" data-bs-toggle="modal"
                                                     data-bs-target="#editPatientModal{{ $patient->id }}">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
-                                                <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                                <button class="btn btn-outline-danger btn-sm d-inline-flex align-items-center justify-content-center" data-bs-toggle="modal"
                                                     data-bs-target="#archivePatientModal{{ $patient->id }}">
                                                     <i class="fas fa-archive"></i>
                                                 </button>

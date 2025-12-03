@@ -1,7 +1,64 @@
 @extends('layouts.admin')
 
 @section('title', 'Patient Medical Profile - Admin Portal')
-@section('page-title', 'Patient Medical Profile: ' . $patient->name)
+@section('page-title', 'Patient Medical Profile')
+@section('hide-sidebar', true)
+
+@push('styles')
+    <style>
+        /* Dark mode support */
+        body.bg-dark .card {
+            background-color: #1e2124 !important;
+            border-color: #2a2f35 !important;
+            color: #e6e6e6 !important;
+        }
+
+        body.bg-dark .card-header {
+            background-color: #1f2327 !important;
+            border-bottom-color: #2a2f35 !important;
+        }
+
+        body.bg-dark .card-title,
+        body.bg-dark .form-label,
+        body.bg-dark h5,
+        body.bg-dark h6,
+        body.bg-dark strong {
+            color: #e6e6e6 !important;
+        }
+
+        body.bg-dark .text-muted {
+            color: #adb5bd !important;
+        }
+
+        body.bg-dark .form-control,
+        body.bg-dark .form-select {
+            background-color: #0f1316 !important;
+            border-color: #2a2f35 !important;
+            color: #e6e6e6 !important;
+        }
+
+        body.bg-dark .form-control:focus,
+        body.bg-dark .form-select:focus {
+            background-color: #161b20 !important;
+            border-color: #007bff !important;
+            color: #e6e6e6 !important;
+        }
+
+        body.bg-dark .form-check-input {
+            background-color: #0f1316 !important;
+            border-color: #2a2f35 !important;
+        }
+
+        body.bg-dark .form-check-input:checked {
+            background-color: #007bff !important;
+            border-color: #007bff !important;
+        }
+
+        body.bg-dark .form-control::placeholder {
+            color: #6c757d !important;
+        }
+    </style>
+@endpush
 
 @section('content')
     @if($patient->age < 6)

@@ -103,12 +103,12 @@
                           "workerIndex": 0,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 3829,
+                          "duration": 3726,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2025-11-28T16:17:26.508Z",
+                          "startTime": "2025-12-02T16:50:02.471Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -137,12 +137,12 @@
                           "workerIndex": 0,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 4529,
+                          "duration": 5988,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2025-11-28T16:17:32.013Z",
+                          "startTime": "2025-12-02T16:50:07.361Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -171,12 +171,12 @@
                           "workerIndex": 0,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 4417,
+                          "duration": 2417,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2025-11-28T16:17:36.583Z",
+                          "startTime": "2025-12-02T16:50:13.387Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -205,12 +205,12 @@
                           "workerIndex": 0,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 9003,
+                          "duration": 2490,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2025-11-28T16:17:41.074Z",
+                          "startTime": "2025-12-02T16:50:15.843Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -239,10 +239,10 @@
                           "workerIndex": 0,
                           "parallelIndex": 0,
                           "status": "failed",
-                          "duration": 13151,
+                          "duration": 8727,
                           "error": {
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/patient\\/dashboard/\u001b[39m\nReceived string:  \u001b[31m\"http://127.0.0.1:8000/login\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    8 × unexpected value \"http://127.0.0.1:8000/login\"\u001b[22m\n",
-                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/patient\\/dashboard/\u001b[39m\nReceived string:  \u001b[31m\"http://127.0.0.1:8000/login\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    8 × unexpected value \"http://127.0.0.1:8000/login\"\u001b[22m\n\n    at C:\\Users\\Lebron\\Documents\\Laravel Projects\\V2 Latest Version IT12\\here\\it12_project\\tests\\playwright\\auth.spec.js:40:32",
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/patient\\/dashboard/\u001b[39m\nReceived string:  \u001b[31m\"http://127.0.0.1:8000/login\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://127.0.0.1:8000/login\"\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/patient\\/dashboard/\u001b[39m\nReceived string:  \u001b[31m\"http://127.0.0.1:8000/login\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://127.0.0.1:8000/login\"\u001b[22m\n\n    at C:\\Users\\Lebron\\Documents\\Laravel Projects\\V2 Latest Version IT12\\here\\it12_project\\tests\\playwright\\auth.spec.js:40:32",
                             "location": {
                               "file": "C:\\Users\\Lebron\\Documents\\Laravel Projects\\V2 Latest Version IT12\\here\\it12_project\\tests\\playwright\\auth.spec.js",
                               "column": 32,
@@ -257,13 +257,13 @@
                                 "column": 32,
                                 "line": 40
                               },
-                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/patient\\/dashboard/\u001b[39m\nReceived string:  \u001b[31m\"http://127.0.0.1:8000/login\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    8 × unexpected value \"http://127.0.0.1:8000/login\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 38 |\u001b[39m         test(\u001b[32m'should login as patient successfully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 39 |\u001b[39m             \u001b[36mawait\u001b[39m login(page\u001b[33m,\u001b[39m testUsers\u001b[33m.\u001b[39mpatient\u001b[33m.\u001b[39memail\u001b[33m,\u001b[39m testUsers\u001b[33m.\u001b[39mpatient\u001b[33m.\u001b[39mpassword)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 40 |\u001b[39m             \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/patient\\/dashboard/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 41 |\u001b[39m         })\u001b[33m;\u001b[39m\n \u001b[90m 42 |\u001b[39m\n \u001b[90m 43 |\u001b[39m         test(\u001b[32m'should login as admin successfully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m\n\u001b[2m    at C:\\Users\\Lebron\\Documents\\Laravel Projects\\V2 Latest Version IT12\\here\\it12_project\\tests\\playwright\\auth.spec.js:40:32\u001b[22m"
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/patient\\/dashboard/\u001b[39m\nReceived string:  \u001b[31m\"http://127.0.0.1:8000/login\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://127.0.0.1:8000/login\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 38 |\u001b[39m         test(\u001b[32m'should login as patient successfully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 39 |\u001b[39m             \u001b[36mawait\u001b[39m login(page\u001b[33m,\u001b[39m testUsers\u001b[33m.\u001b[39mpatient\u001b[33m.\u001b[39memail\u001b[33m,\u001b[39m testUsers\u001b[33m.\u001b[39mpatient\u001b[33m.\u001b[39mpassword)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 40 |\u001b[39m             \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/patient\\/dashboard/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 41 |\u001b[39m         })\u001b[33m;\u001b[39m\n \u001b[90m 42 |\u001b[39m\n \u001b[90m 43 |\u001b[39m         test(\u001b[32m'should login as admin successfully'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m\n\u001b[2m    at C:\\Users\\Lebron\\Documents\\Laravel Projects\\V2 Latest Version IT12\\here\\it12_project\\tests\\playwright\\auth.spec.js:40:32\u001b[22m"
                             }
                           ],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2025-11-28T16:17:50.174Z",
+                          "startTime": "2025-12-02T16:50:18.361Z",
                           "annotations": [],
                           "attachments": [
                             {
@@ -308,12 +308,12 @@
                           "workerIndex": 1,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 7996,
+                          "duration": 8892,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2025-11-28T16:18:06.611Z",
+                          "startTime": "2025-12-02T16:50:28.724Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -342,12 +342,12 @@
                           "workerIndex": 1,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 14034,
+                          "duration": 5942,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2025-11-28T16:18:14.785Z",
+                          "startTime": "2025-12-02T16:50:37.753Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -376,12 +376,12 @@
                           "workerIndex": 1,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 9530,
+                          "duration": 1614,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2025-11-28T16:18:28.868Z",
+                          "startTime": "2025-12-02T16:50:43.741Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -410,12 +410,12 @@
                           "workerIndex": 1,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 8517,
+                          "duration": 6045,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2025-11-28T16:18:38.436Z",
+                          "startTime": "2025-12-02T16:50:45.406Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -437,8 +437,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-11-28T16:17:19.224Z",
-    "duration": 87867.07999999996,
+    "startTime": "2025-12-02T16:49:59.382Z",
+    "duration": 52273.489,
     "expected": 8,
     "skipped": 0,
     "unexpected": 1,

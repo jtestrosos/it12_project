@@ -8,24 +8,26 @@
     'icon' => null,
     'iconPosition' => 'left', // left, right
 ])
-
 @php
     $baseClasses = 'btn d-inline-flex align-items-center justify-content-center gap-2 transition-base';
-    
+
     $variants = [
         'primary' => 'btn-primary text-white',
         'secondary' => 'btn-secondary text-white',
+        'accent' => 'btn-accent text-white',
         'success' => 'btn-success text-white',
         'danger' => 'btn-danger text-white',
-        'warning' => 'btn-warning text-dark',
+        'warning' => 'btn-warning text-white',
         'info' => 'btn-info text-white',
         'light' => 'btn-light text-dark',
         'dark' => 'btn-dark text-white',
         'link' => 'btn-link text-decoration-none',
-        'ghost' => 'btn-ghost text-dark hover:bg-gray-100', // Requires custom CSS
+        'ghost' => 'btn-ghost text-dark hover:bg-gray-100',
         'outline-primary' => 'btn-outline-primary',
         'outline-secondary' => 'btn-outline-secondary',
+        'outline-accent' => 'btn-outline-accent',
         'outline-danger' => 'btn-outline-danger',
+        'outline-success' => 'btn-outline-success',
     ];
 
     $sizes = [
@@ -34,16 +36,16 @@
         'lg' => 'btn-lg text-lg px-5',
     ];
 
-    $classes = $baseClasses . ' ' . 
-               ($variants[$variant] ?? $variants['primary']) . ' ' . 
-               ($sizes[$size] ?? $sizes['md']) . ' ' . 
-               ($block ? 'w-100' : '') . ' ' .
-               ($disabled || $loading ? 'disabled' : '');
+    $classes = $baseClasses . ' ' .
+        ($variants[$variant] ?? $variants['primary']) . ' ' .
+        ($sizes[$size] ?? $sizes['md']) . ' ' .
+        ($block ? 'w-100' : '') . ' ' .
+        ($disabled || $loading ? 'disabled' : '');
 @endphp
 
 <button 
     type="{{ $type }}" 
-    {{ $attributes->merge(['class' => $classes]) }}
+{{ $attributes->merge(['class' => $classes]) }}
     @if($disabled || $loading) disabled @endif
 >
     @if($loading)
