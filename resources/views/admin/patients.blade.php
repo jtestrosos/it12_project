@@ -881,18 +881,23 @@
                     <h5 class="modal-title">Archive Patient</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <p class="mb-2">Are you sure you want to archive this patient?</p>
-                    <p class="fw-bold mb-0">{{ $patient->name }}</p>
-                    <small class="text-muted">{{ $patient->email }}</small>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <form method="POST" action="{{ route('admin.patient.archive', $patient->id) }}" class="d-inline">
-                        @csrf
+                <form method="POST" action="{{ route('admin.patient.archive', $patient->id) }}">
+                    @csrf
+                    <div class="modal-body">
+                        <p class="mb-2">Are you sure you want to archive this patient?</p>
+                        <p class="fw-bold mb-0">{{ $patient->name }}</p>
+                        <small class="text-muted mb-3 d-block">{{ $patient->email }}</small>
+
+                        <div class="mb-3 text-start">
+                            <label for="password{{ $patient->id }}" class="form-label">Enter your password to confirm</label>
+                            <input type="password" class="form-control" id="password{{ $patient->id }}" name="password" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-danger">Archive</button>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
