@@ -120,11 +120,13 @@
                     </div>
                 </div>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-primary btn-lg" onclick="createBackup(this)">
-                        <i class="fas fa-download me-2"></i> Create Backup
+                    <button class="btn btn-primary btn-lg d-flex align-items-center" onclick="createBackup(this)">
+                        <i class="fas fa-download me-2"></i>
+                        <span>Create Backup</span>
                     </button>
-                    <button class="btn btn-outline-secondary" onclick="location.reload()">
-                        <i class="fas fa-sync me-2"></i> Refresh
+                    <button class="btn btn-outline-secondary d-flex align-items-center" onclick="location.reload()">
+                        <i class="fas fa-sync me-2"></i>
+                        <span>Refresh</span>
                     </button>
                 </div>
                 <div class="mt-3">
@@ -246,42 +248,107 @@
                                     </td>
                                     <td>{{ $backup->creator->name ?? 'System' }}</td>
                                     <td>
-                                        @if($backup->status == 'completed')
-                                            <a href="{{ route('superadmin.backup.download', $backup) }}"
-                                                class="btn btn-outline-primary btn-sm me-2">
-                                                <i class="fas fa-download me-1"></i> Download
-                                            </a>
-                                        @endif
-                                        <form action="{{ route('superadmin.backup.delete', $backup) }}" method="POST"
-                                            class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger btn-sm"
-                                                onclick="return confirm('Are you sure you want to delete this backup?')">
-                                                <i class="fas fa-trash me-1"></i> Delete
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
+                                        <div class="btn-group" role="group">
+                                                    @if($backup->status == 'completed')
+                                                        <a href="{{ route('superadmin.backup.download', $backup) }}"
+                                                            class="btn btn-sm btn-outline-secondary" title="Download">
+                                                            <i class="fas fa-download text-primary"></i>
+                                                        </a>
+                                                    @endif
+                                                    <form action="{{ route('superadmin.backup.delete', $backup) }}" method="POST"
+                                                        class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-outline-secondary"
+                                                            onclick="return confirm('Are you sure you want to delete this backup?')"
+                                                            title="Delete">
+                                                            <i class="fas fa-trash text-danger"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
                             @empty
-                                <tr>
-                                    <td colspan="6" class="text-center py-4">
-                                        <i class="fas fa-history fa-2x text-muted mb-2"></i>
-                                        <p class="text-muted mb-0">No backups found. Create your first backup above!</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                @if($backups->hasPages())
-                    <div class="mt-3">
-                        {{ $backups->links() }}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4">
+                                            <i class="fas fa-history fa-2x text-muted mb-2"></i>
+                                            <p class="text-muted mb-0">No backups found. Create your first backup above!</p>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
-                @endif
+                    @if($backups->hasPages())
+                        <div class="d-flex justify-content-center mt-4">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center">
+                                    {{-- Previous Page Link --}}
+                                    @if ($backups->onFirstPage())
+                                        <li class="page-item disabled" aria-disabled="true">
+                                            <span class="page-link">&lsaquo;</span>
+                                        </li>
+                                    @else
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ $backups->previousPageUrl() }}">&lsaquo;</a>
+                                        </li>
+                                    @endif
+
+                                    {{-- First page --}}
+                                    @if ($backups->currentPage() > 3)
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ $backups->url(1) }}">1</a>
+                                        </li>
+                                        @if ($backups->currentPage() > 4)
+                                            <li class="page-item disabled">
+                                                <span class="page-link">...</span>
+                                            </li>
+                                        @endif
+                                    @endif
+
+                                    {{-- Page numbers --}}
+                                    @for ($page = max(1, $backups->currentPage() - 2); $page <= min($backups->lastPage(), $backups->currentPage() + 2); $page++)
+                                        @if ($page == $backups->currentPage())
+                                            <li class="page-item active" aria-current="page">
+                                                <span class="page-link">{{ $page }}</span>
+                                            </li>
+                                        @else
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ $backups->url($page) }}">{{ $page }}</a>
+                                            </li>
+                                        @endif
+                                    @endfor
+
+                                    {{-- Last page --}}
+                                    @if ($backups->currentPage() < $backups->lastPage() - 2)
+                                        @if ($backups->currentPage() < $backups->lastPage() - 3)
+                                            <li class="page-item disabled">
+                                                <span class="page-link">...</span>
+                                            </li>
+                                        @endif
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                                href="{{ $backups->url($backups->lastPage()) }}">{{ $backups->lastPage() }}</a>
+                                        </li>
+                                    @endif
+
+                                    {{-- Next Page Link --}}
+                                    @if ($backups->hasMorePages())
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ $backups->nextPageUrl() }}">&rsaquo;</a>
+                                        </li>
+                                    @else
+                                        <li class="page-item disabled" aria-disabled="true">
+                                            <span class="page-link">&rsaquo;</span>
+                                        </li>
+                                    @endif
+                                </ul>
+                            </nav>
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
-    </div>
 @endsection
 
 @push('scripts')

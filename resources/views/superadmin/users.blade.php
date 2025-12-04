@@ -238,15 +238,15 @@
                 <span class="input-group-text">
                     <i class="fas fa-search"></i>
                 </span>
-                <input type="text" class="form-control" id="searchInput" placeholder="Search users by name or email...">
+                <input type="text" class="form-control" id="searchInput" placeholder="Search users by name or email..."
+                    value="{{ request('search') }}">
             </div>
         </div>
         <div class="col-md-3">
             <select class="form-select" id="roleFilter">
                 <option value="">All Roles</option>
-                <option value="superadmin">Super Admin</option>
-                <option value="admin">Admin</option>
-                <option value="user">User</option>
+                <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>User</option>
             </select>
         </div>
         <div class="col-md-3">
@@ -291,10 +291,11 @@
                                 </td>
                                 <td class="text-center">
                                     <span class="badge rounded-pill 
-                                                                    @if($user->role == 'superadmin') bg-danger
-                                                                    @elseif($user->role == 'admin') bg-warning
-                                                                    @else bg-primary
-                                                                    @endif" style="font-size: 0.75rem; padding: 0.5rem 1rem;">
+                                                                                                                    @if($user->role == 'superadmin') bg-danger
+                                                                                                                    @elseif($user->role == 'admin') bg-warning
+                                                                                                                    @else bg-primary
+                                                                                                                    @endif"
+                                        style="font-size: 0.75rem; padding: 0.5rem 1rem;">
                                         {{ ucfirst($user->role === 'user' ? 'patient' : $user->role) }}
                                     </span>
                                 </td>
@@ -303,17 +304,21 @@
                                 </td>
                                 <td class="text-center pe-4">
                                     <div class="btn-group" role="group">
-                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
-                                            data-bs-target="#viewUserModal{{ $user->id }}" title="View User">
+                                        <button
+                                            class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center"
+                                            data-bs-toggle="modal" data-bs-target="#viewUserModal{{ $user->id }}" title="View User">
                                             <i class="fas fa-eye text-info"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
-                                            data-bs-target="#editUserModal{{ $user->id }}" title="Edit User">
+                                        <button
+                                            class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center"
+                                            data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}" title="Edit User">
                                             <i class="fas fa-edit text-warning"></i>
                                         </button>
                                         @if($user->id !== Auth::id())
-                                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
-                                                data-bs-target="#archiveUserModal{{ $user->id }}" title="Archive User">
+                                            <button
+                                                class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center"
+                                                data-bs-toggle="modal" data-bs-target="#archiveUserModal{{ $user->id }}"
+                                                title="Archive User">
                                                 <i class="fas fa-archive text-danger"></i>
                                             </button>
                                         @endif
@@ -801,10 +806,10 @@
                             <p><strong>Email:</strong> {{ $user->email }}</p>
                             <p><strong>Role:</strong>
                                 <span class="status-badge 
-                                        @if($user->role == 'superadmin') status-superadmin
-                                        @elseif($user->role == 'admin') status-admin
-                                        @else status-user
-                                        @endif">
+                                                        @if($user->role == 'superadmin') status-superadmin
+                                                        @elseif($user->role == 'admin') status-admin
+                                                        @else status-user
+                                                        @endif">
                                     {{ ucfirst($user->role === 'user' ? 'patient' : $user->role) }}
                                 </span>
                             </p>
@@ -895,76 +900,86 @@
 
 @push('scripts')
     <script>
-        // Live Search and Filter Functionality
-        (function () {
+        document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.getElementById('searchInput');
             const roleFilter = document.getElementById('roleFilter');
             const clearBtn = document.getElementById('clearFiltersBtn');
-            const tableBody = document.getElementById('usersTableBody');
-            const rows = tableBody ? tableBody.querySelectorAll('tr') : [];
+            const tableContainer = document.querySelector('.table-container');
 
-            function filterTable() {
-                const searchValue = searchInput ? searchInput.value.toLowerCase() : '';
-                const roleValue = roleFilter ? roleFilter.value.toLowerCase() : '';
+            function fetchUsers(url) {
+                tableContainer.style.opacity = '0.5';
 
-                rows.forEach(row => {
-                    const name = row.cells[0] ? row.cells[0].textContent.toLowerCase() : '';
-                    const email = row.cells[1] ? row.cells[1].textContent.toLowerCase() : '';
-                    const role = row.cells[2] ? row.cells[2].textContent.toLowerCase() : '';
-
-                    let showRow = true;
-
-                    // Search filter
-                    if (searchValue) {
-                        if (!name.includes(searchValue) && !email.includes(searchValue)) {
-                            showRow = false;
-                        }
+                fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
+                })
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newTableContainer = doc.querySelector('.table-container');
 
-                    // Role filter
-                    if (roleValue) {
-                        if (!role.includes(roleValue)) {
-                            showRow = false;
+                        if (newTableContainer && tableContainer) {
+                            tableContainer.innerHTML = newTableContainer.innerHTML;
                         }
-                    }
 
-                    row.style.display = showRow ? '' : 'none';
-                });
-
-                // Update showing count
-                updateShowingCount();
+                        window.history.pushState({}, '', url);
+                        tableContainer.style.opacity = '1';
+                    })
+                    .catch(error => {
+                        console.error('Error fetching users:', error);
+                        tableContainer.style.opacity = '1';
+                    });
             }
 
-            function updateShowingCount() {
-                const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
-                const totalRows = rows.length;
+            function updateFilters() {
+                const search = searchInput.value;
+                const role = roleFilter.value;
+                const url = new URL(window.location.href);
 
-                // Since we're using client-side filtering, always show the count based on visible rows
-                // The pagination info will be handled by the server-side pagination
-                console.log(`Showing ${visibleRows.length} of ${totalRows} users (filtered)`);
+                if (search) url.searchParams.set('search', search);
+                else url.searchParams.delete('search');
+
+                if (role) url.searchParams.set('role', role);
+                else url.searchParams.delete('role');
+
+                url.searchParams.set('page', 1);
+
+                fetchUsers(url.toString());
             }
 
-            // Event listeners
+            let timeout = null;
             if (searchInput) {
-                searchInput.addEventListener('input', filterTable);
+                searchInput.addEventListener('input', function () {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(updateFilters, 500);
+                });
             }
 
             if (roleFilter) {
-                roleFilter.addEventListener('change', filterTable);
+                roleFilter.addEventListener('change', updateFilters);
             }
 
-            // Clear filters
             if (clearBtn) {
                 clearBtn.addEventListener('click', function () {
-                    if (searchInput) searchInput.value = '';
-                    if (roleFilter) roleFilter.value = '';
-                    filterTable();
+                    searchInput.value = '';
+                    roleFilter.value = '';
+                    updateFilters();
                 });
             }
 
-            // Initialize showing count
-            updateShowingCount();
-        })();
+            // Handle pagination clicks
+            if (tableContainer) {
+                tableContainer.addEventListener('click', function (e) {
+                    const link = e.target.closest('.pagination .page-link');
+                    if (link && !link.parentElement.classList.contains('disabled') && !link.parentElement.classList.contains('active')) {
+                        e.preventDefault();
+                        fetchUsers(link.href);
+                    }
+                });
+            }
+        });
 
         // Generic confirmation modal for destructive actions
         (function () {

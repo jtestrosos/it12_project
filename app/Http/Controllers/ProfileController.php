@@ -21,10 +21,10 @@ class ProfileController extends Controller
 
         // Determine correct table based on user type
         $table = match (true) {
-            $user->isPatient() => 'patients',
-            $user->isAdmin() => 'admins',
-            $user->isSuperAdmin() => 'super_admins',
-            default => 'patients',
+            $user->isPatient() => 'patient',
+            $user->isAdmin() => 'admin',
+            $user->isSuperAdmin() => 'super_admin',
+            default => 'patient',
         };
 
         $request->validate([

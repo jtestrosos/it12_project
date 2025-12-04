@@ -352,7 +352,6 @@
                             <div class="logo"><h3></h3></div>
                         </div>
                         <div class="header-right">
-                            <i class="fas fa-bell me-3"></i>
                             <div class="dropdown">
                                 <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUserApp" data-bs-toggle="dropdown" aria-expanded="false">
                                     <div class="user-avatar" style="overflow: hidden;">

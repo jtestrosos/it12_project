@@ -5,81 +5,106 @@
 @section('page-description', 'View and manage archived patient accounts')
 
 @section('page-styles')
-<style>
+    <style>
         /* Match Patient Management dark-mode surfaces */
-        body.bg-dark .main-content { background-color: #151718; }
-        body.bg-dark .sidebar { background: #131516; border-right-color: #2a2f35; }
-        body.bg-dark .header { background: #1b1e20; border-bottom-color: #2a2f35; }
-</style>
+        body.bg-dark .main-content {
+            background-color: #151718;
+        }
+
+        body.bg-dark .sidebar {
+            background: #131516;
+            border-right-color: #2a2f35;
+        }
+
+        body.bg-dark .header {
+            background: #1b1e20;
+            border-bottom-color: #2a2f35;
+        }
+
+        /* Hide sidebar on archive page */
+        .sidebar {
+            display: none !important;
+        }
+
+        /* Adjust main content to full width */
+        .main-content {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+    </style>
 @endsection
 
 @section('content')
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div>
-                            <a href="{{ route('admin.patients') }}" class="btn btn-outline-secondary d-flex align-items-center">
-                                <i class="fas fa-arrow-left me-2"></i>
-                                <span>Back to Patients</span>
-                            </a>
-                        </div>
-                        <div class="text-muted small">
-                            Archived patients cannot log in until they are restored.
-                        </div>
-                    </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a href="{{ route('admin.patients') }}" class="btn btn-outline-secondary d-flex align-items-center">
+                <i class="fas fa-arrow-left me-2"></i>
+                <span>Back to Patients</span>
+            </a>
+        </div>
+        <div class="text-muted small">
+            Archived patients cannot log in until they are restored.
+        </div>
+    </div>
 
-                    <div class="card">
-                        <div class="card-body p-0">
-                            @if($patients->count() > 0)
-                                <div class="table-responsive">
-                                    <table class="table table-hover mb-0">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Patient</th>
-                                                <th>Email</th>
-                                                <th>Archived At</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($patients as $patient)
-                                            <tr>
-                                                <td>{{ $patient->name }}</td>
-                                                <td>{{ $patient->email }}</td>
-                                                <td>{{ optional($patient->deleted_at)->format('M d, Y g:i A') }}</td>
-                                                <td>
-                                                    <div class="d-flex gap-2">
-                                                        <button type="button" class="btn btn-outline-success btn-sm d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#restorePatientModal{{ $patient->id }}">
-                                                            <i class="fas fa-undo me-1"></i>
-                                                            <span>Restore</span>
-                                                        </button>
-                                                        <button type="button" class="btn btn-outline-danger btn-sm d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#deletePatientModal{{ $patient->id }}">
-                                                            <i class="fas fa-trash me-1"></i>
-                                                            <span>Delete</span>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
+    <div class="card">
+        <div class="card-body p-0">
+            @if($patients->count() > 0)
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Patient</th>
+                                <th>Email</th>
+                                <th>Archived At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($patients as $patient)
+                                <tr>
+                                    <td>{{ $patient->name }}</td>
+                                    <td>{{ $patient->email }}</td>
+                                    <td>{{ optional($patient->deleted_at)->format('M d, Y g:i A') }}</td>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-outline-success btn-sm d-flex align-items-center"
+                                                data-bs-toggle="modal" data-bs-target="#restorePatientModal{{ $patient->id }}">
+                                                <i class="fas fa-undo me-1"></i>
+                                                <span>Restore</span>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger btn-sm d-flex align-items-center"
+                                                data-bs-toggle="modal" data-bs-target="#deletePatientModal{{ $patient->id }}">
+                                                <i class="fas fa-trash me-1"></i>
+                                                <span>Delete</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
 
-                                <div class="d-flex justify-content-between align-items-center p-3 border-top">
-                                    <div class="text-muted">
-                                        Showing {{ $patients->firstItem() }} to {{ $patients->lastItem() }} of {{ $patients->total() }} archived patients
-                                    </div>
-                                    <div>
-                                        {{ $patients->withQueryString()->links('pagination::bootstrap-5') }}
-                                    </div>
-                                </div>
-                            @else
-                                <div class="text-center py-5">
-                                    <i class="fas fa-archive fa-3x text-muted mb-3"></i>
-                                    <h5 class="text-muted">No archived patients</h5>
-                                    <p class="text-muted">Archived patients will appear here when you archive them from the Patient Management page.</p>
-                                </div>
-                            @endif
-                        </div>
+                <div class="d-flex justify-content-between align-items-center p-3 border-top">
+                    <div class="text-muted">
+                        Showing {{ $patients->firstItem() }} to {{ $patients->lastItem() }} of {{ $patients->total() }} archived
+                        patients
                     </div>
+                    <div>
+                        {{ $patients->withQueryString()->links('pagination::bootstrap-5') }}
+                    </div>
+                </div>
+            @else
+                <div class="text-center py-5">
+                    <i class="fas fa-archive fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No archived patients</h5>
+                    <p class="text-muted">Archived patients will appear here when you archive them from the Patient Management
+                        page.</p>
+                </div>
+            @endif
+        </div>
+    </div>
 @endsection
 
 @foreach($patients as $patient)

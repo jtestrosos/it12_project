@@ -75,6 +75,21 @@
     @endif
 @endsection
 
+@push('styles')
+    <style>
+        /* Hide sidebar on profile page */
+        .sidebar {
+            display: none !important;
+        }
+
+        /* Adjust main content to full width */
+        .main-content {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -92,22 +107,24 @@
 
                         <div class="text-center mb-4">
                             <div class="position-relative d-inline-block">
-                                @if($user->profile_picture)
-                                    <img src="{{ asset('storage/' . $user->profile_picture) }}" alt="Profile Picture"
-                                        class="rounded-circle object-fit-cover"
-                                        style="width: 120px; height: 120px; border: 3px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                                @else
-                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto"
-                                        style="width: 120px; height: 120px; font-size: 3rem; border: 3px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                                        {{ substr($user->name, 0, 1) }}
-                                    </div>
-                                @endif
+                                <img id="profileImagePreview"
+                                    src="{{ $user->profile_picture ? asset('storage/' . $user->profile_picture) . '?v=' . time() : '' }}"
+                                    alt="Profile Picture"
+                                    class="rounded-circle object-fit-cover {{ $user->profile_picture ? '' : 'd-none' }}"
+                                    style="width: 120px; height: 120px; border: 3px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+
+                                <div id="profileInitials"
+                                    class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto {{ $user->profile_picture ? 'd-none' : '' }}"
+                                    style="width: 120px; height: 120px; font-size: 3rem; border: 3px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                    {{ substr($user->name, 0, 1) }}
+                                </div>
+
                                 <label for="profile_picture"
                                     class="position-absolute bottom-0 end-0 bg-white rounded-circle shadow-sm p-2"
                                     style="cursor: pointer;">
                                     <i class="fas fa-camera text-primary"></i>
                                     <input type="file" name="profile_picture" id="profile_picture" class="d-none"
-                                        accept="image/*" onchange="this.form.submit()">
+                                        accept="image/*">
                                 </label>
                             </div>
                             <h4 class="mt-3 mb-1">{{ $user->name }}</h4>
@@ -175,3 +192,44 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const fileInput = document.getElementById('profile_picture');
+            const imagePreview = document.getElementById('profileImagePreview');
+            const initials = document.getElementById('profileInitials');
+
+            if (fileInput) {
+                fileInput.addEventListener('change', function (e) {
+                    const file = e.target.files[0];
+
+                    if (file) {
+                        // Validate file type
+                        if (!file.type.startsWith('image/')) {
+                            alert('Please select an image file');
+                            fileInput.value = '';
+                            return;
+                        }
+
+                        // Validate file size (max 2MB)
+                        if (file.size > 2 * 1024 * 1024) {
+                            alert('Image size must be less than 2MB');
+                            fileInput.value = '';
+                            return;
+                        }
+
+                        // Preview the image
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            imagePreview.src = e.target.result;
+                            imagePreview.classList.remove('d-none');
+                            initials.classList.add('d-none');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
+    </script>
+@endpush

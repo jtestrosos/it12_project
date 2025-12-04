@@ -141,6 +141,20 @@ class SuperAdminController extends Controller
         // Merge all users
         $allUsers = $patients->concat($admins)->concat($superAdmins);
 
+        // Filter by Role
+        if ($request->has('role') && $request->role) {
+            $allUsers = $allUsers->where('role', $request->role);
+        }
+
+        // Filter by Search
+        if ($request->has('search') && $request->search) {
+            $search = strtolower($request->search);
+            $allUsers = $allUsers->filter(function ($user) use ($search) {
+                return str_contains(strtolower($user->name), $search) ||
+                    str_contains(strtolower($user->email), $search);
+            });
+        }
+
         // Sort by created_at desc
         $sortedUsers = $allUsers->sortByDesc('created_at');
 

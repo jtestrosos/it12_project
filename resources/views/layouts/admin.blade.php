@@ -623,25 +623,25 @@
 <body>
     <!-- Sidebar Overlay -->
     @if(!View::hasSection('hide-sidebar'))
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
     @endif
 
     <!-- Sidebar -->
     @if(!View::hasSection('hide-sidebar'))
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <button class="burger-menu-btn" id="toggleSidebarBtn" aria-label="Toggle sidebar">
-                <i class="fas fa-bars"></i>
-            </button>
-            <button class="burger-menu-btn close-sidebar-btn" id="closeSidebarBtn" aria-label="Close sidebar">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="burger-menu-btn" id="toggleSidebarBtn" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <button class="burger-menu-btn close-sidebar-btn" id="closeSidebarBtn" aria-label="Close sidebar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
 
-        <nav class="nav flex-column">
-            @yield('sidebar-menu')
-        </nav>
-    </aside>
+            <nav class="nav flex-column">
+                @yield('sidebar-menu')
+            </nav>
+        </aside>
     @endif
 
     <!-- Main Content -->
@@ -658,7 +658,6 @@
             </div>
 
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-link text-muted" title="Notifications"><i class="fas fa-bell"></i></button>
                 <button class="btn btn-link text-muted" id="themeToggle" title="Toggle theme"><i
                         class="fas fa-moon"></i></button>
 
@@ -728,7 +727,7 @@
                 @if(session('info'))
                     Toast.fire({ icon: 'info', title: "{{ session('info') }}" });
                 @endif
-                        });
+                            });
         </script>
     @endif
 
