@@ -17,10 +17,6 @@
         href="{{ route('patient.book-appointment') }}" data-tooltip="Book Appointment">
         <i class="fas fa-plus"></i> <span class="sidebar-content">Book Appointment</span>
     </a>
-    <a class="nav-link @if(request()->routeIs('patient.medical-profile')) active @endif"
-        href="{{ route('patient.medical-profile') }}" data-tooltip="Medical Profile">
-        <i class="fas fa-file-medical"></i> <span class="sidebar-content">Medical Profile</span>
-    </a>
 @endsection
 
 @section('user-initials')
@@ -1543,35 +1539,35 @@
                 const notes = document.getElementById('notes').value || 'None';
 
                 confirmationDetails.innerHTML = `
-                        <div class="confirmation-detail">
-                            <span class="confirmation-label">Patient Name:</span>
-                            <span class="confirmation-value">${patientName}</span>
-                        </div>
-                        <div class="confirmation-detail">
-                            <span class="confirmation-label">Phone Number:</span>
-                            <span class="confirmation-value">${patientPhone}</span>
-                        </div>
-                        <div class="confirmation-detail">
-                            <span class="confirmation-label">Appointment Date:</span>
-                            <span class="confirmation-value">${appointmentDate}</span>
-                        </div>
-                        <div class="confirmation-detail">
-                            <span class="confirmation-label">Appointment Time:</span>
-                            <span class="confirmation-value">${appointmentTime}</span>
-                        </div>
-                        <div class="confirmation-detail">
-                            <span class="confirmation-label">Service Type:</span>
-                            <span class="confirmation-value">${serviceType}</span>
-                        </div>
-                        <div class="confirmation-detail">
-                            <span class="confirmation-label">Medical History:</span>
-                            <span class="confirmation-value">${medicalHistory}</span>
-                        </div>
-                        <div class="confirmation-detail">
-                            <span class="confirmation-label">Additional Notes:</span>
-                            <span class="confirmation-value">${notes}</span>
-                        </div>
-                    `;
+                            <div class="confirmation-detail">
+                                <span class="confirmation-label">Patient Name:</span>
+                                <span class="confirmation-value">${patientName}</span>
+                            </div>
+                            <div class="confirmation-detail">
+                                <span class="confirmation-label">Phone Number:</span>
+                                <span class="confirmation-value">${patientPhone}</span>
+                            </div>
+                            <div class="confirmation-detail">
+                                <span class="confirmation-label">Appointment Date:</span>
+                                <span class="confirmation-value">${appointmentDate}</span>
+                            </div>
+                            <div class="confirmation-detail">
+                                <span class="confirmation-label">Appointment Time:</span>
+                                <span class="confirmation-value">${appointmentTime}</span>
+                            </div>
+                            <div class="confirmation-detail">
+                                <span class="confirmation-label">Service Type:</span>
+                                <span class="confirmation-value">${serviceType}</span>
+                            </div>
+                            <div class="confirmation-detail">
+                                <span class="confirmation-label">Medical History:</span>
+                                <span class="confirmation-value">${medicalHistory}</span>
+                            </div>
+                            <div class="confirmation-detail">
+                                <span class="confirmation-label">Additional Notes:</span>
+                                <span class="confirmation-value">${notes}</span>
+                            </div>
+                        `;
 
                 // Mark step 4 as active
                 steps.forEach(s => s.classList.remove('active'));
@@ -1602,6 +1598,6 @@
                     window.toast.error('{{ session('error') }}');
                 }
             @endif
-            });
+                });
     </script>
 @endpush

@@ -9,16 +9,40 @@
         href="{{ route('admin.patients') }}" data-tooltip="Patient Management">
         <i class="fas fa-user"></i> <span class="sidebar-content">Patient Management</span>
     </a>
-    <a class="nav-link @if(request()->routeIs('admin.appointments')) active @endif" href="{{ route('admin.appointments') }}"
-        data-tooltip="Appointments">
-        <i class="fas fa-calendar-check"></i> <span class="sidebar-content">Appointments</span>
-    </a>
+
+
+    <!-- Visits Dropdown -->
+    <div x-data="{ open: {{ request()->routeIs('admin.appointments') || request()->routeIs('admin.walk-in') ? 'true' : 'false' }} }"
+        class="sidebar-dropdown">
+        <a class="nav-link" href="#" @click.prevent="open = !open" data-tooltip="Visits">
+            <i class="fas fa-calendar-check"></i><span class="sidebar-content">Visits</span>
+            <i class="fas fa-chevron-down dropdown-arrow" :class="{ 'rotate-180': open }"></i>
+        </a>
+
+        <div x-show="open" x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 transform -translate-y-2"
+            x-transition:enter-end="opacity-100 transform translate-y-0"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 transform translate-y-0"
+            x-transition:leave-end="opacity-0 transform -translate-y-2" class="submenu">
+
+            <a class="nav-link submenu-link @if(request()->routeIs('admin.appointments')) active @endif"
+                href="{{ route('admin.appointments') }}" data-tooltip="Appointments">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="sidebar-content">Appointments</span>
+            </a>
+            <a class="nav-link submenu-link @if(request()->routeIs('admin.walk-in')) active @endif"
+                href="{{ route('admin.walk-in') }}" data-tooltip="Walk-In Queue">
+                <i class="fas fa-walking"></i>
+                <span class="sidebar-content">Walk-In Queue</span>
+            </a>
+        </div>
+    </div>
 
     <!-- Services & Reports Dropdown -->
     <div x-data="{ open: {{ request()->routeIs('admin.services.*') || request()->routeIs('admin.reports.*') ? 'true' : 'false' }} }"
         class="sidebar-dropdown">
-        <a class="nav-link @if(request()->routeIs('admin.services.*') || request()->routeIs('admin.reports.*')) active @endif"
-            href="#" @click.prevent="open = !open" data-tooltip="Services & Reports">
+        <a class="nav-link" href="#" @click.prevent="open = !open" data-tooltip="Services & Reports">
             <i class="fas fa-chart-bar"></i><span class="sidebar-content">Services & Reports</span>
             <i class="fas fa-chevron-down dropdown-arrow" :class="{ 'rotate-180': open }"></i>
         </a>
