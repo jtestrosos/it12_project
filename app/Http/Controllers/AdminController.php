@@ -1128,7 +1128,25 @@ class AdminController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        $appointments = Appointment::with('user')
+        // Get all patients
+        $patients = Patient::orderBy('name')->get();
+
+        // Get only approved and completed appointments within date range
+        $appointments = Appointment::with('patient')
+            ->whereBetween('appointment_date', [
+                $request->start_date,
+                $request->end_date,
+            ])
+            ->whereIn('status', ['approved', 'completed'])
+            ->orderBy('appointment_date')
+            ->get();
+
+        // Get all inventory items
+        $inventory = Inventory::with('transactions')->orderBy('item_name')->get();
+
+        // Get walk-in patients (appointments marked as walk-in)
+        $walkIns = Appointment::with('patient')
+            ->where('is_walk_in', true)
             ->whereBetween('appointment_date', [
                 $request->start_date,
                 $request->end_date,
@@ -1136,10 +1154,8 @@ class AdminController extends Controller
             ->orderBy('appointment_date')
             ->get();
 
-        $inventory = Inventory::with('transactions')->orderBy('item_name')->get();
-
-        $filename = 'appointments_' . $request->start_date . '_to_' . $request->end_date . '.xlsx';
-        return Excel::download(new AppointmentRangeExport($appointments, $inventory), $filename);
+        $filename = 'barangay_health_report_' . $request->start_date . '_to_' . $request->end_date . '.xlsx';
+        return Excel::download(new AppointmentRangeExport($patients, $appointments, $inventory, $walkIns), $filename);
     }
 
     public function exportAppointmentsPdf(Request $request)
@@ -1149,7 +1165,25 @@ class AdminController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        $appointments = Appointment::with('user')
+        // Get all patients
+        $patients = Patient::orderBy('name')->get();
+
+        // Get only approved and completed appointments within date range
+        $appointments = Appointment::with('patient')
+            ->whereBetween('appointment_date', [
+                $request->start_date,
+                $request->end_date,
+            ])
+            ->whereIn('status', ['approved', 'completed'])
+            ->orderBy('appointment_date')
+            ->get();
+
+        // Get all inventory items
+        $inventory = Inventory::with('transactions')->orderBy('item_name')->get();
+
+        // Get walk-in patients (appointments marked as walk-in)
+        $walkIns = Appointment::with('patient')
+            ->where('is_walk_in', true)
             ->whereBetween('appointment_date', [
                 $request->start_date,
                 $request->end_date,
@@ -1157,25 +1191,13 @@ class AdminController extends Controller
             ->orderBy('appointment_date')
             ->get();
 
-        $patients = $appointments
-            ->pluck('user')
-            ->filter()
-            ->unique(fn($user) => $user->id ?? spl_object_id($user))
-            ->values();
-
-        $patientAppointments = $appointments
-            ->filter(fn($appt) => $appt->user_id !== null)
-            ->values();
-        $walkInAppointments = $appointments
-            ->filter(fn($appt) => $appt->user_id === null)
-            ->values();
-
-        $html = view('admin.reports.appointments-pdf', [
+        $html = view('admin.reports.comprehensive-pdf', [
             'startDate' => Carbon::parse($request->start_date),
             'endDate' => Carbon::parse($request->end_date),
             'patients' => $patients,
-            'patientAppointments' => $patientAppointments,
-            'walkInAppointments' => $walkInAppointments,
+            'appointments' => $appointments,
+            'inventory' => $inventory,
+            'walkIns' => $walkIns,
         ])->render();
 
         $options = new Options();
@@ -1187,7 +1209,7 @@ class AdminController extends Controller
         $dompdf->setPaper('a4', 'landscape');
         $dompdf->render();
 
-        $filename = 'appointments_' . $request->start_date . '_to_' . $request->end_date . '.pdf';
+        $filename = 'barangay_health_report_' . $request->start_date . '_to_' . $request->end_date . '.pdf';
         return response()->streamDownload(
             function () use ($dompdf) {
                 echo $dompdf->output();
