@@ -10,20 +10,14 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('patient', function (Blueprint $table) {
+        Schema::create('admin', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('gender', ['male', 'female', 'other']);
+            $table->string('role')->default('admin');
             $table->string('phone')->nullable();
-            $table->text('address')->nullable();
-            $table->string('barangay');
-            $table->string('barangay_other')->nullable();
-            $table->string('purok')->nullable();
-            $table->date('birth_date');
-            $table->unsignedTinyInteger('age')->nullable();
             $table->string('profile_picture')->nullable();
             $table->rememberToken();
             $table->timestamps();
@@ -36,6 +30,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('patients');
+        Schema::dropIfExists('admin');
     }
 };

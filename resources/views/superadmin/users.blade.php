@@ -227,7 +227,7 @@
         </a>
         <button class="btn btn-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addUserModal">
             <i class="fas fa-plus me-2"></i>
-            <span>Add User</span>
+            <span>Add Admin</span>
         </button>
     </div>
 
@@ -290,11 +290,12 @@
                                     <span>{{ $user->email }}</span>
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge rounded-pill 
-                                                                                                                    @if($user->role == 'superadmin') bg-danger
-                                                                                                                    @elseif($user->role == 'admin') bg-warning
-                                                                                                                    @else bg-primary
-                                                                                                                    @endif"
+                                    <span
+                                        class="badge rounded-pill 
+                                                                                                                                @if($user->role == 'superadmin') bg-danger
+                                                                                                                                @elseif($user->role == 'admin') bg-warning
+                                                                                                                                @else bg-primary
+                                                                                                                                @endif"
                                         style="font-size: 0.75rem; padding: 0.5rem 1rem;">
                                         {{ ucfirst($user->role === 'user' ? 'patient' : $user->role) }}
                                     </span>
@@ -431,7 +432,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add New User</h5>
+                <h5 class="modal-title">Add New Admin</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             @php
@@ -444,16 +445,7 @@
             @endphp
             <form method="POST" action="{{ route('superadmin.user.create') }}" class="superadmin-user-form">
                 @csrf
-                @php
-                    $createRole = old('role');
-                    $createBarangay = old('barangay');
-                    $createPurokOptions = match ($createBarangay) {
-                        'Barangay 11' => ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
-                        'Barangay 12' => ['Purok 1', 'Purok 2', 'Purok 3'],
-                        default => [],
-                    };
-                    $createBirthDate = old('birth_date');
-                @endphp
+                <input type="hidden" name="role" value="admin">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Full Name <span class="text-danger">*</span></label>
@@ -492,83 +484,9 @@
                     <div class="mb-3">
                         <label class="form-label">Phone Number <span class="text-danger">*</span></label>
                         <input type="tel" name="phone" class="form-control @error('phone') is-invalid @enderror"
-                            value="{{ old('phone') }}" placeholder="Enter your phone number" required>
+                            value="{{ old('phone') }}" placeholder="Enter phone number" required>
                         <div class="invalid-feedback">Format for the number is 09123456789</div>
                         @error('phone')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Barangay <span class="text-danger">*</span></label>
-                        <select name="barangay" class="form-control @error('barangay') is-invalid @enderror"
-                            data-role="barangay" required>
-                            <option value="">Select Barangay</option>
-                            <option value="Barangay 11" {{ $selectedBarangayModal === 'Barangay 11' ? 'selected' : '' }}>
-                                Barangay 11</option>
-                            <option value="Barangay 12" {{ $selectedBarangayModal === 'Barangay 12' ? 'selected' : '' }}>
-                                Barangay 12</option>
-                            <option value="Other" {{ $selectedBarangayModal === 'Other' ? 'selected' : '' }}>Other
-                            </option>
-                        </select>
-                        @error('barangay')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-3 {{ $selectedBarangayModal === 'Other' ? '' : 'd-none' }}"
-                        data-role="barangay-other-group">
-                        <label class="form-label">Specify Barangay <span class="text-danger">*</span></label>
-                        <input type="text" name="barangay_other"
-                            class="form-control @error('barangay_other') is-invalid @enderror"
-                            value="{{ old('barangay_other') }}" data-role="barangay-other">
-                        @error('barangay_other')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-3 {{ in_array($selectedBarangayModal, ['Barangay 11', 'Barangay 12']) ? '' : 'd-none' }}"
-                        data-role="purok-group">
-                        <label class="form-label">Purok <span class="text-danger">*</span></label>
-                        <select name="purok" class="form-control @error('purok') is-invalid @enderror" data-role="purok"
-                            data-selected="{{ old('purok') }}">
-                            <option value="">Select Purok</option>
-                            @foreach ($purokOptionsModal as $purok)
-                                <option value="{{ $purok }}" {{ old('purok') === $purok ? 'selected' : '' }}>{{ $purok }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('purok')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Birth Date <span class="text-danger">*</span></label>
-                        <input type="date" name="birth_date"
-                            class="form-control @error('birth_date') is-invalid @enderror"
-                            value="{{ old('birth_date') }}" data-role="birth-date" max="{{ now()->toDateString() }}"
-                            required>
-                        <div class="invalid-feedback">Birth date must be in the past.</div>
-                        @error('birth_date')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Address</label>
-                        <textarea name="address" class="form-control @error('address') is-invalid @enderror"
-                            rows="2">{{ old('address') }}</textarea>
-                        @error('address')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Role <span class="text-danger">*</span></label>
-                        <select name="role" class="form-control @error('role') is-invalid @enderror" required
-                            data-role="user-role">
-                            <option value="">Select Role</option>
-                            <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
-                            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                            <option value="superadmin" {{ old('role') == 'superadmin' ? 'selected' : '' }}>Super Admin
-                            </option>
-                        </select>
-                        @error('role')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -606,7 +524,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add User</button>
+                    <button type="submit" class="btn btn-primary">Add Admin</button>
                 </div>
             </form>
         </div>
@@ -806,10 +724,10 @@
                             <p><strong>Email:</strong> {{ $user->email }}</p>
                             <p><strong>Role:</strong>
                                 <span class="status-badge 
-                                                        @if($user->role == 'superadmin') status-superadmin
-                                                        @elseif($user->role == 'admin') status-admin
-                                                        @else status-user
-                                                        @endif">
+                                                            @if($user->role == 'superadmin') status-superadmin
+                                                            @elseif($user->role == 'admin') status-admin
+                                                            @else status-user
+                                                            @endif">
                                     {{ ucfirst($user->role === 'user' ? 'patient' : $user->role) }}
                                 </span>
                             </p>
