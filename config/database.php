@@ -98,6 +98,36 @@ return [
             'sslmode' => 'prefer',
         ],
 
+        'pgsql_local' => [
+            'driver' => 'pgsql',
+            'url' => env('DATABASE_URL_LOCAL'),
+            'host' => env('DB_HOST_LOCAL', '127.0.0.1'),
+            'port' => env('DB_PORT_LOCAL', '5432'),
+            'database' => env('DB_DATABASE_LOCAL', 'Malasakit'),
+            'username' => env('DB_USERNAME_LOCAL', 'postgres'),
+            'password' => env('DB_PASSWORD_LOCAL', 'Lebron123'),
+            'charset' => env('DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => 'prefer',
+        ],
+
+        'pgsql_online' => [
+            'driver' => 'pgsql',
+            'url' => env('DATABASE_URL_ONLINE'),
+            'host' => env('DB_HOST_ONLINE', 'db.zndvcycziyitoxwvhnpl.supabase.co'),
+            'port' => env('DB_PORT_ONLINE', '5432'),
+            'database' => env('DB_DATABASE_ONLINE', 'postgres'),
+            'username' => env('DB_USERNAME_ONLINE', 'postgres'),
+            'password' => env('DB_PASSWORD_ONLINE', 'Lebron123!'),
+            'charset' => env('DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => 'require',
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),
@@ -148,7 +178,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-database-'),
+            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')) . '-database-'),
             'persistent' => env('REDIS_PERSISTENT', false),
         ],
 

@@ -177,10 +177,10 @@ class SuperAdminController extends Controller
     {
         // Determine correct table for email uniqueness check based on role
         $emailTable = match ($request->role) {
-            'user' => 'patients',
-            'admin' => 'admins',
-            'superadmin' => 'super_admins',
-            default => 'patients',
+            'user' => 'patient',
+            'admin' => 'admin',
+            'superadmin' => 'super_admin',
+            default => 'patient',
         };
 
         $validated = $request->validate([
