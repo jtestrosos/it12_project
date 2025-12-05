@@ -13,8 +13,8 @@ return new class extends Migration {
         Schema::create('inventory_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('inventory_id')->constrained('inventory')->onDelete('cascade');
-            $table->string('performable_type'); // Polymorphic: Admin or SuperAdmin
-            $table->unsignedBigInteger('performable_id');
+            $table->string('performable_type')->nullable(); // Polymorphic: Admin or SuperAdmin or System
+            $table->unsignedBigInteger('performable_id')->nullable();
             $table->enum('transaction_type', ['restock', 'usage', 'adjustment', 'expired']);
             $table->integer('quantity');
             $table->text('notes')->nullable();
