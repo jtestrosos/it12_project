@@ -10,6 +10,17 @@
         body.bg-dark .main-content { background-color: #151718; }
         body.bg-dark .sidebar { background: #131516; border-right-color: #2a2f35; }
         body.bg-dark .header { background: #1b1e20; border-bottom-color: #2a2f35; }
+        
+        /* Hide Bootstrap pagination's built-in "Showing" text on the left */
+        nav[role="navigation"] p,
+        nav[role="navigation"] .text-sm {
+            display: none !important;
+        }
+        
+        /* Bring showing text closer to pagination */
+        #patientsPaginationContainer > div:last-child {
+            margin-top: -0.5rem !important;
+        }
 </style>
 @endsection
 
@@ -58,18 +69,9 @@
                                                     </div>
                                                 </td>
                                             </tr>
-                                            @endforeach
+                                        @endforeach
                                         </tbody>
                                     </table>
-                                </div>
-
-                                <div class="d-flex justify-content-between align-items-center p-3 border-top">
-                                    <div class="text-muted">
-                                        Showing {{ $patients->firstItem() }} to {{ $patients->lastItem() }} of {{ $patients->total() }} archived patients
-                                    </div>
-                                    <div>
-                                        {{ $patients->withQueryString()->links('pagination::bootstrap-5') }}
-                                    </div>
                                 </div>
                             @else
                                 <div class="text-center py-5">
@@ -80,6 +82,18 @@
                             @endif
                         </div>
                     </div>
+
+                    @if($patients->count() > 0)
+                        <div class="d-flex flex-column align-items-center mt-4"
+                            id="patientsPaginationContainer">
+                            <div>
+                                {{ $patients->withQueryString()->links('pagination::bootstrap-5') }}
+                            </div>
+                            <div class="small text-muted mb-0 mt-n2">
+                                Showing {{ $patients->firstItem() }} to {{ $patients->lastItem() }} of {{ $patients->total() }} archived patients
+                            </div>
+                        </div>
+                    @endif
 @endsection
 
 @foreach($patients as $patient)

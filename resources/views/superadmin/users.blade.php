@@ -205,6 +205,47 @@
             border-color: #495057;
             color: #e6e6e6;
         }
+        
+        /* Dark mode for search input group */
+        body.bg-dark .input-group-text {
+            background-color: #1e2124;
+            border-color: #2a2f35;
+            color: #e6e6e6;
+        }
+        
+        body.bg-dark .form-control,
+        body.bg-dark .form-select {
+            background-color: #1e2124;
+            border-color: #2a2f35;
+            color: #e6e6e6;
+        }
+        
+        body.bg-dark .form-control:focus,
+        body.bg-dark .form-select:focus {
+            background-color: #2a2f35;
+            border-color: #007bff;
+            color: #e6e6e6;
+        }
+        
+        body.bg-dark .form-control::placeholder {
+            color: #6c757d;
+        }
+        
+        /* Hide Bootstrap pagination's built-in "Showing" text on the left */
+        nav[role="navigation"] p,
+        nav[role="navigation"] .text-sm,
+        nav p,
+        .pagination-wrapper p,
+        #usersPaginationContainer nav p,
+        #usersPaginationContainer p:first-child,
+        #usersPaginationContainer > p {
+            display: none !important;
+        }
+        
+        /* Bring showing text closer to pagination */
+        #usersPaginationContainer > div:last-child {
+            margin-top: -0.5rem !important;
+        }
     </style>
 @endsection
 
@@ -324,74 +365,6 @@
                     </tbody>
                 </table>
             </div>
-
-            <!-- Pagination -->
-            <div class="d-flex justify-content-center mt-4">
-                @if ($users->hasPages())
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-center">
-                            {{-- Previous Page Link --}}
-                            @if ($users->onFirstPage())
-                                <li class="page-item disabled" aria-disabled="true">
-                                    <span class="page-link">&lsaquo;</span>
-                                </li>
-                            @else
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $users->previousPageUrl() }}">&lsaquo;</a>
-                                </li>
-                            @endif
-
-                            {{-- First page --}}
-                            @if ($users->currentPage() > 3)
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $users->url(1) }}">1</a>
-                                </li>
-                                @if ($users->currentPage() > 4)
-                                    <li class="page-item disabled">
-                                        <span class="page-link">...</span>
-                                    </li>
-                                @endif
-                            @endif
-
-                            {{-- Page numbers --}}
-                            @for ($page = max(1, $users->currentPage() - 2); $page <= min($users->lastPage(), $users->currentPage() + 2); $page++)
-                                @if ($page == $users->currentPage())
-                                    <li class="page-item active" aria-current="page">
-                                        <span class="page-link">{{ $page }}</span>
-                                    </li>
-                                @else
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $users->url($page) }}">{{ $page }}</a>
-                                    </li>
-                                @endif
-                            @endfor
-
-                            {{-- Last page --}}
-                            @if ($users->currentPage() < $users->lastPage() - 2)
-                                @if ($users->currentPage() < $users->lastPage() - 3)
-                                    <li class="page-item disabled">
-                                        <span class="page-link">...</span>
-                                    </li>
-                                @endif
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $users->url($users->lastPage()) }}">{{ $users->lastPage() }}</a>
-                                </li>
-                            @endif
-
-                            {{-- Next Page Link --}}
-                            @if ($users->hasMorePages())
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $users->nextPageUrl() }}">&rsaquo;</a>
-                                </li>
-                            @else
-                                <li class="page-item disabled" aria-disabled="true">
-                                    <span class="page-link">&rsaquo;</span>
-                                </li>
-                            @endif
-                        </ul>
-                    </nav>
-                @endif
-            </div>
         @else
             <div class="text-center py-5">
                 <i class="fas fa-users fa-3x text-muted mb-3"></i>
@@ -400,6 +373,23 @@
             </div>
         @endif
     </div>
+
+    @if($users->count() > 0)
+        <!-- Pagination -->
+        <div class="d-flex flex-column align-items-center mt-4"
+            id="usersPaginationContainer">
+            <div>
+                {{ $users->links('pagination::bootstrap-5') }}
+            </div>
+            <div class="small text-muted mb-0 mt-n2">
+                @if($users->total() > 0)
+                    Showing {{ $users->firstItem() }}-{{ $users->lastItem() }} of {{ $users->total() }} users
+                @else
+                    Showing 0 users
+                @endif
+            </div>
+        </div>
+    @endif
 
     <!-- Confirm Action Modal -->
     <div class="modal fade" id="confirmActionModal" tabindex="-1" aria-hidden="true">

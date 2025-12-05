@@ -86,6 +86,17 @@
         body.bg-dark .card-body {
             color: #e6e6e6;
         }
+        
+        /* Hide Bootstrap pagination's built-in "Showing" text on the left */
+        nav[role="navigation"] p,
+        nav[role="navigation"] .text-sm {
+            display: none !important;
+        }
+        
+        /* Bring showing text closer to pagination */
+        #usersArchivePaginationContainer > div:last-child {
+            margin-top: -0.5rem !important;
+        }
     </style>
 @endsection
 
@@ -165,15 +176,6 @@
                         </tbody>
                     </table>
                 </div>
-
-                <div class="d-flex justify-content-between align-items-center p-3 border-top">
-                    <div class="text-muted">
-                        Showing {{ $users->firstItem() }} to {{ $users->lastItem() }} of {{ $users->total() }} archived users
-                    </div>
-                    <div>
-                        {{ $users->withQueryString()->links() }}
-                    </div>
-                </div>
             @else
                 <div class="text-center py-5">
                     <i class="fas fa-archive fa-3x text-muted mb-3"></i>
@@ -183,6 +185,18 @@
             @endif
         </div>
     </div>
+
+    @if($users->count() > 0)
+        <div class="d-flex flex-column align-items-center mt-4"
+            id="usersArchivePaginationContainer">
+            <div>
+                {{ $users->withQueryString()->links() }}
+            </div>
+            <div class="small text-muted mb-0 mt-n2">
+                Showing {{ $users->firstItem() }} to {{ $users->lastItem() }} of {{ $users->total() }} archived users
+            </div>
+        </div>
+    @endif
 
     <!-- Confirm Action Modal -->
     <div class="modal fade" id="confirmActionModal" tabindex="-1" aria-hidden="true">

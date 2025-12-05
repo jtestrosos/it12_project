@@ -1,5 +1,33 @@
 @extends('layouts.app')
 
+@push('styles')
+<style>
+    /* Darker borders for form inputs to match buttons */
+    .form-control {
+        border-color: #6c757d !important;
+    }
+    
+    .form-control:focus {
+        border-color: #495057 !important;
+        box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.25) !important;
+    }
+    
+    .btn-outline-secondary {
+        border-color: #6c757d !important;
+    }
+    
+    /* Darker border for checkbox */
+    .form-check-input {
+        border-color: #6c757d !important;
+    }
+    
+    .form-check-input:focus {
+        border-color: #495057 !important;
+        box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.25) !important;
+    }
+</style>
+@endpush
+
 @section('content')
 @include('partials.home-content')
 

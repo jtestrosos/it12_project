@@ -88,6 +88,40 @@
     body.bg-dark .modal-body strong {
         color: #e6e6e6;
     }
+
+    /* Dark mode for form controls */
+    body.bg-dark .form-control,
+    body.bg-dark .form-select {
+        background-color: #1e2124;
+        border-color: #2a2f35;
+        color: #e6e6e6;
+    }
+    
+    body.bg-dark .form-control:focus,
+    body.bg-dark .form-select:focus {
+        background-color: #2a2f35;
+        border-color: #007bff;
+        color: #e6e6e6;
+    }
+    
+    body.bg-dark .form-control::placeholder {
+        color: #6c757d;
+    }
+    
+    body.bg-dark .form-label {
+        color: #b0b0b0;
+    }
+    
+    /* Hide Bootstrap pagination's built-in "Showing" text on the left */
+    nav[role="navigation"] p,
+    nav[role="navigation"] .text-sm {
+        display: none !important;
+    }
+    
+    /* Bring showing text closer to pagination */
+    #logsPaginationContainer > div:last-child {
+        margin-top: -0.5rem !important;
+    }
 </style>
 @endsection
 

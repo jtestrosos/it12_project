@@ -4,6 +4,21 @@
 @section('page-title', 'Services Management')
 @section('page-description', 'Manage health center services')
 
+@section('page-styles')
+<style>
+    /* Hide Bootstrap pagination's built-in "Showing" text on the left */
+    nav[role="navigation"] p,
+    nav[role="navigation"] .text-sm {
+        display: none !important;
+    }
+    
+    /* Bring showing text closer to pagination */
+    #servicesPaginationContainer > div:last-child {
+        margin-top: -0.5rem !important;
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="p-0 p-md-4">
     <div class="d-flex justify-content-end mb-3">
@@ -53,13 +68,22 @@
                     </tbody>
                 </table>
             </div>
-            
-            @if($services->hasPages())
-                <x-slot name="footer">
-                    {{ $services->links('pagination::bootstrap-5') }}
-                </x-slot>
-            @endif
         </x-card>
+        
+        @if($services->hasPages())
+            <div class="d-flex flex-column align-items-center mt-4" id="servicesPaginationContainer">
+                <div>
+                    {{ $services->links('pagination::bootstrap-5') }}
+                </div>
+                <div class="small text-muted mb-0 mt-n2">
+                    @if($services->total() > 0)
+                        Showing {{ $services->firstItem() }}-{{ $services->lastItem() }} of {{ $services->total() }} services
+                    @else
+                        Showing 0 services
+                    @endif
+                </div>
+            </div>
+        @endif
     @else
         <x-card>
             <x-empty-state 

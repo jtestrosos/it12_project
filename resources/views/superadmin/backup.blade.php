@@ -91,6 +91,17 @@
             height: 8px;
             border-radius: 4px;
         }
+        
+        /* Hide Bootstrap pagination's built-in "Showing" text on the left */
+        nav[role="navigation"] p,
+        nav[role="navigation"] .text-sm {
+            display: none !important;
+        }
+        
+        /* Bring showing text closer to pagination */
+        #backupsPaginationContainer > div:last-child {
+            margin-top: -0.5rem !important;
+        }
     </style>
 @endsection
 
@@ -274,14 +285,25 @@
                         </tbody>
                     </table>
                 </div>
-                @if($backups->hasPages())
-                    <div class="mt-3">
-                        {{ $backups->links() }}
-                    </div>
-                @endif
             </div>
         </div>
     </div>
+
+    @if($backups->hasPages())
+        <div class="d-flex flex-column align-items-center mt-4"
+            id="backupsPaginationContainer">
+            <div>
+                {{ $backups->links('pagination::bootstrap-5') }}
+            </div>
+            <div class="small text-muted mb-0 mt-n2">
+                @if($backups->total() > 0)
+                    Showing {{ $backups->firstItem() }}-{{ $backups->lastItem() }} of {{ $backups->total() }} backups
+                @else
+                    Showing 0 backups
+                @endif
+            </div>
+        </div>
+    @endif
 @endsection
 
 @push('scripts')

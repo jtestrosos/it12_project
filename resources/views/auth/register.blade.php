@@ -1,5 +1,23 @@
 @extends('layouts.app')
 
+@push('styles')
+<style>
+    /* Darker borders for form inputs to match buttons */
+    .form-control {
+        border-color: #6c757d !important;
+    }
+    
+    .form-control:focus {
+        border-color: #495057 !important;
+        box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.25) !important;
+    }
+    
+    .btn-outline-secondary {
+        border-color: #6c757d !important;
+    }
+</style>
+@endpush
+
 @section('content')
 @include('partials.home-content')
 
@@ -28,10 +46,9 @@
                         <div class="mb-3">
                             <label for="gender" class="form-label fw-medium">Gender <span class="text-danger">*</span></label>
                             <select name="gender" class="form-control @error('gender') is-invalid @enderror" required>
-                                <option value="">Select Gender</option>
+                                <option value="" disabled selected>Select Gender</option>
                                 <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
                                 <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
-                                <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Other</option>
                             </select>
                             @error('gender')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
