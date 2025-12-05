@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('gender', ['male', 'female', 'other']);
-            $table->string('phone');
+            $table->string('phone')->nullable();
             $table->text('address')->nullable();
             $table->string('barangay');
             $table->string('barangay_other')->nullable();
