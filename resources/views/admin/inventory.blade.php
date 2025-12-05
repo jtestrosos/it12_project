@@ -125,9 +125,9 @@
 
         /* Dark mode for search input group */
         body.bg-dark .input-group-text {
-            background-color: #1a1f24 !important;
+            background-color: #0f1316 !important;
             border-color: #2a2f35 !important;
-            color: #9aa4ad !important;
+            color: #e6e6e6 !important;
         }
 
         /* Dark mode modal + form fields */
