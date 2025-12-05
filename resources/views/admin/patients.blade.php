@@ -451,7 +451,7 @@
                                     <th>Registered</th>
                                     <th class="text-center">Appointments</th>
                                     <th>Last Visit</th>
-                                    <th>Actions</th>
+                                    <th class="text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="patientsTableBody">
@@ -496,31 +496,36 @@
                                                 <span class="text-muted">Never</span>
                                             @endif
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             <div class="btn-group" role="group">
-                                                <button class="btn btn-outline-primary btn-sm d-inline-flex align-items-center justify-content-center" data-bs-toggle="modal"
-                                                    data-bs-target="#viewPatientModal{{ $patient->id }}">
+                                                <button
+                                                    class="btn btn-outline-primary btn-sm d-inline-flex align-items-center justify-content-center"
+                                                    data-bs-toggle="modal" data-bs-target="#viewPatientModal{{ $patient->id }}">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
                                                 @if($patient->age >= 6)
                                                     <a href="{{ route('admin.patient.medical-profile', $patient) }}"
-                                                        class="btn btn-outline-info btn-sm d-inline-flex align-items-center justify-content-center" title="View Medical Profile">
+                                                        class="btn btn-outline-info btn-sm d-inline-flex align-items-center justify-content-center"
+                                                        title="View Medical Profile">
                                                         <i class="fas fa-file-medical"></i>
                                                     </a>
                                                 @endif
-                                                <button class="btn btn-outline-success btn-sm d-inline-flex align-items-center justify-content-center" data-bs-toggle="modal"
-                                                    data-bs-target="#createAppointmentModal" data-user-id="{{ $patient->id }}"
-                                                    data-user-name="{{ $patient->name }}"
+                                                <button
+                                                    class="btn btn-outline-success btn-sm d-inline-flex align-items-center justify-content-center"
+                                                    data-bs-toggle="modal" data-bs-target="#createAppointmentModal"
+                                                    data-user-id="{{ $patient->id }}" data-user-name="{{ $patient->name }}"
                                                     data-user-phone="{{ $patient->phone ?? '' }}"
                                                     data-user-address="{{ $patient->address ?? $patient->barangay ?? '' }}">
                                                     <i class="fas fa-calendar-plus"></i>
                                                 </button>
-                                                <button class="btn btn-outline-warning btn-sm d-inline-flex align-items-center justify-content-center" data-bs-toggle="modal"
-                                                    data-bs-target="#editPatientModal{{ $patient->id }}">
+                                                <button
+                                                    class="btn btn-outline-warning btn-sm d-inline-flex align-items-center justify-content-center"
+                                                    data-bs-toggle="modal" data-bs-target="#editPatientModal{{ $patient->id }}">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
-                                                <button class="btn btn-outline-danger btn-sm d-inline-flex align-items-center justify-content-center" data-bs-toggle="modal"
-                                                    data-bs-target="#archivePatientModal{{ $patient->id }}">
+                                                <button
+                                                    class="btn btn-outline-danger btn-sm d-inline-flex align-items-center justify-content-center"
+                                                    data-bs-toggle="modal" data-bs-target="#archivePatientModal{{ $patient->id }}">
                                                     <i class="fas fa-archive"></i>
                                                 </button>
                                             </div>
@@ -806,12 +811,12 @@
                                                     <td>{{ $appointment->service_type }}</td>
                                                     <td>
                                                         <span class="badge 
-                                                                                @if($appointment->status == 'pending') bg-warning
-                                                                                @elseif($appointment->status == 'approved') bg-success
-                                                                                @elseif($appointment->status == 'completed') bg-info
-                                                                                @elseif($appointment->status == 'cancelled') bg-danger
-                                                                                @else bg-secondary
-                                                                                @endif">
+                                                                                                        @if($appointment->status == 'pending') bg-warning
+                                                                                                        @elseif($appointment->status == 'approved') bg-success
+                                                                                                        @elseif($appointment->status == 'completed') bg-info
+                                                                                                        @elseif($appointment->status == 'cancelled') bg-danger
+                                                                                                        @else bg-secondary
+                                                                                                        @endif">
                                                             {{ ucfirst($appointment->status) }}
                                                         </span>
                                                     </td>
@@ -851,8 +856,10 @@
                         <small class="text-muted mb-3 d-block">{{ $patient->email }}</small>
 
                         <div class="mb-3 text-start">
-                            <label for="password{{ $patient->id }}" class="form-label">Enter your password to confirm</label>
-                            <input type="password" class="form-control" id="password{{ $patient->id }}" name="password" required>
+                            <label for="password{{ $patient->id }}" class="form-label">Enter your password to
+                                confirm</label>
+                            <input type="password" class="form-control" id="password{{ $patient->id }}" name="password"
+                                required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -1455,9 +1462,9 @@
                     }
 
                     slotElement.innerHTML = `
-                                <div class="time">${slot.display}</div>
-                                <div class="status">${slot.available ? 'Available' : 'Occupied'}</div>
-                            `;
+                                        <div class="time">${slot.display}</div>
+                                        <div class="status">${slot.available ? 'Available' : 'Occupied'}</div>
+                                    `;
 
                     timeSlotsGrid.appendChild(slotElement);
                 });

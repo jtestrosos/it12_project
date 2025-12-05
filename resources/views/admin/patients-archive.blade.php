@@ -5,7 +5,7 @@
 @section('page-description', 'View and manage archived patient accounts')
 
 @section('page-styles')
-<style>
+    <style>
         /* Match Patient Management dark-mode surfaces */
         body.bg-dark .main-content { background-color: #151718; }
         body.bg-dark .sidebar { background: #131516; border-right-color: #2a2f35; }
@@ -25,17 +25,17 @@
 @endsection
 
 @section('content')
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div>
-                            <a href="{{ route('admin.patients') }}" class="btn btn-outline-secondary d-flex align-items-center">
-                                <i class="fas fa-arrow-left me-2"></i>
-                                <span>Back to Patients</span>
-                            </a>
-                        </div>
-                        <div class="text-muted small">
-                            Archived patients cannot log in until they are restored.
-                        </div>
-                    </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a href="{{ route('admin.patients') }}" class="btn btn-outline-secondary d-flex align-items-center">
+                <i class="fas fa-arrow-left me-2"></i>
+                <span>Back to Patients</span>
+            </a>
+        </div>
+        <div class="text-muted small">
+            Archived patients cannot log in until they are restored.
+        </div>
+    </div>
 
                     <div class="card">
                         <div class="card-body p-0">

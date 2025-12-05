@@ -736,8 +736,135 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Stock deducted successfully.');
     }
 
+    public function searchPatients(Request $request)
+    {
+        $query = $request->input('q', '');
+
+        if (strlen($query) < 2) {
+            return response()->json([]);
+        }
+
+        $patients = Patient::where(function ($q) use ($query) {
+            $q->where('name', 'like', "%{$query}%")
+                ->orWhere('email', 'like', "%{$query}%")
+                ->orWhere('phone', 'like', "%{$query}%");
+        })
+            ->limit(10)
+            ->get(['id', 'name', 'email', 'phone', 'age', 'address']);
+
+        return response()->json($patients);
+    }
+
+    public function walkIn(Request $request)
+    {
+        $query = Appointment::with(['patient', 'approvedByAdmin'])
+            ->where('is_walk_in', true);
+
+        // Search functionality
+        $searchInput = $request->input('search', $request->input('q'));
+        if (filled($searchInput)) {
+            $search = trim($searchInput);
+            $query->where(function ($sub) use ($search) {
+                $sub->where('patient_name', 'like', "%{$search}%")
+                    ->orWhere('patient_phone', 'like', "%{$search}%")
+                    ->orWhere('service_type', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by service
+        if ($request->filled('service')) {
+            $query->where('service_type', $request->service);
+        }
+
+        // Filter by date range
+        if ($request->filled('from')) {
+            $query->whereDate('appointment_date', '>=', $request->from);
+        }
+
+        if ($request->filled('to')) {
+            $query->whereDate('appointment_date', '<=', $request->to);
+        }
+
+        // Sort by most recent first
+        $walkIns = $query->orderByDesc('appointment_date')
+            ->orderByDesc('appointment_time')
+            ->paginate(15)
+            ->withQueryString();
+
+        // Get services for filter dropdown
+        $services = [
+            'General Checkup',
+            'Prenatal',
+            'Medical Check-up',
+            'Immunization',
+            'Family Planning',
+        ];
+        if (class_exists(Service::class) && Schema::hasTable('services')) {
+            $dbServices = Service::where('active', true)->pluck('name')->toArray();
+            if (!empty($dbServices)) {
+                $services = array_values(array_unique(array_merge($services, $dbServices)));
+            }
+        }
+
+        // Stats for today
+        $todayWalkIns = Appointment::where('is_walk_in', true)
+            ->whereDate('appointment_date', today())
+            ->count();
+
+        $todayCompleted = Appointment::where('is_walk_in', true)
+            ->whereDate('appointment_date', today())
+            ->where('status', 'completed')
+            ->count();
+
+        $todayWaiting = Appointment::where('is_walk_in', true)
+            ->whereDate('appointment_date', today())
+            ->where('status', 'waiting')
+            ->count();
+
+        $todayInProgress = Appointment::where('is_walk_in', true)
+            ->whereDate('appointment_date', today())
+            ->where('status', 'in_progress')
+            ->count();
+
+        return view('admin.walk-in', compact('walkIns', 'services', 'todayWalkIns', 'todayCompleted', 'todayWaiting', 'todayInProgress'));
+    }
+
     public function addWalkIn(Request $request)
     {
+        // If user_id is provided, we're using an existing patient
+        if ($request->filled('user_id')) {
+            $request->validate([
+                'user_id' => 'required|exists:patient,id',
+                'service_type' => 'required|string',
+                'notes' => 'nullable|string|max:1000'
+            ]);
+
+            $patient = Patient::findOrFail($request->user_id);
+
+            Appointment::create([
+                'patient_id' => $patient->id,
+                'patient_name' => $patient->name,
+                'patient_phone' => $patient->phone ?? '',
+                'patient_address' => $patient->address ?? 'N/A',
+                'appointment_date' => now()->toDateString(),
+                'appointment_time' => now()->toTimeString(),
+                'service_type' => $request->service_type,
+                'notes' => $request->notes,
+                'is_walk_in' => true,
+                'status' => 'waiting',
+                'approved_by' => Auth::guard('admin')->id(),
+                'approved_at' => now()
+            ]);
+
+            return redirect()->back()->with('success', 'Walk-in patient added successfully.');
+        }
+
+        // Otherwise, create new walk-in with manual entry
         $request->validate([
             'patient_name' => 'required|string|max:255',
             'patient_phone' => 'required|string|max:20',
@@ -747,7 +874,7 @@ class AdminController extends Controller
         ]);
 
         Appointment::create([
-            'user_id' => Auth::guard('admin')->id(), // link to admin user to satisfy FK
+            'patient_id' => Auth::guard('admin')->id(), // link to admin user to satisfy NOT NULL constraint
             'patient_name' => $request->patient_name,
             'patient_phone' => $request->patient_phone,
             'patient_address' => $request->patient_address,
@@ -756,7 +883,7 @@ class AdminController extends Controller
             'service_type' => $request->service_type,
             'notes' => $request->notes,
             'is_walk_in' => true,
-            'status' => 'approved',
+            'status' => 'waiting',
             'approved_by' => Auth::guard('admin')->id(),
             'approved_at' => now()
         ]);
@@ -1001,7 +1128,25 @@ class AdminController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        $appointments = Appointment::with('user')
+        // Get all patients
+        $patients = Patient::orderBy('name')->get();
+
+        // Get only approved and completed appointments within date range
+        $appointments = Appointment::with('patient')
+            ->whereBetween('appointment_date', [
+                $request->start_date,
+                $request->end_date,
+            ])
+            ->whereIn('status', ['approved', 'completed'])
+            ->orderBy('appointment_date')
+            ->get();
+
+        // Get all inventory items
+        $inventory = Inventory::with('transactions')->orderBy('item_name')->get();
+
+        // Get walk-in patients (appointments marked as walk-in)
+        $walkIns = Appointment::with('patient')
+            ->where('is_walk_in', true)
             ->whereBetween('appointment_date', [
                 $request->start_date,
                 $request->end_date,
@@ -1009,10 +1154,8 @@ class AdminController extends Controller
             ->orderBy('appointment_date')
             ->get();
 
-        $inventory = Inventory::with('transactions')->orderBy('item_name')->get();
-
-        $filename = 'appointments_' . $request->start_date . '_to_' . $request->end_date . '.xlsx';
-        return Excel::download(new AppointmentRangeExport($appointments, $inventory), $filename);
+        $filename = 'barangay_health_report_' . $request->start_date . '_to_' . $request->end_date . '.xlsx';
+        return Excel::download(new AppointmentRangeExport($patients, $appointments, $inventory, $walkIns), $filename);
     }
 
     public function exportAppointmentsPdf(Request $request)
@@ -1022,7 +1165,25 @@ class AdminController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        $appointments = Appointment::with('user')
+        // Get all patients
+        $patients = Patient::orderBy('name')->get();
+
+        // Get only approved and completed appointments within date range
+        $appointments = Appointment::with('patient')
+            ->whereBetween('appointment_date', [
+                $request->start_date,
+                $request->end_date,
+            ])
+            ->whereIn('status', ['approved', 'completed'])
+            ->orderBy('appointment_date')
+            ->get();
+
+        // Get all inventory items
+        $inventory = Inventory::with('transactions')->orderBy('item_name')->get();
+
+        // Get walk-in patients (appointments marked as walk-in)
+        $walkIns = Appointment::with('patient')
+            ->where('is_walk_in', true)
             ->whereBetween('appointment_date', [
                 $request->start_date,
                 $request->end_date,
@@ -1030,25 +1191,13 @@ class AdminController extends Controller
             ->orderBy('appointment_date')
             ->get();
 
-        $patients = $appointments
-            ->pluck('user')
-            ->filter()
-            ->unique(fn($user) => $user->id ?? spl_object_id($user))
-            ->values();
-
-        $patientAppointments = $appointments
-            ->filter(fn($appt) => $appt->user_id !== null)
-            ->values();
-        $walkInAppointments = $appointments
-            ->filter(fn($appt) => $appt->user_id === null)
-            ->values();
-
-        $html = view('admin.reports.appointments-pdf', [
+        $html = view('admin.reports.comprehensive-pdf', [
             'startDate' => Carbon::parse($request->start_date),
             'endDate' => Carbon::parse($request->end_date),
             'patients' => $patients,
-            'patientAppointments' => $patientAppointments,
-            'walkInAppointments' => $walkInAppointments,
+            'appointments' => $appointments,
+            'inventory' => $inventory,
+            'walkIns' => $walkIns,
         ])->render();
 
         $options = new Options();
@@ -1060,7 +1209,7 @@ class AdminController extends Controller
         $dompdf->setPaper('a4', 'landscape');
         $dompdf->render();
 
-        $filename = 'appointments_' . $request->start_date . '_to_' . $request->end_date . '.pdf';
+        $filename = 'barangay_health_report_' . $request->start_date . '_to_' . $request->end_date . '.pdf';
         return response()->streamDownload(
             function () use ($dompdf) {
                 echo $dompdf->output();

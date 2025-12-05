@@ -228,10 +228,6 @@ Route::middleware(['patient'])->group(function () {
         Route::get('/appointment/{appointment}', [PatientController::class, 'showAppointment'])->name('appointment.show');
         Route::post('/appointment/{appointment}/cancel', [PatientController::class, 'cancelAppointment'])->name('appointment.cancel');
         Route::put('/appointment/{appointment}/cancel', [PatientController::class, 'cancelAppointment'])->name('cancel-appointment');
-
-        // Medical Profile Routes
-        Route::get('/medical-profile', [PatientController::class, 'medicalProfile'])->name('medical-profile');
-        Route::post('/medical-profile', [PatientController::class, 'updateMedicalProfile'])->name('medical-profile.update');
     });
 });
 
@@ -256,7 +252,9 @@ Route::middleware(['admin'])->group(function () {
         Route::post('/inventory/{inventory}/update', [AdminController::class, 'updateInventory'])->name('inventory.update');
         Route::post('/inventory/{inventory}/restock', [AdminController::class, 'restockInventory'])->name('inventory.restock');
         Route::post('/inventory/{inventory}/deduct', [AdminController::class, 'deductInventory'])->name('inventory.deduct');
-        Route::post('/walk-in', [AdminController::class, 'addWalkIn'])->name('walk-in');
+        Route::get('/patients/search', [AdminController::class, 'searchPatients'])->name('patients.search');
+        Route::get('/walk-in', [AdminController::class, 'walkIn'])->name('walk-in');
+        Route::post('/walk-in', [AdminController::class, 'addWalkIn'])->name('walk-in.store');
         Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
         Route::get('/reports/analytics', [AdminController::class, 'analytics'])->name('reports.analytics');
         Route::get('/reports/patients', [AdminController::class, 'patientReports'])->name('reports.patients');

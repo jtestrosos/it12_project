@@ -131,11 +131,13 @@
                     </div>
                 </div>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-primary btn-lg" onclick="createBackup(this)">
-                        <i class="fas fa-download me-2"></i> Create Backup
+                    <button class="btn btn-primary btn-lg d-flex align-items-center" onclick="createBackup(this)">
+                        <i class="fas fa-download me-2"></i>
+                        <span>Create Backup</span>
                     </button>
-                    <button class="btn btn-outline-secondary" onclick="location.reload()">
-                        <i class="fas fa-sync me-2"></i> Refresh
+                    <button class="btn btn-outline-secondary d-flex align-items-center" onclick="location.reload()">
+                        <i class="fas fa-sync me-2"></i>
+                        <span>Refresh</span>
                     </button>
                 </div>
                 <div class="mt-3">
@@ -257,23 +259,26 @@
                                     </td>
                                     <td>{{ $backup->creator->name ?? 'System' }}</td>
                                     <td>
-                                        @if($backup->status == 'completed')
-                                            <a href="{{ route('superadmin.backup.download', $backup) }}"
-                                                class="btn btn-outline-primary btn-sm me-2">
-                                                <i class="fas fa-download me-1"></i> Download
-                                            </a>
-                                        @endif
-                                        <form action="{{ route('superadmin.backup.delete', $backup) }}" method="POST"
-                                            class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger btn-sm"
-                                                onclick="return confirm('Are you sure you want to delete this backup?')">
-                                                <i class="fas fa-trash me-1"></i> Delete
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
+                                        <div class="btn-group" role="group">
+                                                    @if($backup->status == 'completed')
+                                                        <a href="{{ route('superadmin.backup.download', $backup) }}"
+                                                            class="btn btn-sm btn-outline-secondary" title="Download">
+                                                            <i class="fas fa-download text-primary"></i>
+                                                        </a>
+                                                    @endif
+                                                    <form action="{{ route('superadmin.backup.delete', $backup) }}" method="POST"
+                                                        class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-outline-secondary"
+                                                            onclick="return confirm('Are you sure you want to delete this backup?')"
+                                                            title="Delete">
+                                                            <i class="fas fa-trash text-danger"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
                             @empty
                                 <tr>
                                     <td colspan="6" class="text-center py-4">

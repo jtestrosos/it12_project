@@ -102,6 +102,17 @@
 
 @push('styles')
     <style>
+        /* Hide sidebar on archive page */
+        .sidebar {
+            display: none !important;
+        }
+
+        /* Adjust main content to full width */
+        .main-content {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+
         /* Sidebar dark mode override - loaded AFTER layout styles */
         body.bg-dark .sidebar {
             background: #131516 !important;
@@ -145,28 +156,26 @@
                                     <td class="text-center">{{ ucfirst($user->role === 'user' ? 'patient' : $user->role) }}</td>
                                     <td>{{ optional($user->deleted_at)->format('M d, Y g:i A') }}</td>
                                     <td>
-                                        <div class="d-flex gap-2">
+                                        <div class="btn-group" role="group">
                                             <form method="POST"
                                                 action="{{ route('superadmin.user.restore', ['type' => $user->role, 'id' => $user->id]) }}">
                                                 @csrf
-                                                <button type="button"
-                                                    class="btn btn-outline-success btn-sm d-flex align-items-center action-btn"
+                                                <button type="button" class="btn btn-sm btn-outline-secondary action-btn"
                                                     data-confirm data-confirm-title="Restore User"
-                                                    data-confirm-message="Are you sure you want to restore this user?">
-                                                    <i class="fas fa-undo me-1"></i>
-                                                    <span>Restore</span>
+                                                    data-confirm-message="Are you sure you want to restore this user?"
+                                                    title="Restore">
+                                                    <i class="fas fa-undo text-success"></i>
                                                 </button>
                                             </form>
                                             <form method="POST"
                                                 action="{{ route('superadmin.user.force-delete', ['type' => $user->role, 'id' => $user->id]) }}">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="button"
-                                                    class="btn btn-outline-danger btn-sm d-flex align-items-center action-btn"
+                                                <button type="button" class="btn btn-sm btn-outline-secondary action-btn"
                                                     data-confirm data-confirm-title="Delete User"
-                                                    data-confirm-message="Permanently delete this user? This cannot be undone.">
-                                                    <i class="fas fa-trash me-1"></i>
-                                                    <span>Delete</span>
+                                                    data-confirm-message="Permanently delete this user? This cannot be undone."
+                                                    title="Delete">
+                                                    <i class="fas fa-trash text-danger"></i>
                                                 </button>
                                             </form>
                                         </div>

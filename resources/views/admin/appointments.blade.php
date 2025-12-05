@@ -411,6 +411,16 @@
         body.bg-dark tr[data-status="rescheduled"] {
             background-color: rgba(133, 100, 4, 0.15);
         }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
     </style>
     <style>
         /* Dark Mode Overrides */
@@ -707,7 +717,7 @@
                             <td class="actions-col">
                                 <div class="d-flex gap-1">
                                     <!-- View Button -->
-                                    <button class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                                    <button class="btn btn-outline-primary btn-sm btn-icon" data-bs-toggle="modal"
                                         data-bs-target="#viewAppointmentModal{{ $appointment->id }}" title="View Details">
                                         <i class="fas fa-eye"></i>
                                     </button>
@@ -718,7 +728,7 @@
                                             class="d-inline">
                                             @csrf
                                             <input type="hidden" name="status" value="approved">
-                                            <button type="submit" class="btn btn-outline-success btn-sm" title="Approve">
+                                            <button type="submit" class="btn btn-outline-success btn-sm btn-icon" title="Approve">
                                                 <i class="fas fa-check"></i>
                                             </button>
                                         </form>
@@ -730,7 +740,7 @@
                                             class="d-inline cancel-form">
                                             @csrf
                                             <input type="hidden" name="status" value="cancelled">
-                                            <button type="button" class="btn btn-outline-danger btn-sm" title="Cancel"
+                                            <button type="button" class="btn btn-outline-danger btn-sm btn-icon" title="Cancel"
                                                 onclick="confirmCancel(this)">
                                                 <i class="fas fa-times"></i>
                                             </button>
@@ -964,42 +974,69 @@
                 <form action="{{ route('admin.appointment.create') }}" method="POST">
                     @csrf
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="patient_name" class="form-label">Patient Name <span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="patient_name" name="patient_name" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="patient_phone" class="form-label">Phone Number <span
-                                            class="text-danger">*</span></label>
-                                    <input type="tel" class="form-control" id="patient_phone" name="patient_phone" required>
-                                </div>
+                        <!-- Patient Search Section -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">🔍 Search Existing Patient</label>
+                            <input type="text" class="form-control" id="appointmentPatientSearch"
+                                placeholder="Search by name, email, or phone..." autocomplete="off">
+                            <div id="appointmentSearchResults" class="list-group mt-2" style="display: none;"></div>
+                            <div id="appointmentSelectedPatientInfo" class="alert alert-info mt-2" style="display: none;">
+                                <strong>Selected Patient:</strong>
+                                <div id="appointmentSelectedPatientDetails"></div>
+                                <button type="button" class="btn btn-sm btn-outline-secondary mt-2"
+                                    onclick="clearAppointmentPatientSelection()">
+                                    <i class="fas fa-times"></i> Clear Selection
+                                </button>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="patient_address" class="form-label">Address <span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="patient_address" name="patient_address"
-                                        required>
+
+                        <div class="text-center my-3">
+                            <span class="badge bg-secondary">OR</span>
+                        </div>
+
+                        <input type="hidden" name="user_id" id="selected_patient_id">
+
+                        <div id="manualEntrySection">
+                            <label class="form-label fw-bold">✚ Create New Appointment (Manual Entry)</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="patient_name" class="form-label">Patient Name <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="patient_name" name="patient_name"
+                                            required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="patient_phone" class="form-label">Phone Number <span
+                                                class="text-danger">*</span></label>
+                                        <input type="tel" class="form-control" id="patient_phone" name="patient_phone"
+                                            required>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="service_type" class="form-label">Service Type <span
-                                            class="text-danger">*</span></label>
-                                    <select class="form-select" id="service_type" name="service_type" required>
-                                        <option value="" disabled selected>Select Service</option>
-                                        <option value="General Checkup">General Checkup</option>
-                                        <option value="Prenatal">Prenatal</option>
-                                        <option value="Immunization">Immunization</option>
-                                        <option value="Family Planning">Family Planning</option>
-                                    </select>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="patient_address" class="form-label">Address <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="patient_address" name="patient_address"
+                                            required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="service_type" class="form-label">Service Type <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select" id="service_type" name="service_type" required>
+                                            <option value="" disabled selected>Select Service</option>
+                                            <option value="General Checkup">General Checkup</option>
+                                            <option value="Prenatal">Prenatal</option>
+                                            <option value="Immunization">Immunization</option>
+                                            <option value="Family Planning">Family Planning</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1127,6 +1164,113 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let searchTimeout;
+        const searchInput = document.getElementById('appointmentPatientSearch');
+        const searchResults = document.getElementById('appointmentSearchResults');
+        const selectedPatientInfo = document.getElementById('appointmentSelectedPatientInfo');
+        const selectedPatientDetails = document.getElementById('appointmentSelectedPatientDetails');
+        const selectedPatientId = document.getElementById('selected_patient_id');
+        const manualEntrySection = document.getElementById('manualEntrySection');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+
+                if (query.length < 2) {
+                    searchResults.style.display = 'none';
+                    return;
+                }
+
+                searchTimeout = setTimeout(() => {
+                    fetch(`{{ route('admin.patients.search') }}?q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            displaySearchResults(data);
+                        })
+                        .catch(error => console.error('Search error:', error));
+                }, 300);
+            });
+        }
+
+        function displaySearchResults(patients) {
+            if (patients.length === 0) {
+                searchResults.innerHTML = '<div class="list-group-item text-muted">No patients found</div>';
+                searchResults.style.display = 'block';
+                return;
+            }
+
+            searchResults.innerHTML = patients.map(patient => `
+                <a href="#" class="list-group-item list-group-item-action" onclick="selectPatient(${patient.id}, '${patient.name}', '${patient.phone || ''}', '${patient.email || ''}', ${patient.age || 'null'}, '${patient.address || ''}'); return false;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>${patient.name}</strong>
+                            <div class="small text-muted">
+                                ${patient.phone ? `📞 ${patient.phone}` : ''} 
+                                ${patient.email ? `📧 ${patient.email}` : ''}
+                                ${patient.age ? `👤 Age: ${patient.age}` : ''}
+                            </div>
+                        </div>
+                        <span class="badge bg-primary">Select</span>
+                    </div>
+                </a>
+            `).join('');
+
+            searchResults.style.display = 'block';
+        }
+
+        window.selectPatient = function (id, name, phone, email, age, address) {
+            selectedPatientId.value = id;
+            selectedPatientDetails.innerHTML = `
+                <strong>${name}</strong><br>
+                <small>${phone ? `📞 ${phone}` : ''} ${email ? `📧 ${email}` : ''} ${age ? `👤 Age: ${age}` : ''}</small>
+            `;
+            selectedPatientInfo.style.display = 'block';
+            searchResults.style.display = 'none';
+            searchInput.value = name;
+
+            // Auto-fill and disable manual entry fields
+            const nameInput = document.getElementById('patient_name');
+            const phoneInput = document.getElementById('patient_phone');
+            const addressInput = document.getElementById('patient_address');
+
+            if (nameInput) { nameInput.value = name; nameInput.readOnly = true; }
+            if (phoneInput) { phoneInput.value = phone; phoneInput.readOnly = true; }
+            if (addressInput) { addressInput.value = address; addressInput.readOnly = true; }
+        };
+
+        window.clearAppointmentPatientSelection = function () {
+            selectedPatientId.value = '';
+            selectedPatientInfo.style.display = 'none';
+            searchInput.value = '';
+            searchResults.style.display = 'none';
+
+            // Clear and re-enable manual entry fields
+            const nameInput = document.getElementById('patient_name');
+            const phoneInput = document.getElementById('patient_phone');
+            const addressInput = document.getElementById('patient_address');
+
+            if (nameInput) { nameInput.value = ''; nameInput.readOnly = false; }
+            if (phoneInput) { phoneInput.value = ''; phoneInput.readOnly = false; }
+            if (addressInput) { addressInput.value = ''; addressInput.readOnly = false; }
+        };
+
+        // Reset form when modal is closed
+        const modal = document.getElementById('addAppointmentModal');
+        if (modal) {
+            modal.addEventListener('hidden.bs.modal', function () {
+                const form = modal.querySelector('form');
+                if (form) form.reset();
+                clearAppointmentPatientSelection();
+            });
+        }
+    });
+</script>
+
 
 
 @push('scripts')

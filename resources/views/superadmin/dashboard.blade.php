@@ -16,52 +16,70 @@
         }
 
         /* Dark mode styles for stats cards */
-            body.bg-dark .stats-card { background: #1e2124; color: #e6e6e6; }
-            body.bg-dark .stats-card:hover { background: #2a2f35; }
-            body.bg-dark .chart-container { background: #1e2124; color: #e6e6e6; }
-            body.bg-dark .stat-label { color: #cbd3da; }
+        body.bg-dark .stats-card {
+            background: #1e2124;
+            color: #e6e6e6;
+        }
 
-            .stats-card {
-                background: white;
-                border-radius: 6px;
-                padding: 0.75rem;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                margin-bottom: 0.5rem;
-                border: none;
-                transition: transform 0.2s ease;
-            }
-            .stats-card:hover {
-                transform: translateY(-2px);
-            }
-            .stat-number {
-                font-size: 1.3rem;
-                font-weight: 700;
-                margin-bottom: 0.25rem;
-            }
-            .stat-label {
-                color: #6c757d;
-                font-size: 0.75rem;
-                margin-bottom: 0;
-            }
-            .chart-container {
-                background: white;
-                border-radius: 8px;
-                padding: 0.75rem;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                margin-bottom: 0.5rem;
-                height: 500px;
-            }
-            .chart-container canvas {
-                max-height: 460px !important;
-            }
-        </style>
+        body.bg-dark .stats-card:hover {
+            background: #2a2f35;
+        }
+
+        body.bg-dark .chart-container {
+            background: #1e2124;
+            color: #e6e6e6;
+        }
+
+        body.bg-dark .stat-label {
+            color: #cbd3da;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 6px;
+            padding: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 0.5rem;
+            border: none;
+            transition: transform 0.2s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.75rem;
+            margin-bottom: 0;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 8px;
+            padding: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 0.5rem;
+            height: 500px;
+        }
+
+        .chart-container canvas {
+            max-height: 460px !important;
+        }
+    </style>
 @endsection
 
 @push('styles')
     <style>
-        body.bg-dark .sidebar { 
-            background: #131516 !important; 
-            border-right-color: #2a2f35 !important; 
+        body.bg-dark .sidebar {
+            background: #131516 !important;
+            border-right-color: #2a2f35 !important;
         }
     </style>
 @endpush
@@ -109,13 +127,15 @@
                 <div class="row justify-content-center">
                     <div class="col-4">
                         <div class="stats-card text-center">
-                            <div class="stat-number text-{{ $userGrowthRate >= 0 ? 'success' : 'danger' }}">{{ $userGrowthRate > 0 ? '+' : '' }}{{ $userGrowthRate }}%</div>
+                            <div class="stat-number text-{{ $userGrowthRate >= 0 ? 'success' : 'danger' }}">
+                                {{ $userGrowthRate > 0 ? '+' : '' }}{{ $userGrowthRate }}%</div>
                             <div class="stat-label">User Growth</div>
                         </div>
                     </div>
                     <div class="col-4">
                         <div class="stats-card text-center">
-                            <div class="stat-number text-{{ $lowStockItems > 0 ? 'warning' : 'success' }}">{{ $lowStockItems }}</div>
+                            <div class="stat-number text-{{ $lowStockItems > 0 ? 'warning' : 'success' }}">
+                                {{ $lowStockItems }}</div>
                             <div class="stat-label">Low Stock</div>
                         </div>
                     </div>
@@ -157,19 +177,17 @@
 
         const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
         new Chart(userGrowthCtx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: growthLabels,
                 datasets: [{
                     label: 'New Users',
                     data: growthCounts,
+                    backgroundColor: 'rgba(0, 123, 255, 0.8)',
                     borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                    tension: 0.4,
-                    borderWidth: 5,
-                    pointRadius: 8,
-                    pointHoverRadius: 10,
-                    fill: true
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    barThickness: 40
                 }]
             },
             options: {
@@ -180,12 +198,19 @@
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            font: { size: 16 }
+                            font: { size: 16 },
+                            stepSize: 1
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
                         }
                     },
                     x: {
                         ticks: {
                             font: { size: 16 }
+                        },
+                        grid: {
+                            display: false
                         }
                     }
                 },
@@ -194,6 +219,12 @@
                         labels: {
                             font: { size: 16 }
                         }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 14 }
                     }
                 }
             }
