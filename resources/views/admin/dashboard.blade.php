@@ -281,6 +281,25 @@
             color: #ffffff;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
+
+        /* Dark mode for alerts */
+        body.bg-dark .alert-primary {
+            background-color: rgba(0, 102, 230, 0.2);
+            border-color: hsl(210, 100%, 45%);
+            color: hsl(210, 100%, 75%);
+        }
+
+        body.bg-dark .alert-warning {
+            background-color: rgba(250, 114, 76, 0.2);
+            border-color: hsl(14, 90%, 60%);
+            color: hsl(14, 90%, 75%);
+        }
+
+        body.bg-dark .alert-danger {
+            background-color: rgba(220, 53, 69, 0.2);
+            border-color: hsl(0, 75%, 55%);
+            color: hsl(0, 75%, 75%);
+        }
     </style>
 @endsection
 
