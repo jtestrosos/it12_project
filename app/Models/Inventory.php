@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Syncable;
 
 class Inventory extends Model
 {
-    use HasFactory;
+    use HasFactory, Syncable;
 
     protected $table = 'inventory';
 
@@ -61,7 +62,7 @@ class Inventory extends Model
         } else {
             $this->status = 'in_stock';
         }
-        
+
         $this->save();
     }
 }

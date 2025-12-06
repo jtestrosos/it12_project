@@ -10,9 +10,24 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('patient', function (Blueprint $table) {
-            // Demographics
-            $table->string('accompanying_person')->nullable()->after('profile_picture');
+        Schema::create('patient', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->enum('gender', ['male', 'female', 'other']);
+            $table->string('phone')->nullable();
+            $table->text('address')->nullable();
+            $table->string('barangay');
+            $table->string('barangay_other')->nullable();
+            $table->string('purok')->nullable();
+            $table->date('birth_date');
+            $table->unsignedTinyInteger('age')->nullable();
+            $table->string('profile_picture')->nullable();
+
+            // Treatment Record Fields - Demographics
+            $table->string('accompanying_person')->nullable();
             $table->string('accompanying_relationship')->nullable();
             $table->string('mother_name')->nullable();
             $table->string('father_name')->nullable();
@@ -63,6 +78,10 @@ return new class extends Migration {
             // Consent tracking
             $table->boolean('consent_signed')->default(false);
             $table->timestamp('consent_signed_at')->nullable();
+
+            $table->rememberToken();
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -71,50 +90,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::table('patient', function (Blueprint $table) {
-            $table->dropColumn([
-                'accompanying_person',
-                'accompanying_relationship',
-                'mother_name',
-                'father_name',
-                'maiden_name',
-                'spouse_name',
-                'spouse_age',
-                'spouse_occupation',
-                'religion',
-                'marital_status',
-                'educational_attainment',
-                'occupation',
-                'smoker',
-                'smoker_packs_per_year',
-                'drinks_alcohol',
-                'alcohol_specify',
-                'illicit_drug_use',
-                'multiple_sexual_partners',
-                'is_pwd',
-                'pwd_specify',
-                'has_sti',
-                'has_allergies',
-                'allergies_specify',
-                'social_history_others',
-                'family_hypertension',
-                'family_diabetes',
-                'family_goiter',
-                'family_cancer',
-                'family_history_others',
-                'coitarche_years_old',
-                'history_uti',
-                'history_hypertension',
-                'history_diabetes',
-                'history_goiter',
-                'history_cancer',
-                'history_tuberculosis',
-                'medical_history_others',
-                'previous_surgeries',
-                'maintenance_medicine',
-                'consent_signed',
-                'consent_signed_at',
-            ]);
-        });
+        Schema::dropIfExists('patient');
     }
 };

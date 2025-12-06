@@ -76,6 +76,9 @@ class InventorySeeder extends Seeder
             ],
         ];
 
+        $inventory = [];
+        $now = now();
+
         foreach ($categories as $category => $items) {
             foreach ($items as [$name, $unit]) {
                 $currentStock = rand(20, 150);
@@ -86,7 +89,17 @@ class InventorySeeder extends Seeder
                     $expiry = Carbon::now()->addMonths(rand(3, 24));
                 }
 
-                $item = Inventory::create([
+                // Logic from Inventory model updateStatus()
+                $status = 'in_stock';
+                if ($currentStock == 0) {
+                    $status = 'out_of_stock';
+                } elseif ($currentStock <= $minStock) {
+                    $status = 'low_stock';
+                } elseif ($expiry && $expiry < $now) {
+                    $status = 'expired';
+                }
+
+                $inventory[] = [
                     'item_name' => $name,
                     'description' => null,
                     'category' => $category,
@@ -97,11 +110,15 @@ class InventorySeeder extends Seeder
                     'expiry_date' => $expiry,
                     'supplier' => null,
                     'location' => 'Clinic Storage',
-                    'status' => 'in_stock',
-                ]);
-
-                $item->updateStatus();
+                    'status' => $status,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
             }
+        }
+
+        foreach (array_chunk($inventory, 50) as $chunk) {
+            Inventory::insert($chunk);
         }
     }
 }

@@ -225,7 +225,7 @@ class AdminController extends Controller
                 'max:255',
                 'regex:/^[a-zA-Z\s\.\-\']+$/',
             ],
-            'email' => 'required|string|email|max:255|unique:patients',
+            'email' => 'required|string|email|max:255|unique:patient',
             'gender' => 'required|in:male,female,other',
             'barangay' => [
                 'required',
@@ -300,7 +300,7 @@ class AdminController extends Controller
                 'max:255',
                 'regex:/^[a-zA-Z\s\.\-\']+$/',
             ],
-            'email' => 'required|string|email|max:255|unique:patients,email,' . $patient->id,
+            'email' => 'required|string|email|max:255|unique:patient,email,' . $patient->id,
             'gender' => 'required|in:male,female,other',
             'barangay' => [
                 'required',

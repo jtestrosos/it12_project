@@ -196,44 +196,32 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>User ID</th>
                             <th>User</th>
                             <th>Action</th>
                             <th>Table</th>
                             <th>Record ID</th>
                             <th>Status</th>
                             <th>Date</th>
-                            <th>IP Address</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($logs as $log)
                             @php
-                                $formattedUserId = 'N/A';
-                                if ($log->user) {
-                                    $role = $log->user->role;
-                                    $userId = $log->user->id;
-                                    if ($role === 'user') {
-                                        $formattedUserId = 'PA' . str_pad($userId, 3, '0', STR_PAD_LEFT);
-                                    } elseif ($role === 'admin') {
-                                        $formattedUserId = 'BHW' . str_pad($userId, 3, '0', STR_PAD_LEFT);
-                                    } elseif ($role === 'superadmin') {
-                                        $formattedUserId = 'DEV' . str_pad($userId, 3, '0', STR_PAD_LEFT);
-                                    } else {
-                                        $formattedUserId = 'USR' . str_pad($userId, 3, '0', STR_PAD_LEFT);
-                                    }
+                                // Get the actual user name from polymorphic relationship
+                                $userName = 'System';
+                                if ($log->loggable) {
+                                    $userName = $log->loggable->name;
                                 }
                             @endphp
                             <tr>
-                                <td>{{ $formattedUserId }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
                                             style="width: 32px; height: 32px; font-size: 0.8rem;">
-                                            {{ substr($log->user ? $log->user->name : 'S', 0, 1) }}
+                                            {{ substr($userName, 0, 1) }}
                                         </div>
-                                        {{ $log->user ? $log->user->name : 'System' }}
+                                        {{ $userName }}
                                     </div>
                                 </td>
                                 <td>
@@ -261,23 +249,14 @@
                                     @endif
                                 </td>
                                 <td>{{ $log->created_at->format('M d, Y H:i') }}</td>
-                                <td>{{ $log->ip_address ?? 'N/A' }}</td>
                                 <td>
-                                    <button
-                                        class="btn btn-sm btn-outline-secondary"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#logDetailsModal"
-                                        data-user="{{ $log->user ? $log->user->name : 'System' }}"
-                                        data-action="{{ ucfirst($log->action) }}"
-                                        data-table="{{ $log->table_name ?? 'N/A' }}"
+                                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+                                        data-bs-target="#logDetailsModal" data-user="{{ $userName }}"
+                                        data-action="{{ ucfirst($log->action) }}" data-table="{{ $log->table_name ?? 'N/A' }}"
                                         data-record="{{ $log->record_id ?? 'N/A' }}"
-                                        data-status="{{ ucfirst($log->status ?? 'active') }}"
-                                        data-old='@json($log->old_values)'
-                                        data-new='@json($log->new_values)'
-                                        data-ip="{{ $log->ip_address ?? 'N/A' }}"
-                                        data-timestamp="{{ $log->created_at->format('F d, Y \a\t g:i A') }}"
-                                        title="View Details"
-                                    >
+                                        data-status="{{ ucfirst($log->status ?? 'active') }}" data-old='@json($log->old_values)'
+                                        data-new='@json($log->new_values)' data-ip="{{ $log->ip_address ?? 'N/A' }}"
+                                        data-timestamp="{{ $log->created_at->format('F d, Y \a\t g:i A') }}" title="View Details">
                                         <i class="fas fa-eye text-info"></i>
                                     </button>
                                 </td>

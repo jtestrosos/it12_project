@@ -51,7 +51,9 @@ class ProfileController extends Controller
         $user->phone = $request->phone;
 
         if ($user instanceof \App\Models\Patient) {
-            $user->birth_date = $request->date_of_birth;
+            if ($request->filled('date_of_birth')) {
+                $user->birth_date = $request->date_of_birth;
+            }
             $user->address = $request->address;
         }
 

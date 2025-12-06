@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Patient;
+use App\Traits\Syncable;
 
 class Appointment extends Model
 {
-    use HasFactory;
+    use HasFactory, Syncable;
 
     protected $fillable = [
         'patient_id',
@@ -32,6 +33,11 @@ class Appointment extends Model
         'appointment_time' => 'datetime:H:i',
         'approved_at' => 'datetime',
     ];
+
+    public function services()
+    {
+        return $this->belongsToMany(Service::class, 'appointment_service');
+    }
 
     /**
      * Get the patient that owns the appointment.

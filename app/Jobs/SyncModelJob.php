@@ -1,0 +1,106 @@
+<?php
+
+namespace App\Jobs;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class SyncModelJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    protected $modelClass;
+    protected $data;
+    protected $action;
+    protected $modelId;
+    protected $table;
+
+    /**
+     * Create a new job instance.
+     */
+    public function __construct($model, $action)
+    {
+        $this->modelClass = get_class($model);
+        $this->table = $model->getTable();
+        // We convert to array to pass raw data
+        $this->data = $model->getAttributes();
+        $this->action = $action;
+        $this->modelId = $model->getKey();
+    }
+
+    /**
+     * The number of times the job may be attempted.
+     *
+     * @var int
+     */
+    public $tries = 10;
+
+    /**
+     * The maximum number of unhandled exceptions to allow before failing.
+     *
+     * @var int
+     */
+    public $maxExceptions = 3;
+
+    /**
+     * Execute the job.
+     */
+    public function handle(): void
+    {
+        try {
+            // Target the online connection
+            $targetDb = DB::connection('pgsql_online');
+
+            // Verify connection before attempting operations
+            $targetDb->getPdo();
+
+            if ($this->action === 'created' || $this->action === 'updated') {
+                // Use updateOrInsert to handle both creation and updates, preserving the ID
+                // We use the primary key (usually 'id') to match
+                $targetDb->table($this->table)->updateOrInsert(
+                    ['id' => $this->modelId],
+                    $this->data
+                );
+            } elseif ($this->action === 'deleted') {
+                $targetDb->table($this->table)->where('id', $this->modelId)->delete();
+            }
+
+            Log::info("Synced {$this->modelClass} ID: {$this->modelId} to online database. Action: {$this->action}");
+
+        } catch (\Exception $e) {
+            // Check if it's a connection error (Postgres code 08006 or general PDO connection issues)
+            // SQLSTATE[08006] is "connection_failure"
+            $isConnectionError = false;
+            if ($e instanceof \PDOException) {
+                if ($e->getCode() == 7 || $e->getCode() == '08006' || str_contains($e->getMessage(), 'could not translate host name')) {
+                    $isConnectionError = true;
+                }
+            }
+
+            if ($isConnectionError) {
+                Log::warning("Offline/Connection Error syncing {$this->modelClass} ID: {$this->modelId}. Retrying... Error: " . $e->getMessage());
+            } else {
+                Log::error("Failed to sync {$this->modelClass} ID: {$this->modelId}. Error: " . $e->getMessage());
+            }
+
+            // Throwing the exception will automatically trigger the retry logic with backoff
+            throw $e;
+        }
+    }
+
+    /**
+     * Calculate the number of seconds to wait before retrying the job.
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        // Exponential backoff: 30s, 1m, 2m, 5m, 10m, 20m, etc.
+        return [30, 60, 120, 300, 600, 1200, 2400, 3600];
+    }
+}

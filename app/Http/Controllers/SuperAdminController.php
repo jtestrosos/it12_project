@@ -177,10 +177,10 @@ class SuperAdminController extends Controller
     {
         // Determine correct table for email uniqueness check based on role
         $emailTable = match ($request->role) {
-            'user' => 'patients',
-            'admin' => 'admins',
-            'superadmin' => 'super_admins',
-            default => 'patients',
+            'user' => 'patient',
+            'admin' => 'admin',
+            'superadmin' => 'super_admin',
+            default => 'patient',
         };
 
         $validated = $request->validate([
@@ -745,11 +745,11 @@ class SuperAdminController extends Controller
         try {
             $backup->update(['notes' => 'Creating database backup...']);
 
-            $sqlFile = storage_path('app/backups/full/' . $filename . '.sql');
+            $sqlFile = Storage::path('backups/full/' . $filename . '.sql');
 
             // Ensure directory exists
-            if (!file_exists(storage_path('app/backups/full'))) {
-                mkdir(storage_path('app/backups/full'), 0755, true);
+            if (!Storage::exists('backups/full')) {
+                Storage::makeDirectory('backups/full');
             }
 
             // Try pg_dump first, fallback to Laravel export if not available
@@ -841,7 +841,7 @@ class SuperAdminController extends Controller
             // Create ZIP archive of files
             $backup->update(['notes' => 'Creating files archive...']);
             $zip = new \ZipArchive();
-            $zipFile = storage_path('app/backups/full/' . $filename . '_files.zip');
+            $zipFile = Storage::path('backups/full/' . $filename . '_files.zip');
 
             if ($zip->open($zipFile, \ZipArchive::CREATE) === true) {
                 // Add storage/app/public files
