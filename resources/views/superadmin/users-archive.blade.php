@@ -86,6 +86,17 @@
         body.bg-dark .card-body {
             color: #e6e6e6;
         }
+        
+        /* Hide Bootstrap pagination's built-in "Showing" text on the left */
+        nav[role="navigation"] p,
+        nav[role="navigation"] .text-sm {
+            display: none !important;
+        }
+        
+        /* Bring showing text closer to pagination */
+        #usersArchivePaginationContainer > div:last-child {
+            margin-top: -0.5rem !important;
+        }
     </style>
 @endsection
 
@@ -174,74 +185,6 @@
                         </tbody>
                     </table>
                 </div>
-
-                <!-- Pagination -->
-                @if($users->hasPages())
-                    <div class="d-flex justify-content-center mt-4 p-3 border-top">
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-center mb-0">
-                                {{-- Previous Page Link --}}
-                                @if ($users->onFirstPage())
-                                    <li class="page-item disabled" aria-disabled="true">
-                                        <span class="page-link">&lsaquo;</span>
-                                    </li>
-                                @else
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $users->previousPageUrl() }}">&lsaquo;</a>
-                                    </li>
-                                @endif
-
-                                {{-- First page --}}
-                                @if ($users->currentPage() > 3)
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $users->url(1) }}">1</a>
-                                    </li>
-                                    @if ($users->currentPage() > 4)
-                                        <li class="page-item disabled">
-                                            <span class="page-link">...</span>
-                                        </li>
-                                    @endif
-                                @endif
-
-                                {{-- Page numbers --}}
-                                @for ($page = max(1, $users->currentPage() - 2); $page <= min($users->lastPage(), $users->currentPage() + 2); $page++)
-                                    @if ($page == $users->currentPage())
-                                        <li class="page-item active" aria-current="page">
-                                            <span class="page-link">{{ $page }}</span>
-                                        </li>
-                                    @else
-                                        <li class="page-item">
-                                            <a class="page-link" href="{{ $users->url($page) }}">{{ $page }}</a>
-                                        </li>
-                                    @endif
-                                @endfor
-
-                                {{-- Last page --}}
-                                @if ($users->currentPage() < $users->lastPage() - 2)
-                                    @if ($users->currentPage() < $users->lastPage() - 3)
-                                        <li class="page-item disabled">
-                                            <span class="page-link">...</span>
-                                        </li>
-                                    @endif
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $users->url($users->lastPage()) }}">{{ $users->lastPage() }}</a>
-                                    </li>
-                                @endif
-
-                                {{-- Next Page Link --}}
-                                @if ($users->hasMorePages())
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $users->nextPageUrl() }}">&rsaquo;</a>
-                                    </li>
-                                @else
-                                    <li class="page-item disabled" aria-disabled="true">
-                                        <span class="page-link">&rsaquo;</span>
-                                    </li>
-                                @endif
-                            </ul>
-                        </nav>
-                    </div>
-                @endif
             @else
                 <div class="text-center py-5">
                     <i class="fas fa-archive fa-3x text-muted mb-3"></i>
@@ -251,6 +194,18 @@
             @endif
         </div>
     </div>
+
+    @if($users->count() > 0)
+        <div class="d-flex flex-column align-items-center mt-4"
+            id="usersArchivePaginationContainer">
+            <div>
+                {{ $users->withQueryString()->links() }}
+            </div>
+            <div class="small text-muted mb-0 mt-n2">
+                Showing {{ $users->firstItem() }} to {{ $users->lastItem() }} of {{ $users->total() }} archived users
+            </div>
+        </div>
+    @endif
 
     <!-- Confirm Action Modal -->
     <div class="modal fade" id="confirmActionModal" tabindex="-1" aria-hidden="true">

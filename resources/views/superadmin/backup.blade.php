@@ -91,6 +91,17 @@
             height: 8px;
             border-radius: 4px;
         }
+        
+        /* Hide Bootstrap pagination's built-in "Showing" text on the left */
+        nav[role="navigation"] p,
+        nav[role="navigation"] .text-sm {
+            display: none !important;
+        }
+        
+        /* Bring showing text closer to pagination */
+        #backupsPaginationContainer > div:last-child {
+            margin-top: -0.5rem !important;
+        }
     </style>
 @endsection
 
@@ -269,86 +280,35 @@
                                             </td>
                                         </tr>
                             @empty
-                                    <tr>
-                                        <td colspan="6" class="text-center py-4">
-                                            <i class="fas fa-history fa-2x text-muted mb-2"></i>
-                                            <p class="text-muted mb-0">No backups found. Create your first backup above!</p>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                    @if($backups->hasPages())
-                        <div class="d-flex justify-content-center mt-4">
-                            <nav aria-label="Page navigation">
-                                <ul class="pagination justify-content-center">
-                                    {{-- Previous Page Link --}}
-                                    @if ($backups->onFirstPage())
-                                        <li class="page-item disabled" aria-disabled="true">
-                                            <span class="page-link">&lsaquo;</span>
-                                        </li>
-                                    @else
-                                        <li class="page-item">
-                                            <a class="page-link" href="{{ $backups->previousPageUrl() }}">&lsaquo;</a>
-                                        </li>
-                                    @endif
-
-                                    {{-- First page --}}
-                                    @if ($backups->currentPage() > 3)
-                                        <li class="page-item">
-                                            <a class="page-link" href="{{ $backups->url(1) }}">1</a>
-                                        </li>
-                                        @if ($backups->currentPage() > 4)
-                                            <li class="page-item disabled">
-                                                <span class="page-link">...</span>
-                                            </li>
-                                        @endif
-                                    @endif
-
-                                    {{-- Page numbers --}}
-                                    @for ($page = max(1, $backups->currentPage() - 2); $page <= min($backups->lastPage(), $backups->currentPage() + 2); $page++)
-                                        @if ($page == $backups->currentPage())
-                                            <li class="page-item active" aria-current="page">
-                                                <span class="page-link">{{ $page }}</span>
-                                            </li>
-                                        @else
-                                            <li class="page-item">
-                                                <a class="page-link" href="{{ $backups->url($page) }}">{{ $page }}</a>
-                                            </li>
-                                        @endif
-                                    @endfor
-
-                                    {{-- Last page --}}
-                                    @if ($backups->currentPage() < $backups->lastPage() - 2)
-                                        @if ($backups->currentPage() < $backups->lastPage() - 3)
-                                            <li class="page-item disabled">
-                                                <span class="page-link">...</span>
-                                            </li>
-                                        @endif
-                                        <li class="page-item">
-                                            <a class="page-link"
-                                                href="{{ $backups->url($backups->lastPage()) }}">{{ $backups->lastPage() }}</a>
-                                        </li>
-                                    @endif
-
-                                    {{-- Next Page Link --}}
-                                    @if ($backups->hasMorePages())
-                                        <li class="page-item">
-                                            <a class="page-link" href="{{ $backups->nextPageUrl() }}">&rsaquo;</a>
-                                        </li>
-                                    @else
-                                        <li class="page-item disabled" aria-disabled="true">
-                                            <span class="page-link">&rsaquo;</span>
-                                        </li>
-                                    @endif
-                                </ul>
-                            </nav>
-                        </div>
-                    @endif
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <i class="fas fa-history fa-2x text-muted mb-2"></i>
+                                        <p class="text-muted mb-0">No backups found. Create your first backup above!</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
+    </div>
+
+    @if($backups->hasPages())
+        <div class="d-flex flex-column align-items-center mt-4"
+            id="backupsPaginationContainer">
+            <div>
+                {{ $backups->links('pagination::bootstrap-5') }}
+            </div>
+            <div class="small text-muted mb-0 mt-n2">
+                @if($backups->total() > 0)
+                    Showing {{ $backups->firstItem() }}-{{ $backups->lastItem() }} of {{ $backups->total() }} backups
+                @else
+                    Showing 0 backups
+                @endif
+            </div>
+        </div>
+    @endif
 @endsection
 
 @push('scripts')

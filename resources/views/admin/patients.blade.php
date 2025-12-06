@@ -346,6 +346,22 @@
         body.bg-dark .btn-close {
             filter: invert(1) grayscale(100%) brightness(200%);
         }
+        
+        /* Hide Bootstrap pagination's built-in "Showing" text on the left */
+        nav[role="navigation"] p,
+        nav[role="navigation"] .text-sm,
+        nav p,
+        .pagination-wrapper p,
+        #patientsPaginationContainer nav p,
+        #patientsPaginationContainer p:first-child,
+        #patientsPaginationContainer > p {
+            display: none !important;
+        }
+        
+        /* Bring showing text closer to pagination */
+        #patientsPaginationContainer > div:last-child {
+            margin-top: -0.5rem !important;
+        }
     </style>
 @endsection
 
@@ -530,72 +546,18 @@
             </div>
         @endif
         <!-- Pagination -->
-        <div class="d-flex justify-content-center mt-4">
-            @if ($patients->hasPages())
-                <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-center">
-                        {{-- Previous Page Link --}}
-                        @if ($patients->onFirstPage())
-                            <li class="page-item disabled" aria-disabled="true">
-                                <span class="page-link">&lsaquo;</span>
-                            </li>
-                        @else
-                            <li class="page-item">
-                                <a class="page-link" href="{{ $patients->previousPageUrl() }}">&lsaquo;</a>
-                            </li>
-                        @endif
-
-                        {{-- First page --}}
-                        @if ($patients->currentPage() > 3)
-                            <li class="page-item">
-                                <a class="page-link" href="{{ $patients->url(1) }}">1</a>
-                            </li>
-                            @if ($patients->currentPage() > 4)
-                                <li class="page-item disabled">
-                                    <span class="page-link">...</span>
-                                </li>
-                            @endif
-                        @endif
-
-                        {{-- Page numbers --}}
-                        @for ($page = max(1, $patients->currentPage() - 2); $page <= min($patients->lastPage(), $patients->currentPage() + 2); $page++)
-                            @if ($page == $patients->currentPage())
-                                <li class="page-item active" aria-current="page">
-                                    <span class="page-link">{{ $page }}</span>
-                                </li>
-                            @else
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $patients->url($page) }}">{{ $page }}</a>
-                                </li>
-                            @endif
-                        @endfor
-
-                        {{-- Last page --}}
-                        @if ($patients->currentPage() < $patients->lastPage() - 2)
-                            @if ($patients->currentPage() < $patients->lastPage() - 3)
-                                <li class="page-item disabled">
-                                    <span class="page-link">...</span>
-                                </li>
-                            @endif
-                            <li class="page-item">
-                                <a class="page-link"
-                                    href="{{ $patients->url($patients->lastPage()) }}">{{ $patients->lastPage() }}</a>
-                            </li>
-                        @endif
-
-                        {{-- Next Page Link --}}
-                        @if ($patients->hasMorePages())
-                            <li class="page-item">
-                                <a class="page-link" href="{{ $patients->nextPageUrl() }}">&rsaquo;</a>
-                            </li>
-                        @else
-                            <li class="page-item disabled" aria-disabled="true">
-                                <span class="page-link">&rsaquo;</span>
-                            </li>
-                        @endif
-                    </ul>
-                </nav>
-            @endif
+        <div class="d-flex flex-column align-items-center mt-4"
+            id="patientsPaginationContainer">
+            <div>
+                {{ $patients->links('pagination::bootstrap-5') }}
+            </div>
+            <div class="small text-muted mb-0 mt-n2">
+                @if($patients->total() > 0)
+                    Showing {{ $patients->firstItem() }}-{{ $patients->lastItem() }} of {{ $patients->total() }} patients
+                @else
+                    Showing 0 patients
+                @endif
+            </div>
         </div>
     </div>
     </div>

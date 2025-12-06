@@ -112,6 +112,24 @@
             color: #b0b0b0 !important;
         }
 
+        /* Dark mode for expiring items alert */
+        body.bg-dark .alert-light.border-warning {
+            background-color: #4a3a1a;
+            border-color: #6a5a2a !important;
+            color: #f5d88a;
+        }
+
+        body.bg-dark .alert-light.border-warning .text-warning {
+            color: #fbbf24 !important;
+        }
+
+        /* Dark mode for search input group */
+        body.bg-dark .input-group-text {
+            background-color: #0f1316 !important;
+            border-color: #2a2f35 !important;
+            color: #e6e6e6 !important;
+        }
+
         /* Dark mode modal + form fields */
         body.bg-dark .modal-content {
             background: #1e2124;
@@ -235,6 +253,20 @@
             background-color: rgba(220, 53, 69, 0.2) !important;
             color: #ea868f !important;
         }
+
+        /* Hide Bootstrap pagination's built-in "Showing" text on the left */
+        #inventoryPaginationContainer nav p,
+        #inventoryPaginationContainer nav .text-sm,
+        #inventoryPaginationContainer nav .text-muted,
+        nav[role="navigation"] p,
+        nav[role="navigation"] .text-sm {
+            display: none !important;
+        }
+        
+        /* Bring showing text closer to pagination */
+        #inventoryPaginationContainer > div:last-child {
+            margin-top: -0.5rem !important;
+        }
     </style>
 @endsection
 
@@ -250,7 +282,7 @@
             <div class="alert alert-warning border-danger-subtle mb-3" role="alert">
                 <div class="d-flex align-items-center">
                     <i class="fas fa-triangle-exclamation me-2 text-danger"></i>
-                    <strong>{{ $stats['low_stock'] }} items</strong>
+                    <strong>{{ $stats['low_stock'] }} item(s)</strong>
                     <span class="ms-2">are running low on stock and need restocking.</span>
                 </div>
             </div>
@@ -259,7 +291,7 @@
             <div class="alert alert-light border-warning mb-4" role="alert">
                 <div class="d-flex align-items-center">
                     <i class="fas fa-exclamation-circle me-2 text-warning"></i>
-                    <strong>{{ $stats['expiring_soon'] }} items</strong>
+                    <strong>{{ $stats['expiring_soon'] }} item(s)</strong>
                     <span class="ms-2">are expiring within 90 days.</span>
                 </div>
             </div>
@@ -329,10 +361,6 @@
                     </div>
                 </div>
             </form>
-            <div class="mt-2 small text-muted">
-                Showing {{ $inventory->firstItem() ?? 0 }}-{{ $inventory->lastItem() ?? 0 }} of {{ $inventory->total() }}
-                items
-            </div>
         </div>
 
         @if($inventory->count() > 0)
@@ -392,17 +420,17 @@
                     </table>
                 </div>
             </div>
-            <div class="d-flex flex-wrap justify-content-between align-items-center mt-3 gap-2"
+            <div class="d-flex flex-column align-items-center mt-4"
                 id="inventoryPaginationContainer">
-                <div class="small text-muted mb-0">
+                <div>
+                    {{ $inventory->links('pagination::bootstrap-5') }}
+                </div>
+                <div class="small text-muted mb-0 mt-n2">
                     @if($inventory->total() > 0)
                         Showing {{ $inventory->firstItem() }}-{{ $inventory->lastItem() }} of {{ $inventory->total() }} items
                     @else
                         Showing 0 items
                     @endif
-                </div>
-                <div>
-                    {{ $inventory->links('pagination::bootstrap-5') }}
                 </div>
             </div>
 

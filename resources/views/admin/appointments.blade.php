@@ -439,22 +439,39 @@
         }
 
         /* Dark Mode Pagination */
-        body.bg-dark .page-link {
+        body.bg-dark .pagination .page-link {
             background-color: #1e2124;
             border-color: #2a2f35;
             color: #e6e6e6;
         }
 
-        body.bg-dark .page-item.disabled .page-link {
-            background-color: #1a1d20;
+        body.bg-dark .pagination .page-link:hover {
+            background-color: #2a2f35;
+            border-color: #3f4751;
+            color: #ffffff;
+        }
+
+        body.bg-dark .pagination .page-item.active .page-link {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            color: #ffffff;
+        }
+
+        body.bg-dark .pagination .page-item.disabled .page-link {
+            background-color: #1a1f24;
             border-color: #2a2f35;
             color: #6c757d;
         }
 
-        body.bg-dark .page-item.active .page-link {
-            background-color: #007bff;
-            border-color: #007bff;
-            color: #fff;
+        /* Hide Bootstrap pagination's built-in "Showing" text on the left */
+        nav[role="navigation"] p,
+        nav[role="navigation"] .text-sm {
+            display: none !important;
+        }
+        
+        /* Bring showing text closer to pagination */
+        #appointmentsPaginationContainer > div:last-child {
+            margin-top: -0.5rem !important;
         }
 
         /* Dark Mode Calendar & Time Slots */
@@ -932,8 +949,18 @@
     </div>
 
     <!-- Pagination -->
-    <div class="d-flex justify-content-center mt-3">
-        {{ $appointments->links('pagination::bootstrap-5') }}
+    <div class="d-flex flex-column align-items-center mt-4"
+        id="appointmentsPaginationContainer">
+        <div>
+            {{ $appointments->links('pagination::bootstrap-5') }}
+        </div>
+        <div class="small text-muted mb-0 mt-n2">
+            @if($appointments->total() > 0)
+                Showing {{ $appointments->firstItem() }}-{{ $appointments->lastItem() }} of {{ $appointments->total() }} items
+            @else
+                Showing 0 items
+            @endif
+        </div>
     </div>
 
     <!-- Add Appointment Modal -->

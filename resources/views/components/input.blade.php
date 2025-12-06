@@ -52,7 +52,7 @@
         @endif
 
         @if($type === 'password')
-            <button class="btn btn-outline-secondary border-start-0" type="button" onclick="togglePasswordVisibility('{{ $id }}', this)">
+            <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('{{ $id }}', this)" style="border-left: 1px solid #dee2e6;">
                 <i class="fa-solid fa-eye"></i>
             </button>
         @endif
