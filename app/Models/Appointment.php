@@ -34,6 +34,11 @@ class Appointment extends Model
         'approved_at' => 'datetime',
     ];
 
+    public function services()
+    {
+        return $this->belongsToMany(Service::class, 'appointment_service');
+    }
+
     /**
      * Get the patient that owns the appointment.
      */

@@ -20,11 +20,11 @@
 @endsection
 
 @section('user-initials')
-    {{ substr(\App\Helpers\AuthHelper::user()->name, 0, 2) }}
+    {{ substr(optional(\App\Helpers\AuthHelper::user())->name ?? 'Gu', 0, 2) }}
 @endsection
 
 @section('user-name')
-    {{ \App\Helpers\AuthHelper::user()->name }}
+    {{ optional(\App\Helpers\AuthHelper::user())->name ?? 'Guest' }}
 @endsection
 
 @section('user-role')
@@ -717,19 +717,18 @@
                             </div>
 
                             <div class="mt-3">
-                                <label for="service_type" class="form-label">Service Needed *</label>
-                                <select class="form-control @error('service_type') is-invalid @enderror" id="service_type"
-                                    name="service_type" required>
+                                <label for="service_id" class="form-label">Service Needed *</label>
+                                <select class="form-control @error('service_id') is-invalid @enderror" id="service_id"
+                                    name="service_id" required>
                                     <option value="">Select Service</option>
-                                    <option value="General Checkup" {{ old('service_type') == 'General Checkup' ? 'selected' : '' }}>General Checkup</option>
-                                    <option value="Prenatal" {{ old('service_type') == 'Prenatal' ? 'selected' : '' }}>
-                                        Prenatal</option>
-                                    <option value="Medical Check-up" {{ old('service_type') == 'Medical Check-up' ? 'selected' : '' }}>Medical Check-up</option>
-                                    <option value="Immunization" {{ old('service_type') == 'Immunization' ? 'selected' : '' }}>Immunization</option>
-                                    <option value="Family Planning" {{ old('service_type') == 'Family Planning' ? 'selected' : '' }}>Family Planning</option>
+                                    @foreach($services as $service)
+                                        <option value="{{ $service->id }}" {{ old('service_id') == $service->id ? 'selected' : '' }}>
+                                            {{ $service->name }}
+                                        </option>
+                                    @endforeach
                                 </select>
 
-                                @error('service_type')
+                                @error('service_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -1471,7 +1470,7 @@
                     document.getElementById('patient_phone').value;
                 const hasDateTime = document.getElementById('appointment_date').value &&
                     document.getElementById('appointment_time').value;
-                const hasService = document.getElementById('service_type').value;
+                const hasService = document.getElementById('service_id').value;
 
                 // Update step 1
                 if (hasPatientInfo) {
@@ -1534,40 +1533,42 @@
                     day: 'numeric'
                 });
                 const appointmentTime = timeInput.value;
-                const serviceType = document.getElementById('service_type').value;
+                // Get selected service name using the select element
+                const serviceSelect = document.getElementById('service_id');
+                const serviceType = serviceSelect.options[serviceSelect.selectedIndex].text;
                 const medicalHistory = document.getElementById('medical_history').value || 'None provided';
                 const notes = document.getElementById('notes').value || 'None';
 
                 confirmationDetails.innerHTML = `
-                            <div class="confirmation-detail">
-                                <span class="confirmation-label">Patient Name:</span>
-                                <span class="confirmation-value">${patientName}</span>
-                            </div>
-                            <div class="confirmation-detail">
-                                <span class="confirmation-label">Phone Number:</span>
-                                <span class="confirmation-value">${patientPhone}</span>
-                            </div>
-                            <div class="confirmation-detail">
-                                <span class="confirmation-label">Appointment Date:</span>
-                                <span class="confirmation-value">${appointmentDate}</span>
-                            </div>
-                            <div class="confirmation-detail">
-                                <span class="confirmation-label">Appointment Time:</span>
-                                <span class="confirmation-value">${appointmentTime}</span>
-                            </div>
-                            <div class="confirmation-detail">
-                                <span class="confirmation-label">Service Type:</span>
-                                <span class="confirmation-value">${serviceType}</span>
-                            </div>
-                            <div class="confirmation-detail">
-                                <span class="confirmation-label">Medical History:</span>
-                                <span class="confirmation-value">${medicalHistory}</span>
-                            </div>
-                            <div class="confirmation-detail">
-                                <span class="confirmation-label">Additional Notes:</span>
-                                <span class="confirmation-value">${notes}</span>
-                            </div>
-                        `;
+                                                <div class="confirmation-detail">
+                                                    <span class="confirmation-label">Patient Name:</span>
+                                                    <span class="confirmation-value">${patientName}</span>
+                                                </div>
+                                                <div class="confirmation-detail">
+                                                    <span class="confirmation-label">Phone Number:</span>
+                                                    <span class="confirmation-value">${patientPhone}</span>
+                                                </div>
+                                                <div class="confirmation-detail">
+                                                    <span class="confirmation-label">Appointment Date:</span>
+                                                    <span class="confirmation-value">${appointmentDate}</span>
+                                                </div>
+                                                <div class="confirmation-detail">
+                                                    <span class="confirmation-label">Appointment Time:</span>
+                                                    <span class="confirmation-value">${appointmentTime}</span>
+                                                </div>
+                                                <div class="confirmation-detail">
+                                                    <span class="confirmation-label">Service Type:</span>
+                                                    <span class="confirmation-value">${serviceType}</span>
+                                                </div>
+                                                <div class="confirmation-detail">
+                                                    <span class="confirmation-label">Medical History:</span>
+                                                    <span class="confirmation-value">${medicalHistory}</span>
+                                                </div>
+                                                <div class="confirmation-detail">
+                                                    <span class="confirmation-label">Additional Notes:</span>
+                                                    <span class="confirmation-value">${notes}</span>
+                                                </div>
+                                            `;
 
                 // Mark step 4 as active
                 steps.forEach(s => s.classList.remove('active'));
@@ -1598,6 +1599,6 @@
                     window.toast.error('{{ session('error') }}');
                 }
             @endif
-                });
+                                    });
     </script>
 @endpush

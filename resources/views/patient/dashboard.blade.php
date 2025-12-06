@@ -377,12 +377,12 @@
                                             <td class="text-muted">{{ $appointment->service_type }}</td>
                                             <td>
                                                 <span class="status-badge 
-                                                                                            @if($appointment->status == 'pending') bg-warning text-dark
-                                                                                            @elseif($appointment->status == 'approved') bg-success text-white
-                                                                                            @elseif($appointment->status == 'completed') bg-info text-white
-                                                                                            @elseif($appointment->status == 'cancelled') bg-danger text-white
-                                                                                            @else bg-secondary text-white
-                                                                                            @endif">
+                                                                                                                    @if($appointment->status == 'pending') bg-warning text-dark
+                                                                                                                    @elseif($appointment->status == 'approved') bg-success text-white
+                                                                                                                    @elseif($appointment->status == 'completed') bg-info text-white
+                                                                                                                    @elseif($appointment->status == 'cancelled') bg-danger text-white
+                                                                                                                    @else bg-secondary text-white
+                                                                                                                    @endif">
                                                     {{ ucfirst($appointment->status) }}
                                                 </span>
                                             </td>
@@ -393,15 +393,6 @@
                                                         <i class="fas fa-eye me-1"></i> View
                                                     </a>
                                                     @if($appointment->status == 'pending')
-                                                        <button type="button"
-                                                            class="btn btn-sm btn-outline-danger cancel-appointment-btn"
-                                                            data-appointment-id="{{ $appointment->id }}"
-                                                            data-cancel-url="{{ route('patient.appointment.cancel', $appointment) }}"
-                                                            data-appointment-date="{{ $appointment->appointment_date }}"
-                                                            data-appointment-time="{{ $appointment->appointment_time }}"
-                                                            data-service-type="{{ $appointment->service_type }}">
-                                                            <i class="fas fa-times me-1"></i> Cancel
-                                                        </button>
                                                     @endif
                                                 </div>
                                             </td>
@@ -510,19 +501,19 @@
                     // Populate modal with appointment details
                     const detailsContainer = document.getElementById('cancelAppointmentDetails');
                     detailsContainer.innerHTML = `
-                                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f1f3f4;">
-                                    <span style="font-weight: 600; color: #495057;">Date:</span>
-                                    <span style="color: #6c757d;">${new Date(appointmentDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f1f3f4;">
-                                    <span style="font-weight: 600; color: #495057;">Time:</span>
-                                    <span style="color: #6c757d;">${appointmentTime}</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; padding: 0.75rem 0;">
-                                    <span style="font-weight: 600; color: #495057;">Service:</span>
-                                    <span style="color: #6c757d;">${serviceType}</span>
-                                </div>
-                            `;
+                                        <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f1f3f4;">
+                                            <span style="font-weight: 600; color: #495057;">Date:</span>
+                                            <span style="color: #6c757d;">${new Date(appointmentDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f1f3f4;">
+                                            <span style="font-weight: 600; color: #495057;">Time:</span>
+                                            <span style="color: #6c757d;">${appointmentTime}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; padding: 0.75rem 0;">
+                                            <span style="font-weight: 600; color: #495057;">Service:</span>
+                                            <span style="color: #6c757d;">${serviceType}</span>
+                                        </div>
+                                    `;
 
                     // Store the cancel URL
                     confirmCancelBtn.dataset.cancelUrl = cancelUrl;
@@ -612,6 +603,6 @@
                     window.toast.error('{{ session('error') }}');
                 }
             @endif
-                });
+                        });
     </script>
 @endpush

@@ -1004,10 +1004,9 @@
                                                 class="text-danger">*</span></label>
                                         <select class="form-select" id="service_type" name="service_type" required>
                                             <option value="" disabled selected>Select Service</option>
-                                            <option value="General Checkup">General Checkup</option>
-                                            <option value="Prenatal">Prenatal</option>
-                                            <option value="Immunization">Immunization</option>
-                                            <option value="Family Planning">Family Planning</option>
+                                            @foreach($services as $service)
+                                                <option value="{{ $service }}">{{ $service }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
@@ -1579,6 +1578,8 @@
                         const dayElement = document.createElement('div');
                         dayElement.className = 'calendar-day';
 
+                        dayElement.dataset.date = dayData.date; // Added data-date attribute
+
                         // Create a span for the day number
                         const dayNumber = document.createElement('span');
                         dayNumber.className = 'day-number';
@@ -1765,143 +1766,92 @@
                 // I'll override the renderCalendar method above to include data-date
             }
 
-            // Patch renderCalendar to include data-date
-            AppointmentCalendar.prototype.renderCalendar = function () {
-                const calendarGrid = document.getElementById(this.config.calendarGridId);
-                if (!calendarGrid) return;
-
-                calendarGrid.innerHTML = '';
-
-                const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                dayHeaders.forEach(day => {
-                    const header = document.createElement('div');
-                    header.className = 'calendar-header';
-                    header.textContent = day;
-                    calendarGrid.appendChild(header);
-                });
-
-                const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1).getDay();
-                for (let i = 0; i < firstDay; i++) {
-                    const emptyDay = document.createElement('div');
-                    calendarGrid.appendChild(emptyDay);
-                }
-
-                this.calendarData.forEach(dayData => {
-                    const dayElement = document.createElement('div');
-                    dayElement.className = 'calendar-day';
-                    dayElement.dataset.date = dayData.date; // Added this line
-
-                    const dayNumber = document.createElement('span');
-                    dayNumber.className = 'day-number';
-                    dayNumber.textContent = dayData.day;
-                    dayElement.appendChild(dayNumber);
-
-                    if (dayData.is_weekend) dayElement.classList.add('weekend');
-                    if (dayData.is_past) dayElement.classList.add('past');
-                    else if (dayData.is_fully_occupied) dayElement.classList.add('occupied');
-                    else if (dayData.occupied_slots > 0) dayElement.classList.add('partially-occupied');
-
-                    const indicator = document.createElement('span');
-                    indicator.className = 'slot-indicator';
-                    indicator.textContent = `${dayData.occupied_slots}/${dayData.total_slots}`;
-                    dayElement.appendChild(indicator);
-
-                    if (!dayData.is_past) {
-                        dayElement.addEventListener('click', () => {
-                            this.selectDate(dayData.date);
-                        });
-                    }
-
-                    calendarGrid.appendChild(dayElement);
-                });
-            };
-
             // Initialize Add Appointment Calendar
-            const addAppointmentModal = document.getElementById('addAppointmentModal');
-            let addCalendar = null;
+                    const addAppointmentModal = document.getElementById('addAppointmentModal');
+                    let addCalendar = null;
 
-            if (addAppointmentModal) {
-                addAppointmentModal.addEventListener('shown.bs.modal', function () {
-                    if (!addCalendar) {
-                        addCalendar = new AppointmentCalendar({
-                            prevBtnId: 'prevMonth',
-                            nextBtnId: 'nextMonth',
-                            currentMonthId: 'currentMonth',
-                            calendarGridId: 'calendarGrid',
-                            selectedDateDisplayId: 'selectedDateDisplay',
-                            timeSlotsGridId: 'timeSlotsGrid',
-                            dateInputId: 'appointment_date',
-                            timeInputId: 'appointment_time'
+                    if (addAppointmentModal) {
+                        addAppointmentModal.addEventListener('shown.bs.modal', function () {
+                            if (!addCalendar) {
+                                addCalendar = new AppointmentCalendar({
+                                    prevBtnId: 'prevMonth',
+                                    nextBtnId: 'nextMonth',
+                                    currentMonthId: 'currentMonth',
+                                    calendarGridId: 'calendarGrid',
+                                    selectedDateDisplayId: 'selectedDateDisplay',
+                                    timeSlotsGridId: 'timeSlotsGrid',
+                                    dateInputId: 'appointment_date',
+                                    timeInputId: 'appointment_time'
+                                });
+                            }
+                        });
+
+                        addAppointmentModal.addEventListener('hidden.bs.modal', function () {
+                            if (addCalendar) {
+                                addCalendar.selectedDate = null;
+                                addCalendar.selectedTime = null;
+                                // Reset UI
+                                document.getElementById('selectedDateDisplay').textContent = 'Select a date to view available time slots';
+                                document.getElementById('timeSlotsGrid').innerHTML = '<div class="text-center text-muted"><i class="fas fa-clock fa-2x mb-2"></i><p>Select a date to view time slots</p></div>';
+                                document.getElementById('appointment_date').value = '';
+                                document.getElementById('appointment_time').value = '';
+                                // Remove selection classes
+                                document.querySelectorAll('#calendarGrid .selected').forEach(el => el.classList.remove('selected'));
+                            }
                         });
                     }
-                });
 
-                addAppointmentModal.addEventListener('hidden.bs.modal', function () {
-                    if (addCalendar) {
-                        addCalendar.selectedDate = null;
-                        addCalendar.selectedTime = null;
-                        // Reset UI
-                        document.getElementById('selectedDateDisplay').textContent = 'Select a date to view available time slots';
-                        document.getElementById('timeSlotsGrid').innerHTML = '<div class="text-center text-muted"><i class="fas fa-clock fa-2x mb-2"></i><p>Select a date to view time slots</p></div>';
-                        document.getElementById('appointment_date').value = '';
-                        document.getElementById('appointment_time').value = '';
-                        // Remove selection classes
-                        document.querySelectorAll('#calendarGrid .selected').forEach(el => el.classList.remove('selected'));
-                    }
-                });
-            }
+                    // Initialize Reschedule Appointment Calendar
+                    const rescheduleModal = document.getElementById('rescheduleAppointmentModal');
+                    let rescheduleCalendar = null;
 
-            // Initialize Reschedule Appointment Calendar
-            const rescheduleModal = document.getElementById('rescheduleAppointmentModal');
-            let rescheduleCalendar = null;
+                    if (rescheduleModal) {
+                        rescheduleModal.addEventListener('shown.bs.modal', function () {
+                            if (!rescheduleCalendar) {
+                                rescheduleCalendar = new AppointmentCalendar({
+                                    prevBtnId: 'reschedPrevMonth',
+                                    nextBtnId: 'reschedNextMonth',
+                                    currentMonthId: 'reschedCurrentMonth',
+                                    calendarGridId: 'reschedCalendarGrid',
+                                    selectedDateDisplayId: 'reschedSelectedDateDisplay',
+                                    timeSlotsGridId: 'reschedTimeSlotsGrid',
+                                    dateInputId: 'resched_new_date',
+                                    timeInputId: 'resched_new_time'
+                                });
+                            }
+                        });
 
-            if (rescheduleModal) {
-                rescheduleModal.addEventListener('shown.bs.modal', function () {
-                    if (!rescheduleCalendar) {
-                        rescheduleCalendar = new AppointmentCalendar({
-                            prevBtnId: 'reschedPrevMonth',
-                            nextBtnId: 'reschedNextMonth',
-                            currentMonthId: 'reschedCurrentMonth',
-                            calendarGridId: 'reschedCalendarGrid',
-                            selectedDateDisplayId: 'reschedSelectedDateDisplay',
-                            timeSlotsGridId: 'reschedTimeSlotsGrid',
-                            dateInputId: 'resched_new_date',
-                            timeInputId: 'resched_new_time'
+                        rescheduleModal.addEventListener('hidden.bs.modal', function () {
+                            if (rescheduleCalendar) {
+                                rescheduleCalendar.selectedDate = null;
+                                rescheduleCalendar.selectedTime = null;
+                                // Reset UI
+                                document.getElementById('reschedSelectedDateDisplay').textContent = 'Select a date to view available time slots';
+                                document.getElementById('reschedTimeSlotsGrid').innerHTML = '<div class="text-center text-muted"><i class="fas fa-clock fa-2x mb-2"></i><p>Select a date to view time slots</p></div>';
+                                document.getElementById('resched_new_date').value = '';
+                                document.getElementById('resched_new_time').value = '';
+                                document.querySelectorAll('#reschedCalendarGrid .selected').forEach(el => el.classList.remove('selected'));
+                            }
                         });
                     }
+
+                    // Handle Reschedule Button Clicks
+                    document.addEventListener('click', function (e) {
+                        if (e.target && e.target.classList.contains('reschedule-btn')) {
+                            const btn = e.target;
+                            const appointmentId = btn.dataset.appointmentId;
+                            const actionUrl = btn.dataset.actionUrl;
+
+                            const form = document.getElementById('rescheduleForm');
+                            if (form) {
+                                form.action = actionUrl;
+                            }
+
+                            // Open the modal
+                            const modal = new bootstrap.Modal(document.getElementById('rescheduleAppointmentModal'));
+                            modal.show();
+                        }
+                    });
                 });
-
-                rescheduleModal.addEventListener('hidden.bs.modal', function () {
-                    if (rescheduleCalendar) {
-                        rescheduleCalendar.selectedDate = null;
-                        rescheduleCalendar.selectedTime = null;
-                        // Reset UI
-                        document.getElementById('reschedSelectedDateDisplay').textContent = 'Select a date to view available time slots';
-                        document.getElementById('reschedTimeSlotsGrid').innerHTML = '<div class="text-center text-muted"><i class="fas fa-clock fa-2x mb-2"></i><p>Select a date to view time slots</p></div>';
-                        document.getElementById('resched_new_date').value = '';
-                        document.getElementById('resched_new_time').value = '';
-                        document.querySelectorAll('#reschedCalendarGrid .selected').forEach(el => el.classList.remove('selected'));
-                    }
-                });
-            }
-
-            // Handle Reschedule Button Clicks
-            document.addEventListener('click', function (e) {
-                if (e.target && e.target.classList.contains('reschedule-btn')) {
-                    const btn = e.target;
-                    const appointmentId = btn.dataset.appointmentId;
-                    const actionUrl = btn.dataset.actionUrl;
-
-                    const form = document.getElementById('rescheduleForm');
-                    if (form) {
-                        form.action = actionUrl;
-                    }
-
-                    // Open the modal
-                    const modal = new bootstrap.Modal(document.getElementById('rescheduleAppointmentModal'));
-                    modal.show();
-                }
-            });
-        });
-    </script>
+            </script>
 @endpush

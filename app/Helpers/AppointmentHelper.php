@@ -16,31 +16,36 @@ class AppointmentHelper
     public static function getAvailableSlots($date)
     {
         $timeSlots = self::getAllTimeSlots();
-        $occupiedSlots = self::getOccupiedSlots($date);
-        
-        // Debug: Log what we're working with
-        \Log::info("Date: {$date}");
-        \Log::info("Occupied slots from DB: " . json_encode($occupiedSlots));
-        \Log::info("All time slots: " . json_encode($timeSlots));
-        
+
+        // Optimize: Use DB aggregation instead of fetching all records
+        $counts = Appointment::whereDate('appointment_date', $date)
+            ->whereIn('status', ['approved', 'completed'])
+            ->selectRaw('appointment_time, count(*) as total')
+            ->groupBy('appointment_time')
+            ->pluck('total', 'appointment_time');
+
+        // Map counts to normalized time strings (H:i)
+        $normalizedCounts = [];
+        foreach ($counts as $time => $count) {
+            $normalizedTime = substr($time, 0, 5); // Convert 08:00:00 to 08:00
+            $normalizedCounts[$normalizedTime] = $count;
+        }
+
         $availableSlots = [];
         foreach ($timeSlots as $slot) {
-            $isOccupied = in_array($slot['time'], $occupiedSlots);
-            
-            // Debug: Log each slot check
-            \Log::info("Checking slot {$slot['time']} against occupied slots: " . ($isOccupied ? 'OCCUPIED' : 'AVAILABLE'));
-            
+            $count = $normalizedCounts[$slot['time']] ?? 0;
+
             $availableSlots[] = [
                 'time' => $slot['time'],
                 'display' => $slot['display'],
-                'available' => !$isOccupied,
-                'occupied_count' => self::getSlotOccupancyCount($date, $slot['time'])
+                'available' => $count === 0, // Assuming 1 slot per time capacity
+                'occupied_count' => $count
             ];
         }
-        
+
         return $availableSlots;
     }
-    
+
     /**
      * Get all predefined time slots (15 slots per day)
      * 
@@ -66,69 +71,7 @@ class AppointmentHelper
             ['time' => '16:00', 'display' => '4:00 PM'],
         ];
     }
-    
-    /**
-     * Get occupied time slots for a given date
-     * 
-     * @param string $date
-     * @return array
-     */
-    public static function getOccupiedSlots($date)
-    {
-        $appointments = Appointment::whereDate('appointment_date', $date)
-            ->whereIn('status', ['approved', 'completed'])
-            ->get();
-        
-        // Debug: Log the raw appointment_time values
-        $rawTimes = $appointments->pluck('appointment_time')->toArray();
-        \Log::info("Raw appointment_time values: " . json_encode($rawTimes));
-        
-        $occupiedSlots = $appointments->pluck('appointment_time')
-            ->map(function($time) {
-                // Debug: Log each time value and its length
-                \Log::info("Processing time: '{$time}' (length: " . strlen($time) . ")");
-                
-                // Handle different time formats
-                if (strlen($time) > 5) {
-                    // If it's a datetime, extract just the time part
-                    return substr($time, 11, 5); // Extract HH:MM from datetime format
-                }
-                return $time;
-            })
-            ->toArray();
-        
-        \Log::info("Processed occupied slots: " . json_encode($occupiedSlots));
-        return $occupiedSlots;
-    }
-    
-    /**
-     * Get the number of appointments for a specific time slot
-     * 
-     * @param string $date
-     * @param string $time
-     * @return int
-     */
-    public static function getSlotOccupancyCount($date, $time)
-    {
-        return Appointment::whereDate('appointment_date', $date)
-            ->where('appointment_time', $time)
-            ->whereIn('status', ['approved', 'completed'])
-            ->count();
-    }
-    
-    /**
-     * Check if a time slot is available
-     * 
-     * @param string $date
-     * @param string $time
-     * @return bool
-     */
-    public static function isSlotAvailable($date, $time)
-    {
-        $occupiedCount = self::getSlotOccupancyCount($date, $time);
-        return $occupiedCount === 0;
-    }
-    
+
     /**
      * Get calendar data for a month
      * 
@@ -139,27 +82,38 @@ class AppointmentHelper
     public static function getCalendarData($year, $month)
     {
         $calendar = [];
-        $date = Carbon::create($year, $month, 1);
-        $daysInMonth = $date->daysInMonth;
-        
+        $startDate = Carbon::create($year, $month, 1)->startOfDay();
+        $endDate = $startDate->copy()->endOfMonth()->endOfDay();
+
+        // Optimize: Use DB aggregation to count slots per day
+        $dailyCounts = Appointment::whereBetween('appointment_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->whereIn('status', ['approved', 'completed'])
+            ->selectRaw('appointment_date, count(*) as total')
+            ->groupBy('appointment_date')
+            ->pluck('total', 'appointment_date');
+
+        $daysInMonth = $startDate->daysInMonth;
+        $totalSlotsPerDay = count(self::getAllTimeSlots());
+
         for ($day = 1; $day <= $daysInMonth; $day++) {
-            $currentDate = Carbon::create($year, $month, $day)->format('Y-m-d');
-            $occupiedSlots = self::getOccupiedSlots($currentDate);
-            $totalSlots = count(self::getAllTimeSlots());
-            $availableSlots = $totalSlots - count($occupiedSlots);
-            
+            $currentDate = Carbon::create($year, $month, $day);
+            $dateString = $currentDate->format('Y-m-d');
+
+            $occupiedCount = $dailyCounts[$dateString] ?? 0;
+            $availableSlots = $totalSlotsPerDay - $occupiedCount;
+
             $calendar[] = [
-                'date' => $currentDate,
+                'date' => $dateString,
                 'day' => $day,
-                'total_slots' => $totalSlots,
-                'occupied_slots' => count($occupiedSlots),
+                'total_slots' => $totalSlotsPerDay,
+                'occupied_slots' => $occupiedCount,
                 'available_slots' => $availableSlots,
-                'is_fully_occupied' => $availableSlots === 0,
-                'is_weekend' => $date->copy()->addDays($day - 1)->isWeekend(),
-                'is_past' => Carbon::create($year, $month, $day)->isPast(),
+                'is_fully_occupied' => $availableSlots <= 0,
+                'is_weekend' => $currentDate->isWeekend(),
+                'is_past' => $currentDate->isPast() && !$currentDate->isToday(),
             ];
         }
-        
+
         return $calendar;
     }
 }

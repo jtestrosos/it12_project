@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use App\Models\Patient;
+use App\Models\Service;
 use App\Helpers\AppointmentHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +31,8 @@ class PatientController extends Controller
     public function bookAppointment()
     {
         $user = Auth::guard('patient')->user();
-        return view('patient.book-appointment', compact('user'));
+        $services = Service::where('active', true)->get();
+        return view('patient.book-appointment', compact('user', 'services'));
     }
 
     public function storeAppointment(Request $request)
@@ -42,7 +44,7 @@ class PatientController extends Controller
             'patient_phone' => 'required|string|max:20',
             'appointment_date' => 'required|date|after:today',
             'appointment_time' => 'required',
-            'service_type' => 'required|string',
+            'service_id' => 'required|exists:services,id',
             'notes' => 'nullable|string|max:1000',
             'medical_history' => 'nullable|string|max:2000'
         ];
@@ -64,6 +66,8 @@ class PatientController extends Controller
 
         $request->validate($rules);
 
+        $service = Service::find($request->service_id);
+
         $appointment = Appointment::create([
             'patient_id' => Auth::guard('patient')->id(),
             'patient_name' => $request->patient_name,
@@ -71,11 +75,14 @@ class PatientController extends Controller
             'patient_address' => $patient->address ?? 'N/A',
             'appointment_date' => $request->appointment_date,
             'appointment_time' => $request->appointment_time,
-            'service_type' => $request->service_type,
+            'service_type' => $service->name, // Keep for legacy/display compatibility
             'notes' => $request->notes,
             'medical_history' => $request->medical_history,
             'status' => 'pending'
         ]);
+
+        // Attach service to appointment
+        $appointment->services()->attach($service->id);
 
         // Save treatment record data if eligible
         if ($patient->age >= 6) {
