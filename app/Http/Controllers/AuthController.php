@@ -50,7 +50,7 @@ class AuthController extends Controller
 
         // If no user found in any table
         if (!$guard) {
-            $errors = ['email' => 'Invalid Credentials.'];
+            $errors = ['password' => 'Invalid Credentials.'];
 
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json(['errors' => $errors], 422);
