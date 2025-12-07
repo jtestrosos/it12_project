@@ -58,7 +58,45 @@
           </div>
         </div>
       </div>
+      
+      <!-- Call to Action Section -->
+      <div class="row justify-content-center mt-5 pt-4">
+        <div class="col-md-8 text-center">
+          <h3 class="fw-bold mb-3" style="font-size:2rem;">Ready to Get Started?</h3>
+          <p class="mb-4" style="font-size:1.15rem; color:#555;">Join us today and experience hassle-free appointment booking!</p>
+          <a href="{{ route('login') }}" class="btn btn-lg px-5 py-3 cta-button" style="
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+          ">
+            <i class="fas fa-sign-in-alt"></i>
+            Start Your Journey Now!
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+
+<style>
+  .cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(13, 110, 253, 0.4);
+    background: linear-gradient(135deg, #0a58ca 0%, #084298 100%);
+  }
+  
+  .cta-button:active {
+    transform: translateY(-1px);
+  }
+</style>
+
 @endsection

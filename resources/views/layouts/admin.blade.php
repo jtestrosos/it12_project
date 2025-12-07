@@ -642,6 +642,32 @@
             font-weight: 600;
         }
 
+        /* Light mode scrollbar - ensure consistent width */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 6px;
+            border: 2px solid #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Firefox scrollbar */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #c1c1c1 #f1f1f1;
+        }
+
         /* Dark mode scrollbar */
         body.bg-dark ::-webkit-scrollbar {
             width: 12px;

@@ -48,18 +48,18 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: #eff6ff;
-            color: #1d4ed8;
+            background: rgba(var(--color-primary-rgb), 0.1);
+            color: var(--color-primary);
         }
 
         .metric-icon-pill.metric-icon-success {
-            background: #ecfdf5;
-            color: #047857;
+            background: rgba(var(--color-secondary-rgb), 0.1);
+            color: var(--color-secondary);
         }
 
         .metric-icon-pill.metric-icon-warning {
-            background: #fff7ed;
-            color: #c05621;
+            background: rgba(var(--color-accent-rgb), 0.1);
+            color: var(--color-accent);
         }
 
         /* Table & Filter Styles */
@@ -143,6 +143,21 @@
             background: #0f1316;
             color: #e6e6e6;
             border-color: #2a2f35;
+        }
+
+        body.bg-dark .metric-icon-pill {
+            background: rgba(var(--color-primary-rgb), 0.2);
+            color: var(--color-primary-light);
+        }
+
+        body.bg-dark .metric-icon-pill.metric-icon-success {
+            background: rgba(var(--color-secondary-rgb), 0.25);
+            color: var(--color-secondary-light);
+        }
+
+        body.bg-dark .metric-icon-pill.metric-icon-warning {
+            background: rgba(var(--color-accent-rgb), 0.25);
+            color: var(--color-accent-light);
         }
     </style>
 @endsection

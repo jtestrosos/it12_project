@@ -11,6 +11,37 @@
         body.bg-dark .sidebar { background: #131516; border-right-color: #2a2f35; }
         body.bg-dark .header { background: #1b1e20; border-bottom-color: #2a2f35; }
         
+        /* Dark mode for cards */
+        body.bg-dark .card {
+            background: #1e2124;
+            color: #e6e6e6;
+            border-color: #2a2f35;
+        }
+        
+        /* Dark mode for tables */
+        body.bg-dark .table {
+            color: #d6d6d6;
+        }
+        
+        body.bg-dark .table thead,
+        body.bg-dark .table-light {
+            background: #1a1f24 !important;
+            color: #e6e6e6;
+        }
+        
+        body.bg-dark .table tbody td {
+            border-color: #2a2f35;
+        }
+        
+        body.bg-dark .table-hover tbody tr:hover {
+            background-color: #2a2f35;
+        }
+        
+        /* Dark mode for text */
+        body.bg-dark .text-muted {
+            color: #b0b0b0 !important;
+        }
+        
         /* Hide Bootstrap pagination's built-in "Showing" text on the left */
         nav[role="navigation"] p,
         nav[role="navigation"] .text-sm {

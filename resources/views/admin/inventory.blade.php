@@ -267,6 +267,17 @@
         #inventoryPaginationContainer > div:last-child {
             margin-top: -0.5rem !important;
         }
+
+        /* Dark mode for low stock alert */
+        body.bg-dark .alert-warning.border-danger-subtle {
+            background-color: rgba(220, 53, 69, 0.2);
+            border-color: var(--color-danger) !important;
+            color: var(--color-danger-light);
+        }
+
+        body.bg-dark .alert-warning.border-danger-subtle .text-danger {
+            color: var(--color-danger-light) !important;
+        }
     </style>
 @endsection
 
