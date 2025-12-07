@@ -598,10 +598,10 @@
                         <div class="mb-3">
                             <label class="form-label">Gender <span class="text-danger">*</span></label>
                             <select name="gender" class="form-control @error('gender') is-invalid @enderror" required>
-                                <option value="">Select Gender</option>
+                                <option value="" disabled selected>Select Gender</option>
                                 <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
                                 <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
-                                <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Other</option>
+                                <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Prefer not to say</option>
                             </select>
                             @error('gender')
                                 <div class="invalid-feedback">{{ $message }}</div>

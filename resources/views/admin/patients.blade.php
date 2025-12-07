@@ -595,7 +595,7 @@
                                     <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
                                     <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female
                                     </option>
-                                    <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Other</option>
+                                    <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Prefer not to say</option>
                                 </select>
                                 @error('gender')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -911,7 +911,7 @@
                                         <option value="" disabled selected>Select Gender</option>
                                         <option value="male" {{ old('gender', $patient->gender) == 'male' ? 'selected' : '' }}>Male</option>
                                         <option value="female" {{ old('gender', $patient->gender) == 'female' ? 'selected' : '' }}>Female</option>
-                                        <option value="other" {{ old('gender', $patient->gender) == 'other' ? 'selected' : '' }}>Other</option>
+                                        <option value="other" {{ old('gender', $patient->gender) == 'other' ? 'selected' : '' }}>Prefer not to say</option>
                                     </select>
                                     @error('gender')
                                         <div class="invalid-feedback">{{ $message }}</div>
