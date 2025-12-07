@@ -35,7 +35,7 @@
     <div class="d-flex min-vh-100 align-items-center justify-content-center py-5">
         <div class="container" style="max-width: 450px;">
             <x-card class="shadow-lg border-0" noPadding>
-                <div class="card-header bg-info text-white text-center position-relative py-3">
+                <div class="card-header bg-primary text-white text-center position-relative py-3">
                     <h4 class="mb-0">Login</h4>
                     <a href="{{ route('home') }}" class="btn-close btn-close-white position-absolute top-50 end-0 translate-middle-y me-3" aria-label="Close"></a>
                 </div>
@@ -79,7 +79,7 @@
                             <a href="{{ route('password.request') }}" class="text-decoration-none small">Forgot Password?</a>
                         </div>
 
-                        <x-button type="submit" variant="info" class="w-100 text-white">Login</x-button>
+                        <x-button type="submit" variant="primary" class="w-100 text-white">Login</x-button>
                     </form>
                     <div class="text-center mt-3">
                         <small>Don’t have an account? <a href="{{ route('register') }}">Register here</a></small>

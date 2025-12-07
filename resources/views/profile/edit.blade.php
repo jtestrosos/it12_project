@@ -120,8 +120,8 @@
                                 </div>
 
                                 <label for="profile_picture"
-                                    class="position-absolute bottom-0 end-0 bg-white rounded-circle shadow-sm p-2"
-                                    style="cursor: pointer;">
+                                    class="position-absolute bottom-0 end-0 bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                                    style="cursor: pointer; width: 36px; height: 36px;">
                                     <i class="fas fa-camera text-primary"></i>
                                     <input type="file" name="profile_picture" id="profile_picture" class="d-none"
                                         accept="image/*">

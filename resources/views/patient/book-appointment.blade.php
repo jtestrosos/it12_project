@@ -51,7 +51,7 @@
         }
 
         .booking-header {
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            background: linear-gradient(135deg, #17a2b8, #138496);
             border-radius: 12px 12px 0 0;
             padding: 1.5rem;
         }
@@ -98,8 +98,8 @@
         }
 
         .form-control:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            border-color: #17a2b8;
+            box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
         }
 
         .form-label {
@@ -113,7 +113,7 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            background: linear-gradient(135deg, #17a2b8, #138496);
             border: none;
             border-radius: 8px;
             padding: 0.75rem 2rem;
@@ -170,9 +170,9 @@
         }
 
         .calendar-day.selected {
-            background-color: #007bff;
+            background-color: #17a2b8;
             color: white;
-            border-color: #007bff;
+            border-color: #17a2b8;
         }
 
         .calendar-day.occupied {
@@ -241,8 +241,8 @@
         }
 
         .time-slot.selected {
-            background-color: #007bff;
-            border-color: #007bff;
+            background-color: #17a2b8;
+            border-color: #17a2b8;
             color: white;
         }
 
@@ -308,7 +308,7 @@
         body.bg-dark select.form-control:focus,
         body.bg-dark textarea.form-control:focus {
             background-color: #161b20;
-            border-color: #007bff;
+            border-color: #17a2b8;
             color: #e6e6e6;
         }
 
@@ -321,12 +321,12 @@
         body.bg-dark #prevMonth,
         body.bg-dark #nextMonth {
             color: #e6e6e6;
-            border-color: #007bff;
+            border-color: #17a2b8;
         }
 
         body.bg-dark #prevMonth:hover,
         body.bg-dark #nextMonth:hover {
-            background-color: #007bff;
+            background-color: #17a2b8;
             color: #fff;
         }
 
@@ -352,8 +352,8 @@
 
         /* Dark Mode Calendar Grid Refinements */
         body.bg-dark .calendar-day.selected {
-            background-color: #007bff;
-            border-color: #007bff;
+            background-color: #17a2b8;
+            border-color: #17a2b8;
             color: #fff;
         }
 
@@ -371,8 +371,8 @@
 
         /* Dark Mode Time Slots */
         body.bg-dark .time-slot.selected {
-            background-color: #007bff;
-            border-color: #007bff;
+            background-color: #17a2b8;
+            border-color: #17a2b8;
             color: #fff;
         }
 
@@ -421,10 +421,10 @@
         }
 
         .step.active .step-circle {
-            background: #007bff;
-            border-color: #007bff;
+            background: #17a2b8;
+            border-color: #17a2b8;
             color: white;
-            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2);
+            box-shadow: 0 0 0 4px rgba(23, 162, 184, 0.2);
         }
 
         .step.completed .step-circle {
@@ -440,7 +440,7 @@
         }
 
         .step.active .step-label {
-            color: #007bff;
+            color: #17a2b8;
             font-weight: 600;
         }
 
@@ -515,7 +515,7 @@
         }
 
         .legend-color.selected {
-            background: #007bff;
+            background: #17a2b8;
         }
 
         /* Confirmation Modal */
@@ -568,6 +568,21 @@
 
         body.bg-dark .confirmation-value {
             color: #b0b0b0;
+        }
+
+        /* Dark Mode Form Check Labels */
+        body.bg-dark .form-check-label {
+            color: #e6e6e6;
+        }
+
+        /* Dark Mode Text Utilities */
+        body.bg-dark .text-muted {
+            color: #b0b0b0 !important;
+        }
+
+        body.bg-dark .text-muted.small.fw-bold,
+        body.bg-dark h6.text-muted.small.fw-bold {
+            color: #cbd3da !important;
         }
     </style>
 @endsection

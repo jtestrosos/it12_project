@@ -112,7 +112,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            background: linear-gradient(135deg, #17a2b8, #138496);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -224,13 +224,13 @@
         }
 
         .filter-chip:hover {
-            border-color: #007bff;
-            background: #f0f8ff;
+            border-color: #17a2b8;
+            background: rgba(23, 162, 184, 0.1);
         }
 
         .filter-chip.active {
-            background: #007bff;
-            border-color: #007bff;
+            background: #17a2b8;
+            border-color: #17a2b8;
             color: white;
         }
 
@@ -241,14 +241,14 @@
         }
 
         body.bg-dark .filter-chip:hover {
-            border-color: #007bff;
-            background: #1a3a52;
+            border-color: #17a2b8;
+            background: rgba(23, 162, 184, 0.2);
             color: #fff !important;
         }
 
         body.bg-dark .filter-chip.active {
-            background: #007bff;
-            border-color: #007bff;
+            background: #17a2b8;
+            border-color: #17a2b8;
             color: white !important;
         }
 

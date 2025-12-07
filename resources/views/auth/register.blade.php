@@ -26,105 +26,105 @@
         <div class="d-flex min-vh-100 align-items-center justify-content-center py-5">
             <div class="container" style="max-width: 450px;">
                 <x-card class="shadow-lg border-0" noPadding>
-                    <div class="card-header bg-info text-white text-center position-relative py-3">
-                        <h4 class="mb-0">Register</h4>
-                        <a href="{{ route('home') }}"
-                            class="btn-close btn-close-white position-absolute top-50 end-0 translate-middle-y me-3"
-                            aria-label="Close"></a>
-                    </div>
-                    <div class="card-body p-4">
-                        @php
-                            $selectedBarangay = old('barangay');
-                            $purokOptions = match ($selectedBarangay) {
-                                'Barangay 11' => ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
-                                'Barangay 12' => ['Purok 1', 'Purok 2', 'Purok 3'],
-                                default => [],
-                            };
-                        @endphp
-                        <form method="POST" action="{{ route('register') }}" class="registration-form">
-                            @csrf
+                <div class="card-header bg-primary text-white text-center position-relative py-3">
+                    <h4 class="mb-0">Register</h4>
+                    <a href="{{ route('home') }}"
+                        class="btn-close btn-close-white position-absolute top-50 end-0 translate-middle-y me-3"
+                        aria-label="Close"></a>
+                </div>
+                <div class="card-body p-4">
+                    @php
+                        $selectedBarangay = old('barangay');
+                        $purokOptions = match ($selectedBarangay) {
+                            'Barangay 11' => ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'],
+                            'Barangay 12' => ['Purok 1', 'Purok 2', 'Purok 3'],
+                            default => [],
+                        };
+                    @endphp
+                    <form method="POST" action="{{ route('register') }}" class="registration-form">
+                        @csrf
 
-                            <x-input name="name" label="Full Name" required value="{{ old('name') }}" />
+                        <x-input name="name" label="Full Name" required value="{{ old('name') }}" />
 
-                            <div class="mb-3">
-                                <label for="gender" class="form-label fw-medium">Gender <span
-                                        class="text-danger">*</span></label>
-                                <select name="gender" class="form-control @error('gender') is-invalid @enderror" required>
-                                    <option value="" disabled selected>Select Gender</option>
-                                    <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
-                                    <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
-                                    <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Prefer not to say</option>
-                                </select>
-                                @error('gender')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <div class="mb-3">
+                            <label for="gender" class="form-label fw-medium">Gender <span
+                                    class="text-danger">*</span></label>
+                            <select name="gender" class="form-control @error('gender') is-invalid @enderror" required>
+                                <option value="" disabled selected>Select Gender</option>
+                                <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
+                                <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
+                                <option value="other" {{ old('gender') == 'other' ? 'selected' : '' }}>Prefer not to say</option>
+                            </select>
+                            @error('gender')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                            <x-input name="email" label="Email" type="email" required value="{{ old('email') }}" />
+                        <x-input name="email" label="Email" type="email" required value="{{ old('email') }}" />
 
-                            <x-input name="phone" label="Phone Number" placeholder="Enter your phone number (optional)"
-                                value="{{ old('phone') }}" />
+                        <x-input name="phone" label="Phone Number" placeholder="Enter your phone number (optional)"
+                            value="{{ old('phone') }}" />
 
-                            <div class="mb-3">
-                                <label for="address" class="form-label fw-medium">Address <small
-                                        class="text-muted fw-normal">(Optional)</small></label>
-                                <textarea name="address" class="form-control @error('address') is-invalid @enderror"
-                                    rows="2"
-                                    placeholder="Enter your complete address (optional)">{{ old('address') }}</textarea>
-                                @error('address')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label fw-medium">Address <small
+                                    class="text-muted fw-normal">(Optional)</small></label>
+                            <textarea name="address" class="form-control @error('address') is-invalid @enderror"
+                                rows="2"
+                                placeholder="Enter your complete address (optional)">{{ old('address') }}</textarea>
+                            @error('address')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="barangay" class="form-label fw-medium">Barangay <span
-                                        class="text-danger">*</span></label>
-                                <select name="barangay" class="form-control @error('barangay') is-invalid @enderror"
-                                    data-role="barangay" required>
-                                    <option value="">Select Barangay</option>
-                                    <option value="Barangay 11" {{ $selectedBarangay === 'Barangay 11' ? 'selected' : '' }}>
-                                        Barangay 11</option>
-                                    <option value="Barangay 12" {{ $selectedBarangay === 'Barangay 12' ? 'selected' : '' }}>
-                                        Barangay 12</option>
-                                    <option value="Other" {{ $selectedBarangay === 'Other' ? 'selected' : '' }}>Other</option>
-                                </select>
-                                @error('barangay')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <div class="mb-3">
+                            <label for="barangay" class="form-label fw-medium">Barangay <span
+                                    class="text-danger">*</span></label>
+                            <select name="barangay" class="form-control @error('barangay') is-invalid @enderror"
+                                data-role="barangay" required>
+                                <option value="">Select Barangay</option>
+                                <option value="Barangay 11" {{ $selectedBarangay === 'Barangay 11' ? 'selected' : '' }}>
+                                    Barangay 11</option>
+                                <option value="Barangay 12" {{ $selectedBarangay === 'Barangay 12' ? 'selected' : '' }}>
+                                    Barangay 12</option>
+                                <option value="Other" {{ $selectedBarangay === 'Other' ? 'selected' : '' }}>Other</option>
+                            </select>
+                            @error('barangay')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                            <div class="mb-3 {{ $selectedBarangay === 'Other' ? '' : 'd-none' }}"
-                                data-role="barangay-other-group">
-                                <x-input name="barangay_other" label="Specify Barangay" required
-                                    value="{{ old('barangay_other') }}" data-role="barangay-other" />
-                            </div>
+                        <div class="mb-3 {{ $selectedBarangay === 'Other' ? '' : 'd-none' }}"
+                            data-role="barangay-other-group">
+                            <x-input name="barangay_other" label="Specify Barangay" required
+                                value="{{ old('barangay_other') }}" data-role="barangay-other" />
+                        </div>
 
-                            <div class="mb-3 {{ in_array($selectedBarangay, ['Barangay 11', 'Barangay 12']) ? '' : 'd-none' }}"
-                                data-role="purok-group">
-                                <label for="purok" class="form-label fw-medium">Purok <span
-                                        class="text-danger">*</span></label>
-                                <select name="purok" class="form-control @error('purok') is-invalid @enderror"
-                                    data-role="purok" data-selected="{{ old('purok') }}">
-                                    <option value="">Select Purok</option>
-                                    @foreach ($purokOptions as $purok)
-                                        <option value="{{ $purok }}" {{ old('purok') === $purok ? 'selected' : '' }}>{{ $purok }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('purok')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <div class="mb-3 {{ in_array($selectedBarangay, ['Barangay 11', 'Barangay 12']) ? '' : 'd-none' }}"
+                            data-role="purok-group">
+                            <label for="purok" class="form-label fw-medium">Purok <span
+                                    class="text-danger">*</span></label>
+                            <select name="purok" class="form-control @error('purok') is-invalid @enderror"
+                                data-role="purok" data-selected="{{ old('purok') }}">
+                                <option value="">Select Purok</option>
+                                @foreach ($purokOptions as $purok)
+                                    <option value="{{ $purok }}" {{ old('purok') === $purok ? 'selected' : '' }}>{{ $purok }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('purok')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                            <x-input name="birth_date" label="Birth Date" type="date" required
-                                value="{{ old('birth_date') }}" data-role="birth-date" max="{{ now()->toDateString() }}" />
+                        <x-input name="birth_date" label="Birth Date" type="date" required
+                            value="{{ old('birth_date') }}" data-role="birth-date" max="{{ now()->toDateString() }}" />
 
-                            <x-input name="password" id="register-password" label="Password" type="password" required />
+                        <x-input name="password" id="register-password" label="Password" type="password" required />
 
-                            <x-input name="password_confirmation" id="register-password-confirm" label="Confirm Password"
-                                type="password" required />
+                        <x-input name="password_confirmation" id="register-password-confirm" label="Confirm Password"
+                            type="password" required />
 
-                            <x-button type="submit" variant="info" class="w-100 text-white">Register</x-button>
+                        <x-button type="submit" variant="primary" class="w-100 text-white">Register</x-button>
                         </form>
                         <div class="text-center mt-3">
                             <small>Already have an account? <a href="{{ route('login') }}">Login here</a></small>

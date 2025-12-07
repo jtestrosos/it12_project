@@ -9,6 +9,48 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 
+    <!-- Loading Screen -->
+    <style>
+        /* Hide scrollbar during loading */
+        body:has(#page-loader:not(.loaded)) {
+            overflow: hidden !important;
+        }
+
+        #page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #17a2b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.3s ease;
+        }
+        #page-loader.loaded {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    <script>
+        // Hide body overflow during loading
+        document.documentElement.style.overflow = 'hidden';
+    </script>
+    <div id="page-loader"><div class="spinner"></div></div>
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome CSS -->
@@ -19,6 +61,34 @@
     </noscript>
 
     <style>
+        :root {
+            --bs-primary: #17a2b8;
+            --bs-primary-rgb: 23, 162, 184;
+            --bs-link-color: #17a2b8;
+            --bs-link-hover-color: #138496;
+        }
+        .text-primary { color: #17a2b8 !important; }
+        .bg-primary { background-color: #17a2b8 !important; }
+        .btn-primary {
+            background-color: #17a2b8 !important;
+            border-color: #17a2b8 !important;
+        }
+        .btn-primary:hover {
+            background-color: #138496 !important;
+            border-color: #117a8b !important;
+        }
+        .btn-outline-primary {
+            color: #17a2b8 !important;
+            border-color: #17a2b8 !important;
+        }
+        .btn-outline-primary:hover {
+            background-color: #17a2b8 !important;
+            color: #fff !important;
+        }
+        .border-primary { border-color: #17a2b8 !important; }
+        a { color: #17a2b8; text-decoration: none; }
+        a:hover { color: #138496; }
+
         body {
             background: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -835,6 +905,18 @@
 
                 // No additional birth date handling needed; age is calculated server-side.
             });
+        });
+    </script>
+    <script>
+        // Hide loading screen when page is ready
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('page-loader');
+            if (loader) {
+                loader.classList.add('loaded');
+                // Restore overflow
+                document.documentElement.style.overflow = '';
+                setTimeout(() => loader.remove(), 300);
+            }
         });
     </script>
     @stack('scripts')

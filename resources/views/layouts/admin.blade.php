@@ -7,6 +7,63 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin Panel - Barangay Health Center')</title>
 
+    <!-- Loading Screen -->
+    <style>
+        /* Hide scrollbar during loading */
+        body:has(#page-loader:not(.loaded)) {
+            overflow: hidden !important;
+        }
+
+        #page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.3s ease;
+        }
+        #page-loader.dark {
+            background: #151718;
+        }
+        #page-loader.loaded {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e9ecef;
+            border-top-color: #17a2b8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        #page-loader.dark .spinner {
+            border-color: #2a2f35;
+            border-top-color: #17a2b8;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    <script>
+        // Check theme and apply to loader
+        (function() {
+            var isDark = localStorage.getItem('app-theme') === 'dark';
+            if (isDark) {
+                document.write('<div id="page-loader" class="dark"><div class="spinner"></div></div>');
+            } else {
+                document.write('<div id="page-loader"><div class="spinner"></div></div>');
+            }
+            // Hide body overflow during loading
+            document.documentElement.style.overflow = 'hidden';
+        })();
+    </script>
+
     <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -17,17 +74,17 @@
     <link rel="stylesheet" href="https://unpkg.com/nprogress@0.2.0/nprogress.css" />
     <style>
         #nprogress .bar {
-            background: #0d6efd !important;
+            background: #17a2b8 !important;
             height: 3px !important;
         }
 
         #nprogress .peg {
-            box-shadow: 0 0 10px #0d6efd, 0 0 5px #0d6efd !important;
+            box-shadow: 0 0 10px #17a2b8, 0 0 5px #17a2b8 !important;
         }
 
         #nprogress .spinner-icon {
-            border-top-color: #0d6efd !important;
-            border-left-color: #0d6efd !important;
+            border-top-color: #17a2b8 !important;
+            border-left-color: #17a2b8 !important;
         }
     </style>
 
@@ -55,11 +112,11 @@
             --border-dark: #2a2f35;
 
             /* Theme Colors - Trust Blue, Vitality Teal, Energy Coral */
-            --color-primary: hsl(210, 100%, 45%);
-            --color-primary-dark: hsl(210, 100%, 35%);
-            --color-primary-light: hsl(210, 100%, 65%);
-            --color-primary-hover: hsl(210, 100%, 40%);
-            --color-primary-rgb: 0, 102, 230;
+            --color-primary: #17a2b8;
+            --color-primary-dark: #138496;
+            --color-primary-light: #4dbdcf;
+            --color-primary-hover: #117a8b;
+            --color-primary-rgb: 23, 162, 184;
 
             --color-secondary: hsl(174, 62%, 47%);
             --color-secondary-dark: hsl(174, 62%, 37%);
@@ -103,9 +160,100 @@
             transition: background-color .3s, color .3s;
         }
 
+        /* Global Theme Overrides */
+        .btn-primary {
+            background-color: var(--color-primary) !important;
+            border-color: var(--color-primary) !important;
+            color: #fff;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active {
+            background-color: var(--color-primary-hover) !important;
+            border-color: var(--color-primary-hover) !important;
+            color: #fff;
+        }
+
+        .btn-outline-primary {
+            color: var(--color-primary) !important;
+            border-color: var(--color-primary) !important;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--color-primary) !important;
+            color: #fff !important;
+        }
+
+        .text-primary {
+            color: var(--color-primary) !important;
+        }
+
+        .bg-primary {
+            background-color: var(--color-primary) !important;
+        }
+
         body.bg-dark {
             background-color: var(--bg-dark);
             color: var(--text-dark);
+            scrollbar-color: #3a3f47 #1a1d1f;
+            scrollbar-width: thin;
+        }
+
+        /* Dark Mode Scrollbar Styling - Highest Priority */
+        body.bg-dark::-webkit-scrollbar,
+        body.bg-dark *::-webkit-scrollbar,
+        html:has(body.bg-dark)::-webkit-scrollbar {
+            width: 10px !important;
+            height: 10px !important;
+        }
+
+        body.bg-dark::-webkit-scrollbar-track,
+        body.bg-dark *::-webkit-scrollbar-track,
+        html:has(body.bg-dark)::-webkit-scrollbar-track {
+            background: #1a1d1f !important;
+        }
+
+        body.bg-dark::-webkit-scrollbar-thumb,
+        body.bg-dark *::-webkit-scrollbar-thumb,
+        html:has(body.bg-dark)::-webkit-scrollbar-thumb {
+            background: #3a3f47 !important;
+            border-radius: 5px !important;
+        }
+
+        body.bg-dark::-webkit-scrollbar-thumb:hover,
+        body.bg-dark *::-webkit-scrollbar-thumb:hover,
+        html:has(body.bg-dark)::-webkit-scrollbar-thumb:hover {
+            background: #4a5058 !important;
+        }
+
+        /* Apply to html and body directly */
+        :root:has(body.bg-dark) {
+            scrollbar-color: #3a3f47 #1a1d1f;
+            scrollbar-width: thin;
+        }
+
+        /* Sidebar specific scrollbar */
+        body.bg-dark .sidebar {
+            scrollbar-color: #2a2f35 #0d0f10;
+            scrollbar-width: thin;
+        }
+
+        body.bg-dark .sidebar::-webkit-scrollbar {
+            width: 6px !important;
+        }
+
+        body.bg-dark .sidebar::-webkit-scrollbar-track {
+            background: #0d0f10 !important;
+        }
+
+        body.bg-dark .sidebar::-webkit-scrollbar-thumb {
+            background: #2a2f35 !important;
+            border-radius: 3px !important;
+        }
+
+        body.bg-dark .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #3a3f47 !important;
         }
 
         /* ---------- Sidebar ---------- */
@@ -903,10 +1051,10 @@
                         class="fas fa-moon"></i></button>
 
                 <div class="dropdown">
-                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle user-dropdown-toggle"
                         id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
-                            style="width:40px;height:40px; overflow: hidden;">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2 flex-shrink-0"
+                            style="width:32px;height:32px; overflow: hidden;">
                             @if(\App\Helpers\AuthHelper::user()->profile_picture)
                                 <img src="{{ asset('storage/' . \App\Helpers\AuthHelper::user()->profile_picture) }}"
                                     alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
@@ -914,17 +1062,90 @@
                                 {{ substr(\App\Helpers\AuthHelper::user()->name, 0, 1) }}
                             @endif
                         </div>
-                        <div class="fw-bold me-2">{{ \App\Helpers\AuthHelper::user()->name }}</div>
+                        <div class="fw-bold user-name-text text-nowrap">{{ \App\Helpers\AuthHelper::user()->name }}</div>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="dropdownUser1">
-                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
+                    <style>
+                        .dropdown-toggle::after {
+                            transition: transform 0.2s ease-in-out;
+                        }
+                        .dropdown-toggle.show::after {
+                            transform: rotate(180deg);
+                        }
+                        .dropdown-menu-profile {
+                            min-width: 240px;
+                            margin-top: 8px !important;
+                            font-size: 0.9rem;
+                            padding: 0;
+                            overflow: hidden;
+                        }
+
+                        /* Dark Mode Support */
+                        body.bg-dark .dropdown-menu-profile {
+                            background-color: #1e2124;
+                            border: 1px solid #2a2f35 !important;
+                        }
+                        body.bg-dark .dropdown-menu-profile .bg-light {
+                            background-color: #1a1d1f !important;
+                            border-bottom: 1px solid #2a2f35 !important;
+                        }
+                        body.bg-dark .dropdown-menu-profile .text-dark {
+                            color: #e6e6e6 !important;
+                        }
+                        body.bg-dark .dropdown-menu-profile .text-muted {
+                            color: #a0a0a0 !important;
+                        }
+                        body.bg-dark .dropdown-menu-profile .dropdown-item {
+                            color: #e6e6e6;
+                        }
+                        body.bg-dark .dropdown-menu-profile .dropdown-item:hover {
+                            background-color: rgba(255, 255, 255, 0.05);
+                            color: #fff;
+                        }
+
+                        /* User Name Theme Adaptation */
+                        .user-dropdown-toggle {
+                            color: #343a40; /* Dark for Light Mode */
+                            transition: color 0.3s;
+                        }
+                        .user-name-text {
+                            color: #343a40;
+                        }
+                        
+                        body.bg-dark .user-dropdown-toggle,
+                        body.bg-dark .user-name-text {
+                            color: #fff !important;
+                        }
+                    </style>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 dropdown-menu-profile" aria-labelledby="dropdownUser1">
+                        <li class="px-3 py-3 border-bottom bg-light">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
+                                    style="width:40px;height:40px; overflow: hidden;">
+                                    @if(\App\Helpers\AuthHelper::user()->profile_picture)
+                                        <img src="{{ asset('storage/' . \App\Helpers\AuthHelper::user()->profile_picture) }}"
+                                            alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                                    @else
+                                        {{ substr(\App\Helpers\AuthHelper::user()->name, 0, 1) }}
+                                    @endif
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">{{ \App\Helpers\AuthHelper::user()->name }}</div>
+                                    <small class="text-muted d-block">
+                                        @if(\App\Helpers\AuthHelper::user()->isSuperAdmin()) Super Admin
+                                        @elseif(\App\Helpers\AuthHelper::user()->isAdmin()) Administrator
+                                        @else Patient
+                                        @endif
+                                    </small>
+                                </div>
+                            </div>
                         </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ route('logout') }}"
+                        <li class="p-1">
+                            <a class="dropdown-item rounded py-2 mb-1" href="{{ route('profile.edit') }}">
+                                <i class="fas fa-user-circle me-2 text-muted"></i> My Profile
+                            </a>
+                            <a class="dropdown-item rounded py-2 text-danger" href="{{ route('logout') }}"
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                Logout
+                                <i class="fas fa-sign-out-alt me-2"></i> Logout
                             </a>
                         </li>
                     </ul>
@@ -978,6 +1199,15 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Hide loading screen
+            const loader = document.getElementById('page-loader');
+            if (loader) {
+                loader.classList.add('loaded');
+                // Restore overflow
+                document.documentElement.style.overflow = '';
+                setTimeout(() => loader.remove(), 300);
+            }
+
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
             const toggleBtn = document.getElementById('toggleSidebarBtn');
@@ -1044,11 +1274,25 @@
                 });
             };
 
+            const updateThemeIcon = (isDark) => {
+                const icon = themeToggle?.querySelector('i');
+                if (icon) {
+                    if (isDark) {
+                        icon.classList.remove('fa-moon');
+                        icon.classList.add('fa-sun');
+                    } else {
+                        icon.classList.remove('fa-sun');
+                        icon.classList.add('fa-moon');
+                    }
+                }
+            };
+
             const applySavedTheme = () => {
                 const saved = localStorage.getItem(themeKey);
                 const isDark = saved === 'dark';
                 document.body.classList.toggle('bg-dark', isDark);
                 syncTableDark(isDark);
+                updateThemeIcon(isDark);
             };
 
             applySavedTheme();
@@ -1057,6 +1301,7 @@
                 const isDark = document.body.classList.toggle('bg-dark');
                 localStorage.setItem(themeKey, isDark ? 'dark' : 'light');
                 syncTableDark(isDark);
+                updateThemeIcon(isDark);
             });
 
             const modalEl = document.getElementById('feedbackModal');

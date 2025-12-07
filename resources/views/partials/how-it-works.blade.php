@@ -26,7 +26,7 @@
       <div class="col-md-3 mb-4 d-flex align-items-stretch">
         <div class="card shadow-lg border-0 h-100 w-100" style="background:rgba(255,255,255,0.94);">
           <div class="card-body d-flex flex-column align-items-center justify-content-center">
-            <div class="rounded-circle bg-info text-white d-flex align-items-center justify-content-center mb-3" style="width:94px;height:94px;font-size:3.5rem;">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mb-3" style="width:94px;height:94px;font-size:3.5rem;">
               <i class="fas fa-calendar-alt"></i>
             </div>
             <span class="fw-bold mb-2" style="font-size:1.4rem;">Choose Date & Time</span>
@@ -38,8 +38,8 @@
       <div class="col-md-3 mb-4 d-flex align-items-stretch">
         <div class="card shadow-lg border-0 h-100 w-100" style="background:rgba(255,255,255,0.94);">
           <div class="card-body d-flex flex-column align-items-center justify-content-center">
-            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center mb-3" style="width:94px;height:94px;font-size:3.5rem;">
-              <i class="fas fa-notes-medical"></i>
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mb-3" style="width:94px;height:94px;font-size:3.5rem;">
+              <i class="fas fa-file-medical"></i>
             </div>
             <span class="fw-bold mb-2" style="font-size:1.4rem;">Select Service</span>
             <small style="font-size:1.08rem;">Pick the service you need from our list</small>
@@ -50,7 +50,7 @@
       <div class="col-md-3 mb-4 d-flex align-items-stretch">
         <div class="card shadow-lg border-0 h-100 w-100" style="background:rgba(255,255,255,0.94);">
           <div class="card-body d-flex flex-column align-items-center justify-content-center">
-            <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center mb-3" style="width:94px;height:94px;font-size:3.5rem;">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mb-3" style="width:94px;height:94px;font-size:3.5rem;">
               <i class="fas fa-check-circle"></i>
             </div>
             <span class="fw-bold mb-2" style="font-size:1.4rem;">Confirm Booking</span>
@@ -65,14 +65,14 @@
           <h3 class="fw-bold mb-3" style="font-size:2rem;">Ready to Get Started?</h3>
           <p class="mb-4" style="font-size:1.15rem; color:#555;">Join us today and experience hassle-free appointment booking!</p>
           <a href="{{ route('login') }}" class="btn btn-lg px-5 py-3 cta-button" style="
-            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
             border: none;
             border-radius: 50px;
             color: white;
             font-size: 1.25rem;
             font-weight: 600;
             text-decoration: none;
-            box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3);
+            box-shadow: 0 8px 20px rgba(23, 162, 184, 0.3);
             transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
@@ -90,8 +90,8 @@
 <style>
   .cta-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(13, 110, 253, 0.4);
-    background: linear-gradient(135deg, #0a58ca 0%, #084298 100%);
+    box-shadow: 0 12px 28px rgba(23, 162, 184, 0.4);
+    background: linear-gradient(135deg, #138496 0%, #117a8b 100%) !important;
   }
   
   .cta-button:active {

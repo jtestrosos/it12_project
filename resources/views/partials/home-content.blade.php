@@ -32,7 +32,7 @@
                     </a>
                 @endif
 
-                <a href="{{ route('services') }}" class="btn btn-outline-primary btn-lg mb-2">View Services</a>
+                <a href="{{ route('services') }}" class="btn btn-outline-dark btn-lg mb-2" style="color: black; border-color: black;">View Services</a>
 
                 <div class="mt-4">
                     <span class="me-4"><strong>609+</strong> Patients Served</span>
