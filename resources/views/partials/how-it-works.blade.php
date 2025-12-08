@@ -65,14 +65,14 @@
           <h3 class="fw-bold mb-3" style="font-size:2rem;">Ready to Get Started?</h3>
           <p class="mb-4" style="font-size:1.15rem; color:#555;">Join us today and experience hassle-free appointment booking!</p>
           <a href="{{ route('login') }}" class="btn btn-lg px-5 py-3 cta-button" style="
-            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            background: linear-gradient(135deg, #009fb1 0%, #008a9a 100%);
             border: none;
             border-radius: 50px;
             color: white;
             font-size: 1.25rem;
             font-weight: 600;
             text-decoration: none;
-            box-shadow: 0 8px 20px rgba(23, 162, 184, 0.3);
+            box-shadow: 0 8px 20px rgba(0, 159, 177, 0.3);
             transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
@@ -90,8 +90,8 @@
 <style>
   .cta-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(23, 162, 184, 0.4);
-    background: linear-gradient(135deg, #138496 0%, #117a8b 100%) !important;
+    box-shadow: 0 12px 28px rgba(0, 159, 177, 0.4);
+    background: linear-gradient(135deg, #00B8BB 0%, #007d8a 100%) !important;
   }
   
   .cta-button:active {

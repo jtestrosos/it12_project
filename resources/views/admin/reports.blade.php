@@ -233,7 +233,7 @@
                     labels: serviceLabels,
                     datasets: [{
                         data: serviceCounts,
-                        backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#17a2b8', '#6f42c1']
+                        backgroundColor: ['#009fb1', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#009fb1', '#6f42c1']
                     }]
                 },
                 options: {
@@ -265,8 +265,8 @@
                     datasets: [{
                         label: 'Appointments',
                         data: [],
-                        borderColor: '#007bff',
-                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        borderColor: '#009fb1',
+                        backgroundColor: 'rgba(0, 159, 177, 0.1)',
                         tension: 0.4,
                         borderWidth: 3,
                         pointRadius: 4,

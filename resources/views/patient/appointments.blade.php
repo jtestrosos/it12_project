@@ -112,7 +112,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #17a2b8, #138496);
+            background: linear-gradient(135deg, #009fb1, #008a9a);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -153,8 +153,8 @@
         }
 
         body.bg-dark .page-item.active .page-link {
-            background-color: #007bff;
-            border-color: #007bff;
+            background-color: #009fb1;
+            border-color: #009fb1;
             color: #fff;
         }
 
@@ -224,13 +224,13 @@
         }
 
         .filter-chip:hover {
-            border-color: #17a2b8;
-            background: rgba(23, 162, 184, 0.1);
+            border-color: #009fb1;
+            background: rgba(0, 159, 177, 0.1);
         }
 
         .filter-chip.active {
-            background: #17a2b8;
-            border-color: #17a2b8;
+            background: #009fb1;
+            border-color: #009fb1;
             color: white;
         }
 
@@ -241,14 +241,14 @@
         }
 
         body.bg-dark .filter-chip:hover {
-            border-color: #17a2b8;
-            background: rgba(23, 162, 184, 0.2);
+            border-color: #009fb1;
+            background: rgba(0, 159, 177, 0.2);
             color: #fff !important;
         }
 
         body.bg-dark .filter-chip.active {
-            background: #17a2b8;
-            border-color: #17a2b8;
+            background: #009fb1;
+            border-color: #009fb1;
             color: white !important;
         }
 

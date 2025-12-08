@@ -40,7 +40,7 @@
         body.bg-dark .form-control:focus,
         body.bg-dark .form-select:focus {
             background-color: #161b20 !important;
-            border-color: #007bff !important;
+            border-color: #009fb1 !important;
             color: #e6e6e6 !important;
         }
 
@@ -50,8 +50,8 @@
         }
 
         body.bg-dark .form-check-input:checked {
-            background-color: #007bff !important;
-            border-color: #007bff !important;
+            background-color: #009fb1 !important;
+            border-color: #009fb1 !important;
         }
 
         body.bg-dark .form-control::placeholder {

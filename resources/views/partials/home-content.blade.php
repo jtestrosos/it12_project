@@ -104,6 +104,13 @@
         transform: translateY(-8px);
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     }
+
+    /* View Services button hover state */
+    .btn-outline-dark:hover {
+        color: white !important;
+        background-color: black !important;
+        border-color: black !important;
+    }
 </style>
 
 <!--  Bootstrap Icons CDN -->

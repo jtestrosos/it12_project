@@ -154,11 +154,11 @@ class ToastNotification {
             }
 
             .toast.info {
-                border-left-color: #17a2b8;
+                border-left-color: #009fb1;
             }
             .toast.info .toast-icon {
                 background: #d1ecf1;
-                color: #17a2b8;
+                color: #009fb1;
             }
 
             /* Dark Mode */

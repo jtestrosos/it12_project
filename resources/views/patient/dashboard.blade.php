@@ -159,7 +159,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: #007bff;
+            background: #009fb1;
             display: flex;
             align-items: center;
             justify-content: center;

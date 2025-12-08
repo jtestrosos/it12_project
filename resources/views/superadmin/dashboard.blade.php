@@ -183,8 +183,8 @@
                 datasets: [{
                     label: 'New Users',
                     data: growthCounts,
-                    backgroundColor: 'rgba(0, 123, 255, 0.8)',
-                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 159, 177, 0.8)',
+                    borderColor: '#009fb1',
                     borderWidth: 2,
                     borderRadius: 8,
                     barThickness: 40

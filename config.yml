@@ -1,0 +1,6 @@
+tunnel: 9c9dd3b8-467b-452a-84fc-83a9c066d0a5
+credentials-file: C:\Users\lebro\.cloudflared\9c9dd3b8-467b-452a-84fc-83a9c066d0a5.json
+ingress:
+  - hostname: malasakit.dpdns.org
+    service: http://127.0.0.1:8000
+  - service: http_status:404

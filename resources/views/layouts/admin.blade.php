@@ -38,13 +38,13 @@
             width: 40px;
             height: 40px;
             border: 3px solid #e9ecef;
-            border-top-color: #17a2b8;
+            border-top-color: #009fb1;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
         #page-loader.dark .spinner {
             border-color: #2a2f35;
-            border-top-color: #17a2b8;
+            border-top-color: #009fb1;
         }
         @keyframes spin {
             to { transform: rotate(360deg); }
@@ -74,17 +74,17 @@
     <link rel="stylesheet" href="https://unpkg.com/nprogress@0.2.0/nprogress.css" />
     <style>
         #nprogress .bar {
-            background: #17a2b8 !important;
+            background: #009fb1 !important;
             height: 3px !important;
         }
 
         #nprogress .peg {
-            box-shadow: 0 0 10px #17a2b8, 0 0 5px #17a2b8 !important;
+            box-shadow: 0 0 10px #009fb1, 0 0 5px #009fb1 !important;
         }
 
         #nprogress .spinner-icon {
-            border-top-color: #17a2b8 !important;
-            border-left-color: #17a2b8 !important;
+            border-top-color: #009fb1 !important;
+            border-left-color: #009fb1 !important;
         }
     </style>
 
@@ -112,11 +112,11 @@
             --border-dark: #2a2f35;
 
             /* Theme Colors - Trust Blue, Vitality Teal, Energy Coral */
-            --color-primary: #17a2b8;
-            --color-primary-dark: #138496;
+            --color-primary: #009fb1;
+            --color-primary-dark: #008a9a;
             --color-primary-light: #4dbdcf;
-            --color-primary-hover: #117a8b;
-            --color-primary-rgb: 23, 162, 184;
+            --color-primary-hover: #007d8a;
+            --color-primary-rgb: 0, 159, 177;
 
             --color-secondary: hsl(174, 62%, 47%);
             --color-secondary-dark: hsl(174, 62%, 37%);
@@ -649,15 +649,15 @@
         /* Dark Mode Active State - Using Theme Colors */
         body.bg-dark .sidebar .nav-link.active {
             background: rgba(var(--color-primary-rgb), 0.2);
-            color: var(--color-primary-light) !important;
+            color: var(--color-primary) !important;
         }
 
         body.bg-dark .sidebar .nav-link.active i {
-            color: var(--color-primary-light);
+            color: var(--color-primary);
         }
 
         body.bg-dark .sidebar .nav-link.active::before {
-            background: var(--color-primary-light);
+            background: var(--color-primary);
         }
 
         /* ---------- Dark Mode – Tables ---------- */
@@ -840,6 +840,79 @@
         body.bg-dark * {
             scrollbar-width: thin;
             scrollbar-color: #2a2f35 #1a1f24;
+        }
+
+        /* ---------- Dark Mode SweetAlert2 Styling ---------- */
+        body.bg-dark .swal2-popup {
+            background: #1e2124 !important;
+            color: #e6e6e6 !important;
+            border: 1px solid #2a2f35 !important;
+        }
+
+        body.bg-dark .swal2-title {
+            color: #e6e6e6 !important;
+        }
+
+        body.bg-dark .swal2-html-container,
+        body.bg-dark .swal2-content {
+            color: #b0b0b0 !important;
+        }
+
+        body.bg-dark .swal2-confirm {
+            background-color: #009fb1 !important;
+            border-color: #009fb1 !important;
+        }
+
+        body.bg-dark .swal2-confirm:hover {
+            background-color: #008a9a !important;
+        }
+
+        body.bg-dark .swal2-cancel {
+            background-color: #495057 !important;
+            border-color: #495057 !important;
+        }
+
+        body.bg-dark .swal2-cancel:hover {
+            background-color: #5a6268 !important;
+        }
+
+        body.bg-dark .swal2-timer-progress-bar {
+            background: #009fb1 !important;
+        }
+
+        body.bg-dark .swal2-icon.swal2-warning {
+            border-color: #ffc107 !important;
+            color: #ffc107 !important;
+        }
+
+        body.bg-dark .swal2-icon.swal2-success {
+            border-color: #28a745 !important;
+        }
+
+        body.bg-dark .swal2-icon.swal2-success [class^='swal2-success-line'] {
+            background-color: #28a745 !important;
+        }
+
+        body.bg-dark .swal2-icon.swal2-success .swal2-success-ring {
+            border-color: rgba(40, 167, 69, 0.3) !important;
+        }
+
+        body.bg-dark .swal2-icon.swal2-error {
+            border-color: #dc3545 !important;
+        }
+
+        body.bg-dark .swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+            background-color: #dc3545 !important;
+        }
+
+        body.bg-dark .swal2-icon.swal2-question {
+            border-color: #009fb1 !important;
+            color: #009fb1 !important;
+        }
+
+        body.bg-dark .swal2-icon.swal2-info {
+            border-color: #009fb1 !important;
+            color: #009fb1 !important;
         }
 
         /* ---------- Sidebar Dropdown Styles ---------- */
@@ -1297,11 +1370,69 @@
 
             applySavedTheme();
 
+            // Theme toggle with confirmation and cooldown
+            let lastThemeChange = 0;
+            const THEME_COOLDOWN = 2000; // 2 seconds cooldown
+            
             themeToggle?.addEventListener('click', () => {
-                const isDark = document.body.classList.toggle('bg-dark');
-                localStorage.setItem(themeKey, isDark ? 'dark' : 'light');
-                syncTableDark(isDark);
-                updateThemeIcon(isDark);
+                const now = Date.now();
+                const timeSinceLastChange = now - lastThemeChange;
+                
+                // If within cooldown period, show warning
+                if (timeSinceLastChange < THEME_COOLDOWN && lastThemeChange !== 0) {
+                    Swal.fire({
+                        title: 'Please Wait',
+                        html: `Please wait ${Math.ceil((THEME_COOLDOWN - timeSinceLastChange) / 1000)} second(s) before switching theme again.<br><small class="text-muted">This prevents rapid flashing that may cause discomfort.</small>`,
+                        icon: 'warning',
+                        position: 'top-end',
+                        toast: true,
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'swal-theme-warning'
+                        }
+                    });
+                    return;
+                }
+                
+                // Show confirmation dialog
+                Swal.fire({
+                    title: 'Switch Theme?',
+                    text: 'Do you want to switch between light and dark mode?',
+                    icon: 'question',
+                    position: 'top-end',
+                    toast: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, switch',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#009fb1',
+                    cancelButtonColor: '#6c757d',
+                    timer: 5000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'swal-theme-confirm'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const isDark = document.body.classList.toggle('bg-dark');
+                        localStorage.setItem(themeKey, isDark ? 'dark' : 'light');
+                        syncTableDark(isDark);
+                        updateThemeIcon(isDark);
+                        lastThemeChange = Date.now();
+                        
+                        // Show success message
+                        Swal.fire({
+                            title: `Switched to ${isDark ? 'Dark' : 'Light'} Mode`,
+                            icon: 'success',
+                            position: 'top-end',
+                            toast: true,
+                            showConfirmButton: false,
+                            timer: 1500,
+                            timerProgressBar: true
+                        });
+                    }
+                });
             });
 
             const modalEl = document.getElementById('feedbackModal');

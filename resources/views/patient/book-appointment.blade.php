@@ -51,7 +51,7 @@
         }
 
         .booking-header {
-            background: linear-gradient(135deg, #17a2b8, #138496);
+            background: linear-gradient(135deg, #009fb1, #008a9a);
             border-radius: 12px 12px 0 0;
             padding: 1.5rem;
         }
@@ -98,8 +98,8 @@
         }
 
         .form-control:focus {
-            border-color: #17a2b8;
-            box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+            border-color: #009fb1;
+            box-shadow: 0 0 0 0.2rem rgba(0, 159, 177, 0.25);
         }
 
         .form-label {
@@ -113,7 +113,7 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #17a2b8, #138496);
+            background: linear-gradient(135deg, #009fb1, #008a9a);
             border: none;
             border-radius: 8px;
             padding: 0.75rem 2rem;
@@ -170,9 +170,9 @@
         }
 
         .calendar-day.selected {
-            background-color: #17a2b8;
+            background-color: #009fb1;
             color: white;
-            border-color: #17a2b8;
+            border-color: #009fb1;
         }
 
         .calendar-day.occupied {
@@ -241,8 +241,8 @@
         }
 
         .time-slot.selected {
-            background-color: #17a2b8;
-            border-color: #17a2b8;
+            background-color: #009fb1;
+            border-color: #009fb1;
             color: white;
         }
 
@@ -308,7 +308,7 @@
         body.bg-dark select.form-control:focus,
         body.bg-dark textarea.form-control:focus {
             background-color: #161b20;
-            border-color: #17a2b8;
+            border-color: #009fb1;
             color: #e6e6e6;
         }
 
@@ -321,12 +321,12 @@
         body.bg-dark #prevMonth,
         body.bg-dark #nextMonth {
             color: #e6e6e6;
-            border-color: #17a2b8;
+            border-color: #009fb1;
         }
 
         body.bg-dark #prevMonth:hover,
         body.bg-dark #nextMonth:hover {
-            background-color: #17a2b8;
+            background-color: #009fb1;
             color: #fff;
         }
 
@@ -352,8 +352,8 @@
 
         /* Dark Mode Calendar Grid Refinements */
         body.bg-dark .calendar-day.selected {
-            background-color: #17a2b8;
-            border-color: #17a2b8;
+            background-color: #009fb1;
+            border-color: #009fb1;
             color: #fff;
         }
 
@@ -371,8 +371,8 @@
 
         /* Dark Mode Time Slots */
         body.bg-dark .time-slot.selected {
-            background-color: #17a2b8;
-            border-color: #17a2b8;
+            background-color: #009fb1;
+            border-color: #009fb1;
             color: #fff;
         }
 
@@ -421,10 +421,10 @@
         }
 
         .step.active .step-circle {
-            background: #17a2b8;
-            border-color: #17a2b8;
+            background: #009fb1;
+            border-color: #009fb1;
             color: white;
-            box-shadow: 0 0 0 4px rgba(23, 162, 184, 0.2);
+            box-shadow: 0 0 0 4px rgba(0, 159, 177, 0.2);
         }
 
         .step.completed .step-circle {
@@ -440,7 +440,7 @@
         }
 
         .step.active .step-label {
-            color: #17a2b8;
+            color: #009fb1;
             font-weight: 600;
         }
 
@@ -515,7 +515,7 @@
         }
 
         .legend-color.selected {
-            background: #17a2b8;
+            background: #009fb1;
         }
 
         /* Confirmation Modal */

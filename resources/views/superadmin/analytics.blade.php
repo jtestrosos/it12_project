@@ -211,8 +211,8 @@
                 datasets: [{
                     label: 'Appointments',
                     data: trendCounts,
-                    borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    borderColor: '#009fb1',
+                    backgroundColor: 'rgba(0, 159, 177, 0.1)',
                     tension: 0.4,
                     borderWidth: 5,
                     pointRadius: 8,

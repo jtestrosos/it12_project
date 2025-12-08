@@ -75,7 +75,7 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            background: linear-gradient(135deg, #009fb1, #008a9a);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -99,8 +99,8 @@
 
         .form-control:focus,
         .form-select:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            border-color: #009fb1;
+            box-shadow: 0 0 0 0.2rem rgba(0, 159, 177, 0.25);
         }
 
         /* Role cell alignment */
@@ -223,7 +223,7 @@
         body.bg-dark .form-control:focus,
         body.bg-dark .form-select:focus {
             background-color: #2a2f35;
-            border-color: #007bff;
+            border-color: #009fb1;
             color: #e6e6e6;
         }
         

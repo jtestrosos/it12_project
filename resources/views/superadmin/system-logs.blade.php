@@ -110,7 +110,7 @@
     body.bg-dark .form-control:focus,
     body.bg-dark .form-select:focus {
         background-color: #2a2f35;
-        border-color: #007bff;
+        border-color: #009fb1;
         color: #e6e6e6;
     }
     

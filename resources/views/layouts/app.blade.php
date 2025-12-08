@@ -22,7 +22,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #17a2b8;
+            background: #009fb1;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -62,32 +62,32 @@
 
     <style>
         :root {
-            --bs-primary: #17a2b8;
-            --bs-primary-rgb: 23, 162, 184;
-            --bs-link-color: #17a2b8;
-            --bs-link-hover-color: #138496;
+            --bs-primary: #009fb1;
+            --bs-primary-rgb: 0, 159, 177;
+            --bs-link-color: #009fb1;
+            --bs-link-hover-color: #008a9a;
         }
-        .text-primary { color: #17a2b8 !important; }
-        .bg-primary { background-color: #17a2b8 !important; }
+        .text-primary { color: #009fb1 !important; }
+        .bg-primary { background-color: #009fb1 !important; }
         .btn-primary {
-            background-color: #17a2b8 !important;
-            border-color: #17a2b8 !important;
+            background-color: #009fb1 !important;
+            border-color: #009fb1 !important;
         }
         .btn-primary:hover {
-            background-color: #138496 !important;
-            border-color: #117a8b !important;
+            background-color: #008a9a !important;
+            border-color: #007d8a !important;
         }
         .btn-outline-primary {
-            color: #17a2b8 !important;
-            border-color: #17a2b8 !important;
+            color: #009fb1 !important;
+            border-color: #009fb1 !important;
         }
         .btn-outline-primary:hover {
-            background-color: #17a2b8 !important;
+            background-color: #009fb1 !important;
             color: #fff !important;
         }
-        .border-primary { border-color: #17a2b8 !important; }
-        a { color: #17a2b8; text-decoration: none; }
-        a:hover { color: #138496; }
+        .border-primary { border-color: #009fb1 !important; }
+        a { color: #009fb1; text-decoration: none; }
+        a:hover { color: #008a9a; }
 
         body {
             background: #f8f9fa;
@@ -173,7 +173,7 @@
         }
 
         .admin-sidebar .nav-link.active {
-            background: #007bff;
+            background: #009fb1;
             color: #fff
         }
 
@@ -248,7 +248,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: #0d6efd;
+            background: #009fb1;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -276,12 +276,12 @@
         }
 
         .public-layout header .navbar {
-            background: #17a2b8 !important;
+            background: #009fb1 !important;
             min-height: 80px
         }
 
         .public-layout .navbar {
-            background: #17a2b8;
+            background: #009fb1;
             min-height: 80px
         }
 

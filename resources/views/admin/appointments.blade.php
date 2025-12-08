@@ -191,9 +191,9 @@
         }
 
         .calendar-day.selected {
-            background-color: #007bff;
+            background-color: #009fb1;
             color: white;
-            border-color: #007bff;
+            border-color: #009fb1;
         }
 
         .calendar-day.occupied {
@@ -280,8 +280,8 @@
         }
 
         .time-slot.selected {
-            background-color: #007bff;
-            border-color: #007bff;
+            background-color: #009fb1;
+            border-color: #009fb1;
             color: white;
         }
 
@@ -517,8 +517,8 @@
         }
 
         body.bg-dark .time-slot.selected {
-            background-color: #007bff;
-            border-color: #007bff;
+            background-color: #009fb1;
+            border-color: #009fb1;
             color: #fff;
         }
 
@@ -558,7 +558,7 @@
         body.bg-dark .form-control:focus,
         body.bg-dark .form-select:focus {
             background-color: #161b20;
-            border-color: #007bff;
+            border-color: #009fb1;
             color: #e6e6e6;
         }
 

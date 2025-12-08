@@ -556,7 +556,7 @@ class AdminController extends Controller
 
     public function inventory(Request $request)
     {
-        $query = Inventory::query()->with('transactions')->latest();
+        $query = Inventory::query()->with('transactions')->orderBy('item_name');
         if ($request->filled('category')) {
             $query->whereRaw('LOWER(category) = ?', [strtolower($request->category)]);
         }

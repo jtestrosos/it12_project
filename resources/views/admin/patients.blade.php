@@ -47,7 +47,7 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            background: linear-gradient(135deg, #009fb1, #008a9a);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -172,9 +172,9 @@
         }
 
         .calendar-day.selected {
-            background-color: #007bff;
+            background-color: #009fb1;
             color: white;
-            border-color: #007bff;
+            border-color: #009fb1;
         }
 
         .calendar-day.occupied {
@@ -261,8 +261,8 @@
         }
 
         .time-slot.selected {
-            background-color: #007bff;
-            border-color: #007bff;
+            background-color: #009fb1;
+            border-color: #009fb1;
             color: #fff;
         }
 
@@ -319,8 +319,8 @@
         }
 
         body.bg-dark .time-slot.selected {
-            background-color: #007bff;
-            border-color: #007bff;
+            background-color: #009fb1;
+            border-color: #009fb1;
             color: #fff;
         }
 
@@ -338,8 +338,8 @@
         }
 
         body.bg-dark .page-item.active .page-link {
-            background-color: #007bff;
-            border-color: #007bff;
+            background-color: #009fb1;
+            border-color: #009fb1;
             color: #fff;
         }
 
