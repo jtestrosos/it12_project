@@ -49,6 +49,27 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Theme Transition Overlay - Prevents flash when navigating between themes */
+        #theme-transition-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-light);
+            z-index: 100000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        #theme-transition-overlay.dark {
+            background: var(--bg-dark);
+        }
+        #theme-transition-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
     </style>
     <script>
         // Check theme and apply to loader
@@ -63,6 +84,9 @@
             document.documentElement.style.overflow = 'hidden';
         })();
     </script>
+    
+    <!-- Theme Transition Overlay -->
+    <div id="theme-transition-overlay"></div>
 
     <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -1217,7 +1241,7 @@
                                 <i class="fas fa-user-circle me-2 text-muted"></i> My Profile
                             </a>
                             <a class="dropdown-item rounded py-2 text-danger" href="{{ route('logout') }}"
-                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                onclick="event.preventDefault(); handleLogout();">
                                 <i class="fas fa-sign-out-alt me-2"></i> Logout
                             </a>
                         </li>
@@ -1271,7 +1295,60 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Global function for logout with fade transition
+        function handleLogout() {
+            const overlay = document.getElementById('theme-transition-overlay');
+            const isDark = document.body.classList.contains('bg-dark');
+            
+            if (overlay) {
+                if (isDark) {
+                    // For dark mode: fade to dark, then the app page will fade from dark to light
+                    overlay.classList.add('dark');
+                    overlay.classList.add('active');
+                    
+                    // Set a one-time flag in sessionStorage for the dark fade transition
+                    sessionStorage.setItem('logout-from-dark', 'true');
+                    // Clear theme preference so app page doesn't show dark on reload
+                    localStorage.removeItem('app-theme');
+                    
+                    // Submit logout form after dark fade completes
+                    setTimeout(() => {
+                        document.getElementById('logout-form').submit();
+                    }, 400);
+                } else {
+                    // For light mode: fade to light
+                    overlay.classList.remove('dark');
+                    overlay.classList.add('active');
+                    
+                    // Clear theme preference
+                    localStorage.removeItem('app-theme');
+                    
+                    setTimeout(() => {
+                        document.getElementById('logout-form').submit();
+                    }, 400);
+                }
+            } else {
+                // Fallback if overlay doesn't exist
+                localStorage.removeItem('app-theme');
+                document.getElementById('logout-form').submit();
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize theme transition overlay
+            const themeOverlay = document.getElementById('theme-transition-overlay');
+            const savedTheme = localStorage.getItem('app-theme');
+            const isDark = savedTheme === 'dark';
+            
+            // Set overlay to match current theme on page load
+            if (themeOverlay) {
+                themeOverlay.classList.toggle('dark', isDark);
+                // Fade out overlay after page loads
+                setTimeout(() => {
+                    themeOverlay.classList.remove('active');
+                }, 100);
+            }
+
             // Hide loading screen
             const loader = document.getElementById('page-loader');
             if (loader) {
@@ -1415,22 +1492,41 @@
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        const isDark = document.body.classList.toggle('bg-dark');
-                        localStorage.setItem(themeKey, isDark ? 'dark' : 'light');
-                        syncTableDark(isDark);
-                        updateThemeIcon(isDark);
-                        lastThemeChange = Date.now();
+                        const willBeDark = !document.body.classList.contains('bg-dark');
                         
-                        // Show success message
-                        Swal.fire({
-                            title: `Switched to ${isDark ? 'Dark' : 'Light'} Mode`,
-                            icon: 'success',
-                            position: 'top-end',
-                            toast: true,
-                            showConfirmButton: false,
-                            timer: 1500,
-                            timerProgressBar: true
-                        });
+                        // Show fade overlay with current theme
+                        if (themeOverlay) {
+                            themeOverlay.classList.toggle('dark', !willBeDark);
+                            themeOverlay.classList.add('active');
+                        }
+                        
+                        // Wait for fade, then switch theme
+                        setTimeout(() => {
+                            const isDark = document.body.classList.toggle('bg-dark');
+                            localStorage.setItem(themeKey, isDark ? 'dark' : 'light');
+                            syncTableDark(isDark);
+                            updateThemeIcon(isDark);
+                            lastThemeChange = Date.now();
+                            
+                            // Update overlay to new theme and fade out
+                            if (themeOverlay) {
+                                themeOverlay.classList.toggle('dark', isDark);
+                                setTimeout(() => {
+                                    themeOverlay.classList.remove('active');
+                                }, 50);
+                            }
+                            
+                            // Show success message
+                            Swal.fire({
+                                title: `Switched to ${isDark ? 'Dark' : 'Light'} Mode`,
+                                icon: 'success',
+                                position: 'top-end',
+                                toast: true,
+                                showConfirmButton: false,
+                                timer: 1500,
+                                timerProgressBar: true
+                            });
+                        }, 200);
                     }
                 });
             });

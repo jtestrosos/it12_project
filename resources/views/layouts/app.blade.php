@@ -22,12 +22,15 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #009fb1;
+            background: #f8f9fa;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 99999;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.6s ease;
+        }
+        #page-loader.dark {
+            background: #151718;
         }
         #page-loader.loaded {
             opacity: 0;
@@ -36,20 +39,58 @@
         .spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top-color: #ffffff;
+            border: 3px solid #e9ecef;
+            border-top-color: #009fb1;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
+        }
+        #page-loader.dark .spinner {
+            border-color: #2a2f35;
+            border-top-color: #009fb1;
         }
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Dark-to-Light Fade Overlay */
+        #dark-fade-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #151718;
+            z-index: 100000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+        #dark-fade-overlay.active {
+            opacity: 1;
+        }
     </style>
     <script>
-        // Hide body overflow during loading
-        document.documentElement.style.overflow = 'hidden';
+        // Check if coming from dark mode logout (one-time flag)
+        (function() {
+            var isLogoutFromDark = sessionStorage.getItem('logout-from-dark') === 'true';
+            var darkFadeOverlay = document.createElement('div');
+            darkFadeOverlay.id = 'dark-fade-overlay';
+            
+            if (isLogoutFromDark) {
+                // Coming from dark mode logout - show dark overlay that will fade out
+                darkFadeOverlay.className = 'active';
+                // Clear the flag immediately so it doesn't persist
+                sessionStorage.removeItem('logout-from-dark');
+                document.write('<div id="page-loader" class="dark"><div class="spinner"></div></div>');
+            } else {
+                // Normal page load - show light loader
+                document.write('<div id="page-loader"><div class="spinner"></div></div>');
+            }
+            
+            document.write(darkFadeOverlay.outerHTML);
+            document.documentElement.style.overflow = 'hidden';
+        })();
     </script>
-    <div id="page-loader"><div class="spinner"></div></div>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -908,14 +949,37 @@
         });
     </script>
     <script>
-        // Hide loading screen when page is ready
+        // Hide loading screen when page is ready with smooth dark-to-light transition
         window.addEventListener('load', function() {
             const loader = document.getElementById('page-loader');
+            const darkFade = document.getElementById('dark-fade-overlay');
+            // Check if this was a logout from dark mode (flag is already cleared but overlay is active)
+            const wasDark = darkFade && darkFade.classList.contains('active');
+            
             if (loader) {
-                loader.classList.add('loaded');
-                // Restore overflow
-                document.documentElement.style.overflow = '';
-                setTimeout(() => loader.remove(), 300);
+                // Add a slight delay to ensure smooth transition
+                setTimeout(() => {
+                    loader.classList.add('loaded');
+                    
+                    // If coming from dark mode logout, fade the dark overlay after loader
+                    if (wasDark && darkFade) {
+                        setTimeout(() => {
+                            darkFade.classList.remove('active');
+                            // Restore overflow after all transitions
+                            setTimeout(() => {
+                                document.documentElement.style.overflow = '';
+                            }, 800);
+                        }, 300); // Wait for loader to fade
+                    } else {
+                        // Restore overflow immediately for light mode
+                        document.documentElement.style.overflow = '';
+                    }
+                    
+                    setTimeout(() => {
+                        loader.remove();
+                        if (darkFade && !wasDark) darkFade.remove();
+                    }, 600);
+                }, 100);
             }
         });
     </script>
