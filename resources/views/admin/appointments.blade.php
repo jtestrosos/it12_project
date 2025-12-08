@@ -420,6 +420,15 @@
             align-items: center;
             justify-content: center;
             border-radius: 6px;
+            line-height: 1;
+        }
+
+        .btn-icon i {
+            margin: 0;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
     <style>
@@ -580,6 +589,213 @@
         body.bg-dark .table-modern tbody tr:hover {
             background-color: #2a2f35;
         }
+
+        /* Polished Modal Styling */
+        .info-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            transition: all 0.2s ease;
+        }
+
+        .info-item {
+            position: relative;
+        }
+
+        .info-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-value {
+            font-size: 0.95rem;
+            color: #212529;
+            font-weight: 500;
+        }
+
+        .notes-box {
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            font-size: 0.9rem;
+            color: #495057;
+            line-height: 1.6;
+        }
+
+        .timestamp-item {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .timestamp-label {
+            font-weight: 600;
+            margin-right: 0.25rem;
+        }
+
+        .timestamp-value {
+            color: #495057;
+        }
+
+        /* Dark Mode Modal Styling */
+        body.bg-dark .info-card {
+            background: #2a2f35;
+            border-color: #3f4751;
+        }
+
+        body.bg-dark .info-label {
+            color: #adb5bd;
+        }
+
+        body.bg-dark .info-value {
+            color: #e9ecef;
+        }
+
+        body.bg-dark .notes-box {
+            background: #1a1f24;
+            border-color: #3f4751;
+            color: #cbd3da;
+        }
+
+        body.bg-dark .timestamp-item {
+            color: #adb5bd;
+        }
+
+        body.bg-dark .timestamp-value {
+            color: #cbd3da;
+        }
+
+        body.bg-dark .modal-footer {
+            background-color: #1a1f24 !important;
+            border-top-color: #2a2f35;
+        }
+
+        /* Modern Button Styles */
+        .btn-modern {
+            padding: 0.5rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            border: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-modern:active {
+            transform: translateY(0);
+        }
+
+        /* Success Button */
+        .btn-modern-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-modern-success:hover {
+            background: #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Warning Button */
+        .btn-modern-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-modern-warning:hover {
+            background: #d97706;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        }
+
+        /* Danger Button */
+        .btn-modern-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-modern-danger:hover {
+            background: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Secondary Button */
+        .btn-modern-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-modern-secondary:hover {
+            background: #4b5563;
+            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.4);
+        }
+
+        /* Outline Button */
+        .btn-modern-outline {
+            background: transparent;
+            color: #6b7280;
+            border: 2px solid #d1d5db;
+        }
+
+        .btn-modern-outline:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+            color: #374151;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Dark Mode Button Styles */
+        body.bg-dark .btn-modern-outline {
+            color: #cbd3da;
+            border-color: #3f4751;
+        }
+
+        body.bg-dark .btn-modern-outline:hover {
+            background: #2a2f35;
+            border-color: #4b5563;
+            color: #e9ecef;
+        }
+
+        /* Dark Mode for Add Appointment Modal */
+        body.bg-dark #appointmentSearchResults {
+            background: #1e2124;
+            border-color: #2a2f35;
+        }
+
+        body.bg-dark #appointmentSearchResults .list-group-item {
+            background: #1e2124;
+            border-color: #2a2f35;
+            color: #e6e6e6;
+        }
+
+        body.bg-dark #appointmentSearchResults .list-group-item:hover {
+            background: #2a2f35;
+        }
+
+        body.bg-dark #appointmentSearchResults .list-group-item .text-muted,
+        body.bg-dark #appointmentSearchResults .list-group-item .small {
+            color: #adb5bd !important;
+        }
+
+        body.bg-dark #appointmentSelectedPatientInfo {
+            background-color: rgba(23, 162, 184, 0.2);
+            border-color: rgba(23, 162, 184, 0.4);
+            color: #cbd3da;
+        }
+
+        body.bg-dark .badge.bg-secondary {
+            background-color: #4b5563 !important;
+        }
     </style>
 @endsection
 
@@ -666,19 +882,19 @@
                         <th>
                             <a href="{{ request()->fullUrlWithQuery(['sort' => 'date', 'direction' => $nextDirection]) }}"
                                 class="text-decoration-none d-inline-flex align-items-center gap-1">
-                                Date
+                                <span style="color: #009fb1;">Date</span>
                                 @if($currentSort === 'date')
-                                    <i class="fas fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} fa-sm ms-1"></i>
+                                    <i class="fas fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} fa-sm ms-1" style="color: #009fb1;"></i>
                                 @else
-                                    <i class="fas fa-sort fa-sm ms-1 text-muted"></i>
+                                    <i class="fas fa-sort fa-sm ms-1" style="color: #009fb1;"></i>
                                 @endif
                             </a>
                         </th>
                         <th>Patient</th>
                         <th>Service</th>
 
-                        <th>Status</th>
-                        <th class="actions-col">Actions</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center actions-col">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="appointmentsTableBody">
@@ -701,7 +917,7 @@
                             </td>
                             <td>{{ $appointment->service_type }}</td>
 
-                            <td>
+                            <td class="text-center">
                                 @php
                                     $statusDisplay = [
                                         'pending' => 'Pending',
@@ -714,38 +930,13 @@
                                 @endphp
                                 <span class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
                             </td>
-                            <td class="actions-col">
-                                <div class="d-flex gap-1">
+                            <td class="text-center actions-col">
+                                <div class="d-flex gap-1 justify-content-center">
                                     <!-- View Button -->
                                     <button class="btn btn-outline-primary btn-sm btn-icon" data-bs-toggle="modal"
                                         data-bs-target="#viewAppointmentModal{{ $appointment->id }}" title="View Details">
                                         <i class="fas fa-eye"></i>
                                     </button>
-
-                                    <!-- Approve Button (only show if pending) -->
-                                    @if($appointment->status === 'pending')
-                                        <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
-                                            class="d-inline">
-                                            @csrf
-                                            <input type="hidden" name="status" value="approved">
-                                            <button type="submit" class="btn btn-outline-success btn-sm btn-icon" title="Approve">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                        </form>
-                                    @endif
-
-                                    <!-- Cancel Button -->
-                                    @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
-                                        <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
-                                            class="d-inline cancel-form">
-                                            @csrf
-                                            <input type="hidden" name="status" value="cancelled">
-                                            <button type="button" class="btn btn-outline-danger btn-sm btn-icon" title="Cancel"
-                                                onclick="confirmCancel(this)">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </form>
-                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -758,91 +949,110 @@
                                         <h5 class="modal-title">Appointment Details</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
-                                    <div class="modal-body">
+                                    <div class="modal-body p-4">
                                         <div class="row g-4">
                                             <!-- Left Column: Patient Info -->
-                                            <div class="col-md-6 border-end">
-                                                <h6 class="text-uppercase text-muted small fw-bold mb-3">Patient Information
-                                                </h6>
-                                                <div class="mb-3">
-                                                    <label class="small text-muted d-block">Name</label>
-                                                    <div class="fw-bold">{{ $appointment->patient_name }}</div>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="small text-muted d-block">Contact</label>
-                                                    <div>{{ $appointment->patient_phone }}</div>
-                                                    <div class="small">{{ $appointment->user->email ?? 'No email linked' }}
+                                            <div class="col-md-6">
+                                                <div class="info-card p-3 rounded-3 h-100">
+                                                    <h6 class="text-uppercase text-muted small fw-bold mb-3 d-flex align-items-center">
+                                                        <i class="fas fa-user-circle me-2"></i>Patient Information
+                                                    </h6>
+                                                    <div class="info-item mb-3">
+                                                        <label class="info-label">Name</label>
+                                                        <div class="info-value">{{ $appointment->patient_name }}</div>
                                                     </div>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="small text-muted d-block">Address</label>
-                                                    <div>{{ $appointment->patient_address ?? 'N/A' }}</div>
+                                                    <div class="info-item mb-3">
+                                                        <label class="info-label">Contact</label>
+                                                        <div class="info-value">
+                                                            <div><i class="fas fa-phone me-2 text-muted"></i>{{ $appointment->patient_phone }}</div>
+                                                            <div class="mt-1"><i class="fas fa-envelope me-2 text-muted"></i>{{ $appointment->user->email ?? 'No email linked' }}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="info-item">
+                                                        <label class="info-label">Address</label>
+                                                        <div class="info-value"><i class="fas fa-map-marker-alt me-2 text-muted"></i>{{ $appointment->patient_address ?? 'N/A' }}</div>
+                                                    </div>
                                                 </div>
                                             </div>
 
                                             <!-- Right Column: Appointment Info -->
                                             <div class="col-md-6">
-                                                <h6 class="text-uppercase text-muted small fw-bold mb-3">Appointment Information
-                                                </h6>
-                                                <div class="mb-3">
-                                                    <label class="small text-muted d-block">Service</label>
-                                                    <div class="fw-bold text-primary">{{ $appointment->service_type }}</div>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="small text-muted d-block">Date & Time</label>
-                                                    <div class="fw-bold">
-                                                        <i class="fas fa-calendar-alt me-1 text-muted"></i>
-                                                        {{ $appointment->appointment_date->format('F d, Y') }}
+                                                <div class="info-card p-3 rounded-3 h-100">
+                                                    <h6 class="text-uppercase text-muted small fw-bold mb-3 d-flex align-items-center">
+                                                        <i class="fas fa-calendar-check me-2"></i>Appointment Information
+                                                    </h6>
+                                                    <div class="info-item mb-3">
+                                                        <label class="info-label">Service</label>
+                                                        <div class="info-value text-primary fw-bold">
+                                                            <i class="fas fa-stethoscope me-2"></i>{{ $appointment->service_type }}
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <i class="fas fa-clock me-1 text-muted"></i>
-                                                        {{ $appointment->appointment_time }}
+                                                    <div class="info-item mb-3">
+                                                        <label class="info-label">Date & Time</label>
+                                                        <div class="info-value">
+                                                            <div class="mb-1">
+                                                                <i class="fas fa-calendar-alt me-2 text-muted"></i>
+                                                                {{ $appointment->appointment_date->format('F d, Y') }}
+                                                            </div>
+                                                            <div>
+                                                                <i class="fas fa-clock me-2 text-muted"></i>
+                                                                {{ $appointment->appointment_time }}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="small text-muted d-block">Status</label>
-                                                    @php
-                                                        $statusDisplay = [
-                                                            'pending' => 'Pending',
-                                                            'approved' => 'Confirmed',
-                                                            'rescheduled' => 'Rescheduled',
-                                                            'cancelled' => 'Cancelled',
-                                                            'completed' => 'Completed',
-                                                            'no_show' => 'No Show'
-                                                        ][$appointment->status] ?? ucfirst($appointment->status);
-                                                    @endphp
-                                                    <span
-                                                        class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
-                                                </div>
-                                                @if($appointment->notes)
-                                                    <div class="mb-3">
-                                                        <label class="small text-muted d-block">Notes</label>
-                                                        <div class="p-2 bg-light rounded border">{{ $appointment->notes }}</div>
+                                                    <div class="info-item mb-3">
+                                                        <label class="info-label">Status</label>
+                                                        @php
+                                                            $statusDisplay = [
+                                                                'pending' => 'Pending',
+                                                                'approved' => 'Confirmed',
+                                                                'rescheduled' => 'Rescheduled',
+                                                                'cancelled' => 'Cancelled',
+                                                                'completed' => 'Completed',
+                                                                'no_show' => 'No Show'
+                                                            ][$appointment->status] ?? ucfirst($appointment->status);
+                                                        @endphp
+                                                        <div>
+                                                            <span class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
+                                                        </div>
                                                     </div>
-                                                @endif
+                                                    @if($appointment->notes)
+                                                        <div class="info-item">
+                                                            <label class="info-label">Notes</label>
+                                                            <div class="notes-box p-2 rounded">{{ $appointment->notes }}</div>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                                <div class="row mt-4 pt-3 border-top">
-                                                    <div class="col-6">
-                                                        <label class="small text-muted d-block">Created At</label>
-                                                        <small>{{ $appointment->created_at->format('M d, Y h:i A') }}</small>
-                                                    </div>
-                                                    <div class="col-6">
-                                                        <label class="small text-muted d-block">Last Updated</label>
-                                                        <small>{{ $appointment->updated_at->format('M d, Y h:i A') }}</small>
-                                                    </div>
+                                        <!-- Timestamps -->
+                                        <div class="row g-3 mt-3 pt-3 border-top">
+                                            <div class="col-6">
+                                                <div class="timestamp-item">
+                                                    <i class="fas fa-plus-circle me-2 text-muted"></i>
+                                                    <span class="timestamp-label">Created:</span>
+                                                    <span class="timestamp-value">{{ $appointment->created_at->format('M d, Y h:i A') }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="timestamp-item">
+                                                    <i class="fas fa-edit me-2 text-muted"></i>
+                                                    <span class="timestamp-label">Updated:</span>
+                                                    <span class="timestamp-value">{{ $appointment->updated_at->format('M d, Y h:i A') }}</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="modal-footer d-flex justify-content-between bg-light">
-                                        <div class="d-flex gap-2">
+                                    <div class="modal-footer d-flex justify-content-between align-items-center px-4 py-3">
+                                        <div class="d-flex gap-2 flex-wrap">
                                             <!-- Reschedule -->
                                             @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
-                                                <button type="button" class="btn btn-warning btn-sm reschedule-btn"
+                                                <button type="button" class="btn-modern btn-modern-warning reschedule-btn"
                                                     data-appointment-id="{{ $appointment->id }}"
                                                     data-action-url="{{ route('admin.appointment.update', $appointment) }}"
                                                     data-bs-dismiss="modal">
-                                                    <i class="fas fa-calendar-alt me-1"></i> Reschedule
+                                                    <i class="fas fa-calendar-alt me-2"></i>Reschedule
                                                 </button>
                                             @endif
 
@@ -852,8 +1062,8 @@
                                                     class="d-inline">
                                                     @csrf
                                                     <input type="hidden" name="status" value="completed">
-                                                    <button type="submit" class="btn btn-success btn-sm">
-                                                        <i class="fas fa-check-circle me-1"></i> Complete
+                                                    <button type="submit" class="btn-modern btn-modern-success">
+                                                        <i class="fas fa-check-circle me-2"></i>Complete
                                                     </button>
                                                 </form>
                                             @endif
@@ -864,14 +1074,42 @@
                                                     class="d-inline">
                                                     @csrf
                                                     <input type="hidden" name="status" value="no_show">
-                                                    <button type="submit" class="btn btn-secondary btn-sm">
-                                                        <i class="fas fa-user-slash me-1"></i> No-show
+                                                    <button type="submit" class="btn-modern btn-modern-secondary">
+                                                        <i class="fas fa-user-slash me-2"></i>No-show
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            
+                                            <!-- Approve Button (only show if pending) -->
+                                            @if($appointment->status === 'pending')
+                                                <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
+                                                    class="d-inline">
+                                                    @csrf
+                                                    <input type="hidden" name="status" value="approved">
+                                                    <button type="submit" class="btn-modern btn-modern-success">
+                                                        <i class="fas fa-check me-2"></i>Approve
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            
+                                            <!-- Cancel Button -->
+                                            @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
+                                                <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
+                                                    class="d-inline cancel-form" id="cancelForm{{ $appointment->id }}">
+                                                    @csrf
+                                                    <input type="hidden" name="status" value="cancelled">
+                                                    <button type="button" class="btn-modern btn-modern-danger"
+                                                        data-form-id="cancelForm{{ $appointment->id }}"
+                                                        onclick="confirmCancel(this)">
+                                                        <i class="fas fa-times me-2"></i>Cancel Appointment
                                                     </button>
                                                 </form>
                                             @endif
                                         </div>
-                                        <button type="button" class="btn btn-outline-secondary"
-                                            data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn-modern btn-modern-outline"
+                                            data-bs-dismiss="modal">
+                                            <i class="fas fa-times-circle me-2"></i>Close
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -1009,20 +1247,16 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="patient_phone" class="form-label">Phone Number <span
-                                                class="text-danger">*</span></label>
-                                        <input type="tel" class="form-control" id="patient_phone" name="patient_phone"
-                                            required>
+                                        <label for="patient_phone" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="patient_phone" name="patient_phone">
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="patient_address" class="form-label">Address <span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="patient_address" name="patient_address"
-                                            required>
+                                        <label for="patient_address" class="form-label">Address</label>
+                                        <input type="text" class="form-control" id="patient_address" name="patient_address">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -1282,17 +1516,36 @@
 
             // SweetAlert2 Confirmation for Cancel
             window.confirmCancel = function (btn) {
+                const formId = btn.getAttribute('data-form-id');
+                console.log('confirmCancel called, form ID:', formId);
+                
+                if (!formId) {
+                    console.error('No form ID found on button');
+                    alert('Error: Cannot find form identifier. Please refresh the page.');
+                    return;
+                }
+                
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You are about to cancel this appointment. This action cannot be undone!",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Yes, cancel it!'
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, cancel it!',
+                    cancelButtonText: 'No, keep it'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        btn.closest('form').submit();
+                        const form = document.getElementById(formId);
+                        console.log('Form found by ID:', form);
+                        
+                        if (form) {
+                            console.log('Submitting form to:', form.action);
+                            form.submit();
+                        } else {
+                            console.error('Could not find form with ID:', formId);
+                            alert('Error: Could not find form to submit. Please refresh the page and try again.');
+                        }
                     }
                 });
             };
@@ -1880,5 +2133,53 @@
                         }
                     });
                 });
+
+                // Custom validation for Add Appointment form
+                const addAppointmentForm = document.querySelector('#addAppointmentModal form');
+                if (addAppointmentForm) {
+                    addAppointmentForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        
+                        const selectedPatientId = document.getElementById('selected_patient_id').value;
+                        const patientNameField = document.getElementById('patient_name');
+                        const patientName = patientNameField.value.trim();
+                        const serviceType = document.getElementById('service_type').value;
+                        const appointmentDate = document.getElementById('appointment_date').value;
+                        const appointmentTime = document.getElementById('appointment_time').value;
+                        
+                        let missingFields = [];
+                        
+                        // If no patient selected from search, check manual entry (only Patient Name is required)
+                        if (!selectedPatientId) {
+                            // Only check Patient Name if field is not disabled
+                            if (!patientNameField.disabled && !patientName) {
+                                missingFields.push('Patient Name (or search and select an existing patient)');
+                            }
+                        }
+                        
+                        if (!serviceType) missingFields.push('Service Type');
+                        if (!appointmentDate) missingFields.push('Appointment Date (select from calendar)');
+                        if (!appointmentTime) missingFields.push('Time Slot (select from available times)');
+                        
+                        if (missingFields.length > 0) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Missing Information',
+                                html: '<p class="mb-3">Please fill in the following required fields:</p><ul class="text-start ps-4">' + 
+                                      missingFields.map(field => '<li class="mb-1">' + field + '</li>').join('') + 
+                                      '</ul>',
+                                confirmButtonText: 'OK, I\'ll complete them',
+                                confirmButtonColor: '#17a2b8',
+                                customClass: {
+                                    popup: 'swal-wide'
+                                }
+                            });
+                            return false;
+                        }
+                        
+                        // If all validation passes, submit the form
+                        this.submit();
+                    });
+                }
             </script>
 @endpush

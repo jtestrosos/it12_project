@@ -735,7 +735,7 @@
                                 <label for="service_id" class="form-label">Service Needed *</label>
                                 <select class="form-control @error('service_id') is-invalid @enderror" id="service_id"
                                     name="service_id" required>
-                                    <option value="">Select Service</option>
+                                    <option value="" disabled selected>Select Service</option>
                                     @foreach($services as $service)
                                         <option value="{{ $service->id }}" {{ old('service_id') == $service->id ? 'selected' : '' }}>
                                             {{ $service->name }}

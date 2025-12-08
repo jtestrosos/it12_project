@@ -223,8 +223,8 @@
                             <th>Phone</th>
                             <th>Service</th>
                             <th>Date & Time</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -242,7 +242,7 @@
                                     <small
                                         class="text-muted">{{ \Carbon\Carbon::parse($walkIn->appointment_time)->format('h:i A') }}</small>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <span
                                         class="status-badge 
                                                                                                                 @if ($walkIn->status == 'waiting') bg-warning text-dark
@@ -253,7 +253,7 @@
                                         {{ ucfirst(str_replace('_', ' ', $walkIn->status)) }}
                                     </span>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <div class="btn-group btn-group-sm">
                                         @if ($walkIn->status !== 'completed')
                                             <button class="btn btn-outline-success" data-bs-toggle="modal"
@@ -445,7 +445,7 @@
                         <div class="mb-3">
                             <label for="service_type" class="form-label">Service Type *</label>
                             <select class="form-control" id="service_type" name="service_type" required>
-                                <option value="">Select Service</option>
+                                <option value="" disabled selected>Select Service</option>
                                 @foreach ($services as $service)
                                     <option value="{{ $service }}">{{ $service }}</option>
                                 @endforeach

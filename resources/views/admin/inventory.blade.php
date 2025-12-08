@@ -324,7 +324,7 @@
                 <div class="inventory-card py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="small text-muted">Low Stock</div>
-                        <i class="fas fa-cubes-stacked text-warning"></i>
+                        <i class="fas fa-exclamation-triangle text-warning"></i>
                     </div>
 
                     <div class="h5 mb-0">{{ $stats['low_stock'] ?? 0 }}</div>

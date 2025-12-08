@@ -34,18 +34,35 @@
         }
 
         .status-active {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: rgba(16, 185, 129, 0.25);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.4);
         }
 
         .status-inactive {
-            background-color: #f8d7da;
-            color: #721c24;
+            background-color: rgba(239, 68, 68, 0.25);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        /* Dark mode status badges */
+        body.bg-dark .status-active {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        body.bg-dark .status-inactive {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.4);
         }
 
         .patient-avatar {
             width: 50px;
             height: 50px;
+            min-width: 50px;
+            min-height: 50px;
             border-radius: 50%;
             background: linear-gradient(135deg, #009fb1, #008a9a);
             display: flex;
@@ -54,6 +71,14 @@
             color: white;
             font-weight: bold;
             font-size: 1.2rem;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .patient-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         /* Cards inherit theme text color */
@@ -1114,7 +1139,7 @@
                                         <label for="service_type" class="form-label">Service Type <span
                                                 class="text-danger">*</span></label>
                                         <select class="form-select" id="service_type" name="service_type" required>
-                                            <option value="">Select Service</option>
+                                            <option value="" disabled selected>Select Service</option>
                                             <option value="General Checkup">General Checkup</option>
                                             <option value="Prenatal">Prenatal</option>
                                             <option value="Medical Check-up">Medical Check-up</option>

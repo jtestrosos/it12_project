@@ -504,7 +504,7 @@
                         <div class="mb-3">
                             <label for="service_type" class="form-label">Service *</label>
                             <select class="form-control" id="service_type" name="service_type" required>
-                                <option value="">Select Service</option>
+                                <option value="" disabled selected>Select Service</option>
                                 <option value="General Checkup">General Checkup</option>
                                 <option value="Prenatal">Prenatal</option>
                                 <option value="Medical Check-up">Medical Check-up</option>
