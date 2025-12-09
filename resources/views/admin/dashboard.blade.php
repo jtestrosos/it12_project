@@ -34,8 +34,8 @@
             border-color: #d0e2ff;
         }
 
-        /* Welcome card with teal background */
-        .welcome-card-row .metric-card {
+        /* Welcome card styling removed - using default card style */
+        /* .welcome-card-row .metric-card {
             background: #009fb1;
             border-color: #008a9a;
             color: #ffffff;
@@ -61,7 +61,7 @@
         .welcome-card-row .metric-icon-pill {
             background: rgba(255, 255, 255, 0.2);
             color: #ffffff;
-        }
+        } */
 
         .metric-number {
             font-size: 2.35rem;
@@ -187,16 +187,33 @@
             border-color: #2a2f35;
         }
 
-        /* Dark mode welcome card - keep the same teal color */
+        /* Dark mode welcome card - use dark theme instead of teal */
         body.bg-dark .welcome-card-row .metric-card {
-            background: #009fb1;
-            border-color: #008a9a;
-            color: #ffffff;
+            background: #1e2124;
+            border-color: #2a2f35;
+            color: #e6e6e6;
         }
 
         body.bg-dark .welcome-card-row .metric-card:hover {
-            background: #008a9a;
-            border-color: #007580;
+            background: #2a2f35;
+            border-color: #3a3f45;
+        }
+
+        body.bg-dark .welcome-card-row .metric-label {
+            color: #cbd3da;
+        }
+
+        body.bg-dark .welcome-card-row .metric-number {
+            color: #e6e6e6;
+        }
+
+        body.bg-dark .welcome-card-row .metric-change {
+            color: #b0b0b0 !important;
+        }
+
+        body.bg-dark .welcome-card-row .metric-icon-pill {
+            background: rgba(59, 130, 246, 0.18);
+            color: #bfdbfe;
         }
 
         body.bg-dark .table thead {
