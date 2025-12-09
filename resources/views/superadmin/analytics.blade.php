@@ -15,37 +15,13 @@
             color: #fff;
         }
 
-        /* Dark mode styles for stats cards */
-        body.bg-dark .stats-card {
-            background: #1e2124;
-            color: #e6e6e6;
-        }
-
-        body.bg-dark .stats-card:hover {
-            background: #2a2f35;
+        body.bg-dark .stat-label {
+            color: #cbd3da;
         }
 
         body.bg-dark .chart-container {
             background: #1e2124;
             color: #e6e6e6;
-        }
-
-        body.bg-dark .stat-label {
-            color: #cbd3da;
-        }
-
-        .stats-card {
-            background: white;
-            border-radius: 6px;
-            padding: 0.75rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 0.5rem;
-            border: none;
-            transition: transform 0.2s ease;
-        }
-
-        .stats-card:hover {
-            transform: translateY(-2px);
         }
 
         .stat-number {
@@ -58,6 +34,34 @@
             color: #6c757d;
             font-size: 0.75rem;
             margin-bottom: 0;
+        }
+
+        /* Make stats cards more visible */
+        .stats-card {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stats-card:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        body.bg-dark .stats-card {
+            background: #2a2f35;
+            border: 1px solid #3a3f45;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        body.bg-dark .stats-card:hover {
+            background: #343940;
         }
 
         .chart-container {
@@ -89,34 +93,34 @@
     <div class="row mb-2">
         <!-- Appointment Statistics -->
         <div class="col-md-6">
-            <div class="chart-container" style="height: 150px; padding: 0.75rem;">
+            <div class="chart-container" style="height: auto; min-height: auto; padding: 0.75rem;">
                 <h6 class="mb-2" style="font-size: 1rem;">Appointment Statistics</h6>
-                <div class="row justify-content-center">
-                    <div class="col-2">
+                <div class="row g-2">
+                    <div class="col">
                         <div class="stats-card text-center">
                             <div class="stat-number text-primary">{{ $appointmentStats['total'] ?? 0 }}</div>
                             <div class="stat-label">Total</div>
                         </div>
                     </div>
-                    <div class="col-2">
+                    <div class="col">
                         <div class="stats-card text-center">
                             <div class="stat-number text-warning">{{ $appointmentStats['pending'] ?? 0 }}</div>
                             <div class="stat-label">Pending</div>
                         </div>
                     </div>
-                    <div class="col-2">
+                    <div class="col">
                         <div class="stats-card text-center">
                             <div class="stat-number text-success">{{ $appointmentStats['approved'] ?? 0 }}</div>
                             <div class="stat-label">Approved</div>
                         </div>
                     </div>
-                    <div class="col-2">
+                    <div class="col">
                         <div class="stats-card text-center">
                             <div class="stat-number text-info">{{ $appointmentStats['completed'] ?? 0 }}</div>
                             <div class="stat-label">Completed</div>
                         </div>
                     </div>
-                    <div class="col-2">
+                    <div class="col">
                         <div class="stats-card text-center">
                             <div class="stat-number text-danger">{{ $appointmentStats['cancelled'] ?? 0 }}</div>
                             <div class="stat-label">Cancelled</div>
@@ -128,7 +132,7 @@
 
         <!-- User Statistics -->
         <div class="col-md-6">
-            <div class="chart-container" style="height: 150px; padding: 0.75rem;">
+            <div class="chart-container" style="height: auto; min-height: auto; padding: 0.75rem;">
                 <h6 class="mb-2" style="font-size: 1rem;">User Statistics</h6>
                 <div class="row justify-content-center">
                     <div class="col-3">

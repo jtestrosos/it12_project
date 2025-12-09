@@ -388,7 +388,7 @@
                                 <th scope="col">Min Stock</th>
                                 <th scope="col">Expiry Date</th>
                                 <th scope="col">Location</th>
-                                <th scope="col">Status</th>
+                                <th scope="col" class="text-center">Status</th>
                             </tr>
                         </thead>
                         <tbody id="inventoryTableBody">
@@ -410,7 +410,7 @@
                                     <td>{{ $item->expiry_date ? \Illuminate\Support\Carbon::parse($item->expiry_date)->format('Y-m-d') : 'N/A' }}
                                     </td>
                                     <td>{{ $item->location ?? 'N/A' }}</td>
-                                    <td>
+                                    <td class="text-center">
                                         @php
                                             $badge = 'secondary';
                                             if ($item->status === 'in_stock')

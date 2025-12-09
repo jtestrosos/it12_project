@@ -60,6 +60,35 @@
             margin-bottom: 0;
         }
 
+        /* Make stats cards more visible */
+        .stats-card {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            min-width: 100px;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stats-card:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        body.bg-dark .stats-card {
+            background: #2a2f35;
+            border: 1px solid #3a3f45;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        body.bg-dark .stats-card:hover {
+            background: #343940;
+        }
+
         .chart-container {
             background: white;
             border-radius: 8px;
@@ -89,7 +118,7 @@
     <div class="row mb-2">
         <!-- System Statistics -->
         <div class="col-md-6">
-            <div class="chart-container" style="height: 150px; padding: 0.75rem;">
+            <div class="chart-container" style="height: auto; min-height: auto; padding: 0.75rem;">
                 <h6 class="mb-2" style="font-size: 1rem;">System Statistics</h6>
                 <div class="row justify-content-center">
                     <div class="col-3">
@@ -122,7 +151,7 @@
 
         <!-- Health Statistics -->
         <div class="col-md-6">
-            <div class="chart-container" style="height: 150px; padding: 0.75rem;">
+            <div class="chart-container" style="height: auto; min-height: auto; padding: 0.75rem;">
                 <h6 class="mb-2" style="font-size: 1rem;">System Health</h6>
                 <div class="row justify-content-center">
                     <div class="col-4">

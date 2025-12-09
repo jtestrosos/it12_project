@@ -16,6 +16,18 @@
     #servicesPaginationContainer > div:last-child {
         margin-top: -0.5rem !important;
     }
+
+    /* Center align action button icons */
+    .table tbody td .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .table tbody td .btn i {
+        margin: 0;
+        line-height: 1;
+    }
 </style>
 @endsection
 
@@ -36,7 +48,7 @@
                             <th class="ps-4">Service Name</th>
                             <th>Description</th>
                             <th>Status</th>
-                            <th class="text-end pe-4">Actions</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -49,8 +61,8 @@
                                     {{ $service->active ? 'Active' : 'Inactive' }}
                                 </span>
                             </td>
-                            <td class="text-end pe-4">
-                                <div class="d-flex justify-content-end gap-2">
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
                                     <a href="{{ route('admin.services.edit', $service) }}" class="btn btn-sm btn-outline-primary">
                                         <i class="fas fa-edit"></i>
                                     </a>

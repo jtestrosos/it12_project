@@ -37,7 +37,7 @@
             name="{{ $name }}" 
             id="{{ $id }}"
             value="{{ old($name, $value) }}"
-            class="form-control {{ $hasError ? 'is-invalid' : '' }} {{ $icon && $iconPosition === 'left' ? 'border-start-0 ps-0' : '' }} {{ $icon && $iconPosition === 'right' ? 'border-end-0 pe-0' : '' }}"
+            class="form-control {{ $hasError ? 'is-invalid' : '' }} {{ $icon && $iconPosition === 'left' ? 'border-start-0 ps-0' : '' }} {{ $icon && $iconPosition === 'right' ? 'border-end-0 pe-0' : '' }} {{ $type === 'password' ? 'password-input-outline' : '' }}"
             placeholder="{{ $placeholder }}"
             @if($required) required @endif
             @if($disabled) disabled @endif
@@ -52,7 +52,7 @@
         @endif
 
         @if($type === 'password')
-            <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('{{ $id }}', this)" style="border-left: 1px solid #dee2e6;">
+            <button class="btn btn-outline-secondary password-toggle-btn" type="button" onclick="togglePasswordVisibility('{{ $id }}', this)">
                 <i class="fa-solid fa-eye"></i>
             </button>
         @endif
@@ -70,6 +70,59 @@
 </div>
 
 @once
+    @push('styles')
+    <style>
+        /* Password input outline styling */
+        .password-input-outline {
+            background-color: transparent !important;
+            border-color: #6c757d !important;
+        }
+
+        .password-input-outline:focus {
+            background-color: transparent !important;
+            border-color: #6c757d !important;
+            box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.25) !important;
+        }
+
+        .password-toggle-btn {
+            border-color: #6c757d !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 0.375rem 0.75rem !important;
+            min-width: 38px !important;
+        }
+
+        .password-toggle-btn i {
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1 !important;
+            display: inline-block !important;
+            vertical-align: middle !important;
+        }
+
+        .password-toggle-btn:hover,
+        .password-toggle-btn:focus {
+            background-color: #6c757d !important;
+            border-color: #6c757d !important;
+            color: white !important;
+        }
+
+        /* Dark mode support */
+        body.bg-dark .password-input-outline {
+            background-color: transparent !important;
+            border-color: #6c757d !important;
+            color: #e6e6e6 !important;
+        }
+
+        body.bg-dark .password-input-outline:focus {
+            background-color: transparent !important;
+            border-color: #6c757d !important;
+            box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.25) !important;
+        }
+    </style>
+    @endpush
+
     @push('scripts')
     <script>
         function togglePasswordVisibility(inputId, btn) {

@@ -132,6 +132,18 @@
     #logsPaginationContainer > div:last-child {
         margin-top: -0.5rem !important;
     }
+
+    /* Center align action button icons */
+    .table tbody td .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .table tbody td .btn i {
+        margin: 0;
+        line-height: 1;
+    }
 </style>
 @endsection
 
@@ -197,12 +209,12 @@
                     <thead>
                         <tr>
                             <th>User</th>
-                            <th>Action</th>
+                            <th class="text-center">Action</th>
                             <th>Table</th>
                             <th>Record ID</th>
-                            <th>Status</th>
+                            <th class="text-center">Status</th>
                             <th>Date</th>
-                            <th>Actions</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -224,7 +236,7 @@
                                         {{ $userName }}
                                     </div>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     @if($log->action == 'created')
                                         <span class="badge bg-success">{{ ucfirst($log->action) }}</span>
                                     @elseif($log->action == 'updated')
@@ -237,7 +249,7 @@
                                 </td>
                                 <td>{{ $log->table_name ?? 'N/A' }}</td>
                                 <td>{{ $log->record_id ?? 'N/A' }}</td>
-                                <td>
+                                <td class="text-center">
                                     @if($log->status == 'active')
                                         <span class="badge bg-success">{{ ucfirst($log->status) }}</span>
                                     @elseif($log->status == 'inactive')
@@ -248,8 +260,8 @@
                                         <span class="badge bg-info">{{ ucfirst($log->status ?? 'active') }}</span>
                                     @endif
                                 </td>
-                                <td>{{ $log->created_at->format('M d, Y H:i') }}</td>
-                                <td>
+                                <td>{{ $log->created_at->format('M d, Y g:i A') }}</td>
+                                <td class="text-center">
                                     <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
                                         data-bs-target="#logDetailsModal" data-user="{{ $userName }}"
                                         data-action="{{ ucfirst($log->action) }}" data-table="{{ $log->table_name ?? 'N/A' }}"

@@ -159,6 +159,24 @@
             background: rgba(var(--color-accent-rgb), 0.25);
             color: var(--color-accent-light);
         }
+
+        /* Center align action buttons */
+        .table tbody td .btn-group {
+            display: inline-flex;
+            vertical-align: middle;
+        }
+
+        .table tbody td .btn-group .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.375rem 0.5rem;
+        }
+
+        .table tbody td .btn-group .btn i {
+            margin: 0;
+            line-height: 1;
+        }
     </style>
 @endsection
 

@@ -34,6 +34,35 @@
             border-color: #d0e2ff;
         }
 
+        /* Welcome card with teal background */
+        .welcome-card-row .metric-card {
+            background: #009fb1;
+            border-color: #008a9a;
+            color: #ffffff;
+        }
+
+        .welcome-card-row .metric-card:hover {
+            background: #008a9a;
+            border-color: #007580;
+        }
+
+        .welcome-card-row .metric-label {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .welcome-card-row .metric-number {
+            color: #ffffff;
+        }
+
+        .welcome-card-row .metric-change {
+            color: rgba(255, 255, 255, 0.75) !important;
+        }
+
+        .welcome-card-row .metric-icon-pill {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+
         .metric-number {
             font-size: 2.35rem;
             font-weight: 700;
@@ -156,6 +185,18 @@
             color: #e6e6e6;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             border-color: #2a2f35;
+        }
+
+        /* Dark mode welcome card - keep the same teal color */
+        body.bg-dark .welcome-card-row .metric-card {
+            background: #009fb1;
+            border-color: #008a9a;
+            color: #ffffff;
+        }
+
+        body.bg-dark .welcome-card-row .metric-card:hover {
+            background: #008a9a;
+            border-color: #007580;
         }
 
         body.bg-dark .table thead {
@@ -332,7 +373,7 @@
         @endif
 
         <!-- Metrics Cards -->
-        <div class="row g-3 mb-4">
+        <div class="row g-3 mb-4 welcome-card-row">
             <div class="col-sm-6 col-lg-3">
                 <div class="metric-card">
                     <div class="d-flex justify-content-between align-items-start">
