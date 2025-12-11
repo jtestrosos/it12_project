@@ -398,7 +398,7 @@
                                                     class="btn btn-sm btn-outline-primary btn-modern me-2">
                                                     <i class="fas fa-eye me-1"></i> View
                                                 </a>
-                                                @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
+                                                @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed' && $appointment->status !== 'approved')
                                                     <button type="button" class="btn btn-sm btn-danger cancel-appointment-btn"
                                                         data-appointment-id="{{ $appointment->id }}"
                                                         data-cancel-url="{{ route('patient.cancel-appointment', $appointment) }}"

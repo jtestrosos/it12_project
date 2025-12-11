@@ -208,10 +208,50 @@
             border-radius: 2px;
         }
 
+        .time-slots-container {
+            background: #ffffff;
+            border: 1px solid #e9ecef !important;
+            max-height: 500px;
+        }
+
+        body.bg-dark .time-slots-container {
+            background: #1e2124 !important;
+            border-color: #2a2f35 !important;
+        }
+
+        .time-slots-grid-wrapper {
+            max-height: 450px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 0.5rem;
+        }
+
+        .time-slots-grid-wrapper::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .time-slots-grid-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        body.bg-dark .time-slots-grid-wrapper::-webkit-scrollbar-track {
+            background: #2a2f35;
+        }
+
+        .time-slots-grid-wrapper::-webkit-scrollbar-thumb {
+            background: #009fb1;
+            border-radius: 4px;
+        }
+
+        .time-slots-grid-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #008a9a;
+        }
+
         .time-slots-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 0.5rem;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
         }
 
         .time-slot {
@@ -238,6 +278,14 @@
             border-color: #f5c6cb;
             color: #721c24;
             cursor: not-allowed;
+        }
+
+        .time-slot.past {
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+            color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
 
         .time-slot.selected {
@@ -297,6 +345,13 @@
             color: #ff6b6b;
         }
 
+        body.bg-dark .time-slot.past {
+            background-color: #1e2124;
+            border-color: #2a2f35;
+            color: #6c757d;
+            opacity: 0.5;
+        }
+
         /* Dark Mode Form Controls */
         body.bg-dark select.form-control,
         body.bg-dark textarea.form-control {
@@ -333,6 +388,12 @@
         body.bg-dark #currentMonth,
         body.bg-dark #selectedDateDisplay {
             color: #e6e6e6;
+        }
+
+        /* Dark Mode Time Slots Container */
+        body.bg-dark .border.rounded {
+            border-color: #2a2f35 !important;
+            background-color: #1e2124 !important;
         }
 
         /* Dark Mode Inner Cards */
@@ -584,6 +645,24 @@
         body.bg-dark h6.text-muted.small.fw-bold {
             color: #cbd3da !important;
         }
+
+        /* Responsive adjustments */
+        @media (max-width: 1199px) {
+            .col-xl-6 {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .time-slots-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .calendar-grid {
+                font-size: 0.75rem;
+            }
+        }
     </style>
 @endsection
 
@@ -695,8 +774,9 @@
                                     </h5>
                                 </div>
                                 <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-4">
+                                    <div class="row g-4">
+                                        <!-- Calendar Column -->
+                                        <div class="col-xl-6 col-lg-6 col-md-12">
                                             <div class="d-flex justify-content-between align-items-center mb-3">
                                                 <button type="button" class="btn btn-sm btn-outline-primary" id="prevMonth">
                                                     <i class="fas fa-chevron-left"></i>
@@ -710,21 +790,20 @@
                                                 <!-- Calendar will be populated here -->
                                             </div>
                                         </div>
-                                        <div class="col-md-8">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h6 class="mb-0" id="selectedDateDisplay">Select a date to view
-                                                        available time slots</h6>
+                                        
+                                        <!-- Time Slots Column -->
+                                        <div class="col-xl-6 col-lg-6 col-md-12">
+                                            <div class="border rounded p-3 time-slots-container">
+                                                <h6 class="mb-3 pb-2 border-bottom" id="selectedDateDisplay">
+                                                    Select a date to view available time slots
+                                                </h6>
+                                                <div id="timeSlotsGrid" class="time-slots-grid-wrapper">
+                                                    <!-- Time slots will be populated here -->
                                                 </div>
-                                                <div class="card-body">
-                                                    <div id="timeSlotsGrid" class="time-slots-grid">
-                                                        <!-- Time slots will be populated here -->
-                                                    </div>
-                                                    <input type="hidden" id="appointment_date" name="appointment_date"
-                                                        value="{{ old('appointment_date') }}" required>
-                                                    <input type="hidden" id="appointment_time" name="appointment_time"
-                                                        value="{{ old('appointment_time') }}" required>
-                                                </div>
+                                                <input type="hidden" id="appointment_date" name="appointment_date"
+                                                    value="{{ old('appointment_date') }}" required>
+                                                <input type="hidden" id="appointment_time" name="appointment_time"
+                                                    value="{{ old('appointment_time') }}" required>
                                             </div>
                                         </div>
                                     </div>
@@ -1424,12 +1503,32 @@
                 }
 
                 renderTimeSlots(slots) {
-                    const timeSlotsGrid = document.getElementById('timeSlotsGrid');
-                    timeSlotsGrid.innerHTML = '';
+                    const timeSlotsWrapper = document.getElementById('timeSlotsGrid');
+                    timeSlotsWrapper.innerHTML = '';
+                    
+                    // Create the grid container
+                    const gridContainer = document.createElement('div');
+                    gridContainer.className = 'time-slots-grid';
 
                     slots.forEach(slot => {
                         const slotElement = document.createElement('div');
-                        slotElement.className = `time-slot ${slot.available ? 'available' : 'occupied'}`;
+                        
+                        // Determine slot class based on availability and time
+                        let slotClass = 'time-slot';
+                        let statusText = '';
+                        
+                        if (slot.is_past) {
+                            slotClass += ' past';
+                            statusText = 'Time Passed';
+                        } else if (!slot.available) {
+                            slotClass += ' occupied';
+                            statusText = `Occupied (${slot.occupied_count})`;
+                        } else {
+                            slotClass += ' available';
+                            statusText = 'Available';
+                        }
+                        
+                        slotElement.className = slotClass;
 
                         const timeElement = document.createElement('div');
                         timeElement.className = 'time';
@@ -1437,19 +1536,22 @@
 
                         const statusElement = document.createElement('div');
                         statusElement.className = 'status';
-                        statusElement.textContent = slot.available ? 'Available' : `Occupied (${slot.occupied_count})`;
+                        statusElement.textContent = statusText;
 
                         slotElement.appendChild(timeElement);
                         slotElement.appendChild(statusElement);
 
-                        if (slot.available) {
+                        // Only allow clicking on available slots that haven't passed
+                        if (slot.available && !slot.is_past) {
                             slotElement.addEventListener('click', () => {
                                 this.selectTimeSlot(slot);
                             });
                         }
 
-                        timeSlotsGrid.appendChild(slotElement);
+                        gridContainer.appendChild(slotElement);
                     });
+                    
+                    timeSlotsWrapper.appendChild(gridContainer);
                 }
 
                 selectTimeSlot(slot) {

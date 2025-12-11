@@ -16,6 +16,9 @@ class AppointmentHelper
     public static function getAvailableSlots($date)
     {
         $timeSlots = self::getAllTimeSlots();
+        $selectedDate = Carbon::parse($date);
+        $now = Carbon::now();
+        $isToday = $selectedDate->isToday();
 
         // Optimize: Use DB aggregation instead of fetching all records
         $counts = Appointment::whereDate('appointment_date', $date)
@@ -34,12 +37,20 @@ class AppointmentHelper
         $availableSlots = [];
         foreach ($timeSlots as $slot) {
             $count = $normalizedCounts[$slot['time']] ?? 0;
+            
+            // Check if the time slot has passed (only for today)
+            $isPast = false;
+            if ($isToday) {
+                $slotTime = Carbon::parse($date . ' ' . $slot['time']);
+                $isPast = $slotTime->isPast();
+            }
 
             $availableSlots[] = [
                 'time' => $slot['time'],
                 'display' => $slot['display'],
-                'available' => $count === 0, // Assuming 1 slot per time capacity
-                'occupied_count' => $count
+                'available' => $count === 0 && !$isPast, // Not available if occupied or time has passed
+                'occupied_count' => $count,
+                'is_past' => $isPast
             ];
         }
 
