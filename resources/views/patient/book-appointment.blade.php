@@ -176,15 +176,22 @@
         }
 
         .calendar-day.occupied {
-            background-color: #dc3545;
-            color: white;
-            border-color: #dc3545;
+            background-color: #F53838;
+            color: #000;
+            border-color: #F53838;
         }
 
         .calendar-day.partially-occupied {
-            background-color: #ffc107;
-            color: #212529;
-            border-color: #ffc107;
+            background-color: #FFF52E;
+            color: #000;
+            border-color: #FFF52E;
+        }
+
+        /* Selected state takes priority over partially-occupied */
+        .calendar-day.partially-occupied.selected {
+            background-color: #009fb1;
+            color: white;
+            border-color: #009fb1;
         }
 
         .calendar-day.weekend {
@@ -220,7 +227,7 @@
         }
 
         .time-slots-grid-wrapper {
-            max-height: 450px;
+            max-height: 400px;
             overflow-y: auto;
             overflow-x: hidden;
             padding-right: 0.5rem;
@@ -264,19 +271,19 @@
         }
 
         .time-slot.available {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
+            background-color: #77dd77;
+            border-color: #66cc66;
+            color: #000;
         }
 
         .time-slot.available:hover {
-            background-color: #c3e6cb;
+            background-color: #66cc66;
         }
 
         .time-slot.occupied {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
+            background-color: #F53838;
+            border-color: #e62929;
+            color: #000;
             cursor: not-allowed;
         }
 
@@ -334,15 +341,15 @@
         }
 
         body.bg-dark .time-slot.available {
-            background-color: #1e3a1f;
-            border-color: #2a5f2e;
-            color: #90ee90;
+            background-color: #77dd77;
+            border-color: #66cc66;
+            color: #000;
         }
 
         body.bg-dark .time-slot.occupied {
-            background-color: #3d1a1a;
-            border-color: #5c2a2a;
-            color: #ff6b6b;
+            background-color: #F53838;
+            border-color: #e62929;
+            color: #000;
         }
 
         body.bg-dark .time-slot.past {
@@ -419,15 +426,22 @@
         }
 
         body.bg-dark .calendar-day.occupied {
-            background-color: #3d1a1a;
-            border-color: #5c2a2a;
-            color: #ff6b6b;
+            background-color: #F53838;
+            border-color: #e62929;
+            color: #000;
         }
 
         body.bg-dark .calendar-day.partially-occupied {
-            background-color: #4d3e0b;
-            border-color: #66520f;
-            color: #ffd700;
+            background-color: #FFF52E;
+            border-color: #ffe61f;
+            color: #000;
+        }
+
+        /* Selected state takes priority in dark mode too */
+        body.bg-dark .calendar-day.partially-occupied.selected {
+            background-color: #009fb1;
+            border-color: #009fb1;
+            color: #fff;
         }
 
         /* Dark Mode Time Slots */
@@ -558,25 +572,35 @@
         }
 
         .legend-color.available {
-            background: white;
-            border-color: #dee2e6;
+            background: #77dd77;
+            border-color: #66cc66;
         }
 
         body.bg-dark .legend-color.available {
-            background: #1e2124;
-            border-color: #495057;
+            background: #77dd77;
+            border-color: #66cc66;
         }
 
         .legend-color.partially-occupied {
-            background: #ffc107;
+            background: #FFF52E;
         }
 
         .legend-color.occupied {
-            background: #dc3545;
+            background: #F53838;
         }
 
         .legend-color.selected {
             background: #009fb1;
+        }
+
+        .legend-color.unavailable {
+            background: white;
+            border-color: #dee2e6;
+        }
+
+        body.bg-dark .legend-color.unavailable {
+            background: #1e2124;
+            border-color: #495057;
         }
 
         /* Confirmation Modal */
@@ -754,16 +778,20 @@
                                     <span>Available</span>
                                 </div>
                                 <div class="legend-item">
-                                    <div class="legend-color partially-occupied"></div>
-                                    <span>Limited Slots</span>
-                                </div>
-                                <div class="legend-item">
                                     <div class="legend-color occupied"></div>
                                     <span>Fully Booked</span>
                                 </div>
                                 <div class="legend-item">
+                                    <div class="legend-color partially-occupied"></div>
+                                    <span>Limited Slots</span>
+                                </div>
+                                <div class="legend-item">
                                     <div class="legend-color selected"></div>
                                     <span>Selected</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color unavailable"></div>
+                                    <span>Unavailable</span>
                                 </div>
                             </div>
 
@@ -1519,7 +1547,7 @@
                         
                         if (slot.is_past) {
                             slotClass += ' past';
-                            statusText = 'Time Passed';
+                            statusText = 'Unavailable';
                         } else if (!slot.available) {
                             slotClass += ' occupied';
                             statusText = `Occupied (${slot.occupied_count})`;

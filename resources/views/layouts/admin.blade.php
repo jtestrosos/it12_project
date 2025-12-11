@@ -217,6 +217,212 @@
             background-color: var(--color-primary) !important;
         }
 
+        /* Global Green Color Override - Change all green to #77dd77 */
+        .bg-success,
+        .badge.bg-success,
+        .btn-success,
+        .alert-success {
+            background-color: #77dd77 !important;
+            border-color: #77dd77 !important;
+            color: #000 !important;
+        }
+
+        .text-success {
+            color: #77dd77 !important;
+        }
+
+        .btn-success:hover,
+        .btn-success:focus,
+        .btn-success:active {
+            background-color: #66cc66 !important;
+            border-color: #66cc66 !important;
+            color: #000 !important;
+        }
+
+        .btn-outline-success {
+            color: #77dd77 !important;
+            border-color: #77dd77 !important;
+        }
+
+        .btn-outline-success:hover {
+            background-color: #77dd77 !important;
+            border-color: #77dd77 !important;
+            color: #000 !important;
+        }
+
+        .bg-success-subtle {
+            background-color: rgba(119, 221, 119, 0.1) !important;
+            color: #000 !important;
+        }
+
+        /* Dark mode green overrides */
+        body.bg-dark .alert-success {
+            background-color: rgba(119, 221, 119, 0.15) !important;
+            border-color: rgba(119, 221, 119, 0.3) !important;
+            color: #77dd77 !important;
+        }
+
+        body.bg-dark .bg-success {
+            background-color: #77dd77 !important;
+            color: #000 !important;
+        }
+
+        body.bg-dark .text-success {
+            color: #77dd77 !important;
+        }
+
+        body.bg-dark .badge.bg-success {
+            color: #000 !important;
+        }
+
+        body.bg-dark .btn-success {
+            color: #000 !important;
+        }
+
+        /* Force black text on all status badges in dark mode */
+        body.bg-dark .status-badge {
+            color: #000 !important;
+        }
+
+        body.bg-dark .badge.bg-warning,
+        body.bg-dark .badge.bg-danger,
+        body.bg-dark .badge.bg-info,
+        body.bg-dark span.bg-warning,
+        body.bg-dark span.bg-success,
+        body.bg-dark span.bg-danger,
+        body.bg-dark span.bg-info {
+            color: #000 !important;
+        }
+
+        /* Global Yellow/Warning Color Override - Change all yellow to #FFF52E */
+        .bg-warning,
+        .badge.bg-warning,
+        .btn-warning,
+        .alert-warning {
+            background-color: #FFF52E !important;
+            border-color: #FFF52E !important;
+            color: #000 !important;
+        }
+
+        .text-warning {
+            color: #FFF52E !important;
+        }
+
+        .btn-warning:hover,
+        .btn-warning:focus,
+        .btn-warning:active {
+            background-color: #ffe61f !important;
+            border-color: #ffe61f !important;
+            color: #000 !important;
+        }
+
+        .btn-outline-warning {
+            color: #FFF52E !important;
+            border-color: #FFF52E !important;
+        }
+
+        .btn-outline-warning:hover {
+            background-color: #FFF52E !important;
+            border-color: #FFF52E !important;
+            color: #000 !important;
+        }
+
+        .bg-warning-subtle {
+            background-color: rgba(255, 245, 46, 0.1) !important;
+            color: #000 !important;
+        }
+
+        /* Dark mode yellow overrides */
+        body.bg-dark .alert-warning {
+            background-color: rgba(255, 245, 46, 0.15) !important;
+            border-color: rgba(255, 245, 46, 0.3) !important;
+            color: #FFF52E !important;
+        }
+
+        body.bg-dark .bg-warning {
+            background-color: #FFF52E !important;
+            color: #000 !important;
+        }
+
+        body.bg-dark .text-warning {
+            color: #FFF52E !important;
+        }
+
+        body.bg-dark .badge.bg-warning {
+            color: #000 !important;
+        }
+
+        body.bg-dark .btn-warning {
+            color: #000 !important;
+        }
+
+        /* Global Red/Danger Color Override - Change all red to #F53838 */
+        .bg-danger,
+        .badge.bg-danger,
+        .alert-danger {
+            background-color: #F53838 !important;
+            border-color: #F53838 !important;
+            color: #000 !important;
+        }
+
+        .btn-danger {
+            background-color: #F53838 !important;
+            border-color: #F53838 !important;
+            color: #fff !important;
+        }
+
+        .text-danger {
+            color: #F53838 !important;
+        }
+
+        .btn-danger:hover,
+        .btn-danger:focus,
+        .btn-danger:active {
+            background-color: #e62929 !important;
+            border-color: #e62929 !important;
+            color: #fff !important;
+        }
+
+        .btn-outline-danger {
+            color: #F53838 !important;
+            border-color: #F53838 !important;
+        }
+
+        .btn-outline-danger:hover {
+            background-color: #F53838 !important;
+            border-color: #F53838 !important;
+            color: #fff !important;
+        }
+
+        .bg-danger-subtle {
+            background-color: rgba(245, 56, 56, 0.1) !important;
+            color: #000 !important;
+        }
+
+        /* Dark mode red overrides */
+        body.bg-dark .alert-danger {
+            background-color: rgba(245, 56, 56, 0.15) !important;
+            border-color: rgba(245, 56, 56, 0.3) !important;
+            color: #F53838 !important;
+        }
+
+        body.bg-dark .bg-danger {
+            background-color: #F53838 !important;
+            color: #000 !important;
+        }
+
+        body.bg-dark .text-danger {
+            color: #F53838 !important;
+        }
+
+        body.bg-dark .badge.bg-danger {
+            color: #000 !important;
+        }
+
+        body.bg-dark .btn-danger {
+            color: #fff !important;
+        }
+
         body.bg-dark {
             background-color: var(--bg-dark);
             color: var(--text-dark);

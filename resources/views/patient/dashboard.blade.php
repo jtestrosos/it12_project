@@ -394,7 +394,7 @@
                                             <td>
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('patient.appointment.show', $appointment) }}"
-                                                        class="btn btn-sm btn-outline-primary">
+                                                        class="btn btn-sm btn-primary">
                                                         <i class="fas fa-eye me-1"></i> View
                                                     </a>
                                                     @if($appointment->status == 'pending')
@@ -408,7 +408,7 @@
                         </div>
                         @if($appointments->count() > 10)
                             <div class="text-center p-3 border-top">
-                                <a href="{{ route('patient.appointments') }}" class="btn btn-outline-primary">
+                                <a href="{{ route('patient.appointments') }}" class="btn btn-primary">
                                     <i class="fas fa-calendar me-2"></i> View All Appointments
                                 </a>
                             </div>

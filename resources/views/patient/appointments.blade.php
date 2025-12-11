@@ -126,6 +126,21 @@
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 500;
+            display: inline-block;
+            color: #000 !important;
+        }
+        
+        .table-modern .text-center {
+            text-align: center;
+            padding-right: 4rem;
+        }
+        
+        /* Ensure all badge text is black */
+        .status-badge.bg-warning,
+        .status-badge.bg-success,
+        .status-badge.bg-danger,
+        .status-badge.bg-info {
+            color: #000 !important;
         }
 
         .btn-modern {
@@ -190,8 +205,14 @@
             color: #e6e6e6 !important;
         }
 
-        body.bg-dark .appointments-card .table-modern tbody td * {
+        body.bg-dark .appointments-card .table-modern tbody td *:not(.status-badge):not(.badge) {
             color: inherit !important;
+        }
+
+        /* Force status badges to have black text in dark mode */
+        body.bg-dark .appointments-card .table-modern tbody td .status-badge,
+        body.bg-dark .appointments-card .table-modern tbody td .badge {
+            color: #000 !important;
         }
 
         body.bg-dark .appointments-card .table-modern tbody td div {
@@ -354,7 +375,7 @@
                                         <th>Appointment</th>
                                         <th>Date & Time</th>
                                         <th>Service</th>
-                                        <th>Status</th>
+                                        <th class="text-center">Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -382,20 +403,20 @@
                                                 </div>
                                             </td>
                                             <td class="text-muted">{{ $appointment->service_type }}</td>
-                                            <td>
+                                            <td class="text-center">
                                                 <span class="status-badge 
-                                                                        @if($appointment->status == 'pending') bg-warning text-dark
-                                                                        @elseif($appointment->status == 'approved') bg-success text-white
-                                                                        @elseif($appointment->status == 'completed') bg-info text-white
-                                                                        @elseif($appointment->status == 'cancelled') bg-danger text-white
-                                                                        @else bg-secondary text-white
+                                                                        @if($appointment->status == 'pending') bg-warning
+                                                                        @elseif($appointment->status == 'approved') bg-success
+                                                                        @elseif($appointment->status == 'completed') bg-info
+                                                                        @elseif($appointment->status == 'cancelled') bg-danger
+                                                                        @else bg-secondary
                                                                         @endif">
                                                     {{ ucfirst($appointment->status) }}
                                                 </span>
                                             </td>
                                             <td>
                                                 <a href="{{ route('patient.appointment.show', $appointment) }}"
-                                                    class="btn btn-sm btn-outline-primary btn-modern me-2">
+                                                    class="btn btn-sm btn-primary me-2">
                                                     <i class="fas fa-eye me-1"></i> View
                                                 </a>
                                                 @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed' && $appointment->status !== 'approved')
