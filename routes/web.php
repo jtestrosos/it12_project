@@ -60,6 +60,7 @@ Route::middleware(['auth.multi'])->group(function () {
 
 Route::get('/register', fn() => view('auth.register'))->name('register');
 Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
+Route::post('/check-email', [App\Http\Controllers\AuthController::class, 'checkEmailAvailability']);
 
 // Patient Routes
 Route::middleware(['patient'])->group(function () {

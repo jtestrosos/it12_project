@@ -235,12 +235,11 @@ class SuperAdminController extends Controller
             'password' => [
                 'required',
                 'min:8',
-                'confirmed',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]).+$/',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
             ],
         ], [
             'name.regex' => 'The name field should not contain numbers. Only letters, spaces, periods, hyphens, and apostrophes are allowed.',
-            'password.regex' => 'The password must contain at least one lowercase letter, one uppercase letter, and one special character.',
+            'password.regex' => 'The password must contain at least one lowercase letter, one uppercase letter, and one number.',
             'gender.required' => 'Please select a gender.',
             'barangay.in' => 'Please select Barangay 11, Barangay 12, or choose Other.',
             'barangay.required' => 'Barangay is required for patient accounts.',
@@ -354,12 +353,11 @@ class SuperAdminController extends Controller
             'password' => [
                 'nullable',
                 'min:8',
-                'confirmed',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{}|,.<>\/?]).+$/',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
             ],
         ], [
             'name.regex' => 'The name field should not contain numbers. Only letters, spaces, periods, hyphens, and apostrophes are allowed.',
-            'password.regex' => 'The password must contain at least one lowercase letter, one uppercase letter, and one special character.',
+            'password.regex' => 'The password must contain at least one lowercase letter, one uppercase letter, and one number.',
             'gender.required' => 'Please select a gender.',
             'barangay.in' => 'Please select Barangay 11, Barangay 12, or choose Other.',
             'barangay.required' => 'Barangay is required for patient accounts.',

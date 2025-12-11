@@ -722,27 +722,28 @@
                         @enderror
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password <span
                                         class="text-danger">*</span></label>
-                                <input type="password" class="form-control @error('password') is-invalid @enderror"
-                                    id="password" name="password" required>
+                                <div class="input-group">
+                                    <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                        id="password" name="password" required>
+                                    <button class="btn btn-outline-secondary toggle-password-btn" type="button" style="background: white; border-color: #ced4da; border-left: 0;">
+                                        <i class="fas fa-eye text-muted"></i>
+                                    </button>
+                                </div>
                                 @error('password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="password_confirmation" class="form-label">Confirm Password <span
-                                        class="text-danger">*</span></label>
-                                <input type="password"
-                                    class="form-control @error('password_confirmation') is-invalid @enderror"
-                                    id="password_confirmation" name="password_confirmation" required>
-                                @error('password_confirmation')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <div class="password-strength-indicator mt-2" id="password-strength-add" style="display: none;">
+                                    <div class="d-flex gap-1 mb-1" style="height: 4px;">
+                                        <div class="strength-bar flex-grow-1 rounded-pill" style="background-color: #e9ecef;"></div>
+                                        <div class="strength-bar flex-grow-1 rounded-pill" style="background-color: #e9ecef;"></div>
+                                        <div class="strength-bar flex-grow-1 rounded-pill" style="background-color: #e9ecef;"></div>
+                                    </div>
+                                    <small class="strength-text text-muted" style="font-size: 0.75rem;"></small>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1045,27 +1046,19 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <div class="mb-3">
                                     <label for="edit_password{{ $patient->id }}" class="form-label">New Password</label>
-                                    <input type="password" class="form-control @error('password') is-invalid @enderror"
-                                        id="edit_password{{ $patient->id }}" name="password"
-                                        placeholder="Leave blank to keep current password">
+                                    <div class="input-group">
+                                        <input type="password" class="form-control @error('password') is-invalid @enderror"
+                                            id="edit_password{{ $patient->id }}" name="password"
+                                            placeholder="Leave blank to keep current password">
+                                        <button class="btn btn-outline-secondary toggle-password-btn" type="button" style="background: white; border-color: #ced4da; border-left: 0;">
+                                            <i class="fas fa-eye text-muted"></i>
+                                        </button>
+                                    </div>
                                     @error('password')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="edit_password_confirmation{{ $patient->id }}" class="form-label">Confirm New
-                                        Password</label>
-                                    <input type="password"
-                                        class="form-control @error('password_confirmation') is-invalid @enderror"
-                                        id="edit_password_confirmation{{ $patient->id }}" name="password_confirmation"
-                                        placeholder="Confirm new password">
-                                    @error('password_confirmation')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
@@ -1218,6 +1211,101 @@
 
 @push('scripts')
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Password Visibility Toggle (Delegated)
+            document.body.addEventListener('click', function(e) {
+                const btn = e.target.closest('.toggle-password-btn');
+                if (btn) {
+                    const input = btn.parentElement.querySelector('input');
+                    if (input) {
+                        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                        input.setAttribute('type', type);
+                        
+                        const icon = btn.querySelector('i');
+                        if (type === 'text') {
+                            icon.classList.remove('fa-eye');
+                            icon.classList.add('fa-eye-slash');
+                        } else {
+                            icon.classList.remove('fa-eye-slash');
+                            icon.classList.add('fa-eye');
+                        }
+                    }
+                }
+            });
+
+            // 2. Password Strength Meter (Add Patient Modal)
+            const passwordInput = document.getElementById('password');
+            const strengthIndicator = document.getElementById('password-strength-add');
+            
+            if (passwordInput && strengthIndicator) {
+                const bars = [
+                    strengthIndicator.querySelector('.strength-bar:nth-child(1)'),
+                    strengthIndicator.querySelector('.strength-bar:nth-child(2)'),
+                    strengthIndicator.querySelector('.strength-bar:nth-child(3)')
+                ];
+                const text = strengthIndicator.querySelector('.strength-text');
+
+                passwordInput.addEventListener('input', function() {
+                    const value = this.value;
+                    if (value.length > 0) {
+                        strengthIndicator.style.display = 'block';
+                    } else {
+                        strengthIndicator.style.display = 'none';
+                        return;
+                    }
+
+                    let strength = 0;
+                    if (value.length >= 8) strength++; // Length
+                    if (/[A-Z]/.test(value)) strength++; // Uppercase
+                    if (/[0-9]/.test(value)) strength++; // Number
+                    // Bonus for special char or lowercase mix
+                    if (/[a-z]/.test(value) && /[^a-zA-Z0-9]/.test(value)) strength++; 
+
+                    // Cap strength at 3 for 3 bars
+                    // But our regex is relaxed: Min 8, 1 lower, 1 upper, 1 number.
+                    // Let's simplified strength calc to match bars:
+                    // 1 bar: Weak (too short or missing types)
+                    // 2 bars: Medium (Good length, mixed types)
+                    // 3 bars: Strong (Excellent)
+
+                    let score = 0;
+                    if (value.length >= 8) score++;
+                    if (/[A-Z]/.test(value) && /[a-z]/.test(value)) score++;
+                    if (/[0-9]/.test(value)) score++;
+                    if (/[^a-zA-Z0-9]/.test(value)) score++;
+
+                    // Map score (0-4) to bars (0-3)
+                    let activeBars = 0;
+                    let color = '#dc3545'; // Red
+                    let label = 'Weak';
+
+                    if (score < 2) {
+                        activeBars = 1;
+                    } else if (score === 2 || score === 3) {
+                        activeBars = 2;
+                        color = '#ffc107'; // Yellow
+                        label = 'Medium';
+                    } else if (score >= 4) {
+                        activeBars = 3;
+                        color = '#198754'; // Green
+                        label = 'Strong';
+                    }
+
+                    // Update UI
+                    text.textContent = label;
+                    text.style.color = color;
+
+                    bars.forEach((bar, index) => {
+                        if (index < activeBars) {
+                            bar.style.backgroundColor = color;
+                        } else {
+                            bar.style.backgroundColor = '#e9ecef';
+                        }
+                    });
+                });
+            }
+        });
+
         // Search and Filter Functionality
         document.addEventListener('DOMContentLoaded', function () {
             const statusFilter = document.getElementById('statusFilter');

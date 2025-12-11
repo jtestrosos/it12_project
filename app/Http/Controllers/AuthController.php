@@ -85,6 +85,23 @@ class AuthController extends Controller
     }
 
     /**
+     * Check if email is available for registration.
+     */
+    public function checkEmailAvailability(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $exists = Patient::where('email', $request->email)->exists();
+
+        return response()->json([
+            'available' => !$exists,
+            'message' => $exists ? 'This email is already registered.' : 'Email is available.'
+        ]);
+    }
+
+    /**
      * Handle user registration request.
      */
     public function register(Request $request)
@@ -133,9 +150,7 @@ class AuthController extends Controller
             'password' => [
                 'required',
                 'min:8',
-                'confirmed',
-                // At least one lowercase, one uppercase, and one special character
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{}|,.<>\/?]).+$/',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
             ],
         ], [
             'name.regex' => 'The name field should not contain numbers. Only letters, spaces, periods, hyphens, and apostrophes are allowed.',
@@ -147,7 +162,6 @@ class AuthController extends Controller
             'purok.required' => 'Please select a purok for the chosen barangay.',
             'purok.in' => 'Please choose a valid purok option.',
             'birth_date.before' => 'Birth date must be in the past.',
-            'password.confirmed' => 'Password and confirm password must match.',
         ]);
 
         $age = Carbon::parse($validated['birth_date'])->age;

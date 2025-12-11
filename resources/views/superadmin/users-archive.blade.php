@@ -137,54 +137,7 @@
     <div class="card">
         <div class="card-body p-0">
             @if($users->count() > 0)
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Email</th>
-                                <th class="text-center">Role</th>
-                                <th>Archived At</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($users as $user)
-                                <tr>
-                                    <td>{{ $user->name }}</td>
-                                    <td>{{ $user->email }}</td>
-                                    <td class="text-center">{{ ucfirst($user->role === 'user' ? 'patient' : $user->role) }}</td>
-                                    <td>{{ optional($user->deleted_at)->format('M d, Y g:i A') }}</td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <form method="POST"
-                                                action="{{ route('superadmin.user.restore', ['type' => $user->role, 'id' => $user->id]) }}">
-                                                @csrf
-                                                <button type="button" class="btn btn-sm btn-outline-secondary action-btn"
-                                                    data-confirm data-confirm-title="Restore User"
-                                                    data-confirm-message="Are you sure you want to restore this user?"
-                                                    title="Restore">
-                                                    <i class="fas fa-undo text-success"></i>
-                                                </button>
-                                            </form>
-                                            <form method="POST"
-                                                action="{{ route('superadmin.user.force-delete', ['type' => $user->role, 'id' => $user->id]) }}">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" class="btn btn-sm btn-outline-secondary action-btn"
-                                                    data-confirm data-confirm-title="Delete User"
-                                                    data-confirm-message="Permanently delete this user? This cannot be undone."
-                                                    title="Delete">
-                                                    <i class="fas fa-trash text-danger"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+@include('superadmin.partials.users-archive-table')
             @else
                 <div class="text-center py-5">
                     <i class="fas fa-archive fa-3x text-muted mb-3"></i>
@@ -207,90 +160,10 @@
         </div>
     @endif
 
-    <!-- Confirm Action Modal -->
-    <div class="modal fade" id="confirmActionModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmActionTitle">Confirm Action</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="confirmActionMessage">
-                    Are you sure?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="confirmActionBtn">Confirm</button>
-                </div>
-            </div>
-        </div>
-    </div>
+@include('superadmin.partials.confirm-modal')
 @endsection
 
 @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Sync table with dark mode on page load
-            const syncTableDark = () => {
-                const isDark = document.body.classList.contains('bg-dark');
-                const table = document.querySelector('.table');
-                if (table) {
-                    table.classList.toggle('table-dark', isDark);
-                }
-            };
-
-            // Sync on load
-            syncTableDark();
-
-            // Watch for theme changes
-            const observer = new MutationObserver(() => {
-                syncTableDark();
-            });
-            observer.observe(document.body, {
-                attributes: true,
-                attributeFilter: ['class']
-            });
-        });
-
-        (function () {
-            const modalEl = document.getElementById('confirmActionModal');
-            if (!modalEl || typeof bootstrap === 'undefined') {
-                return;
-            }
-
-            const modal = new bootstrap.Modal(modalEl);
-            const titleEl = document.getElementById('confirmActionTitle');
-            const messageEl = document.getElementById('confirmActionMessage');
-            const confirmBtn = document.getElementById('confirmActionBtn');
-
-            let pendingForm = null;
-
-            document.querySelectorAll('[data-confirm]').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    const form = btn.closest('form');
-                    if (!form) return;
-                    pendingForm = form;
-
-                    if (titleEl) {
-                        titleEl.textContent = btn.getAttribute('data-confirm-title') || 'Confirm Action';
-                    }
-                    if (messageEl) {
-                        messageEl.textContent = btn.getAttribute('data-confirm-message') || 'Are you sure you want to proceed?';
-                    }
-
-                    modal.show();
-                });
-            });
-
-            if (confirmBtn) {
-                confirmBtn.addEventListener('click', () => {
-                    if (pendingForm) {
-                        pendingForm.submit();
-                        pendingForm = null;
-                    }
-                    modal.hide();
-                });
-            }
-        })();
-    </script>
+@include('superadmin.partials.users-archive-scripts')
+@include('superadmin.partials.confirm-modal-script')
 @endpush

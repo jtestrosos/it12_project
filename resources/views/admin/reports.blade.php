@@ -42,7 +42,8 @@
                 padding: 1rem;
                 box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
                 margin-bottom: 0.75rem;
-                height: 500px;
+                min-height: auto;
+                height: auto !important;
                 border: 1px solid #edf1f7;
             }
             .chart-container canvas {
@@ -128,7 +129,7 @@
         <div class="row mb-2">
             <!-- Appointment Statistics -->
             <div class="col-md-6">
-                <div class="chart-container" style="height: 150px; padding: 0.75rem;">
+                <div class="chart-container" style="padding: 0.75rem;">
                     <h6 class="mb-2" style="font-size: 1rem;">Appointment Statistics</h6>
                     <div class="d-flex justify-content-center align-items-stretch gap-2 flex-wrap">
                         <div class="stats-card text-center d-flex flex-column justify-content-center" style="flex: 1 1 auto; min-width: 70px; max-width: 100px;">
@@ -157,32 +158,24 @@
 
             <!-- Inventory Statistics -->
             <div class="col-md-6">
-                <div class="chart-container" style="height: 150px; padding: 0.75rem;">
+                <div class="chart-container" style="padding: 0.75rem;">
                     <h6 class="mb-2" style="font-size: 1rem;">Inventory Statistics</h6>
-                    <div class="row justify-content-center">
-                        <div class="col-3">
-                            <div class="stats-card text-center">
-                                <div class="stat-number text-primary">{{ $inventoryStats['total_items'] ?? 0 }}</div>
-                                <div class="stat-label">Total Items</div>
-                            </div>
+                    <div class="d-flex justify-content-center align-items-stretch gap-2 flex-wrap">
+                        <div class="stats-card text-center d-flex flex-column justify-content-center" style="flex: 1 1 auto; min-width: 70px; max-width: 100px;">
+                            <div class="stat-number text-primary">{{ $inventoryStats['total_items'] ?? 0 }}</div>
+                            <div class="stat-label">Total Items</div>
                         </div>
-                        <div class="col-3">
-                            <div class="stats-card text-center">
-                                <div class="stat-number text-warning">{{ $inventoryStats['low_stock'] ?? 0 }}</div>
-                                <div class="stat-label">Low Stock</div>
-                            </div>
+                        <div class="stats-card text-center d-flex flex-column justify-content-center" style="flex: 1 1 auto; min-width: 70px; max-width: 100px;">
+                            <div class="stat-number text-warning">{{ $inventoryStats['low_stock'] ?? 0 }}</div>
+                            <div class="stat-label">Low Stock</div>
                         </div>
-                        <div class="col-3">
-                            <div class="stats-card text-center">
-                                <div class="stat-number text-danger">{{ $inventoryStats['out_of_stock'] ?? 0 }}</div>
-                                <div class="stat-label">Out of Stock</div>
-                            </div>
+                        <div class="stats-card text-center d-flex flex-column justify-content-center" style="flex: 1 1 auto; min-width: 70px; max-width: 100px;">
+                            <div class="stat-number text-danger">{{ $inventoryStats['out_of_stock'] ?? 0 }}</div>
+                            <div class="stat-label">Out of Stock</div>
                         </div>
-                        <div class="col-3">
-                            <div class="stats-card text-center">
-                                <div class="stat-number text-dark">{{ $inventoryStats['expired'] ?? 0 }}</div>
-                                <div class="stat-label">Expired</div>
-                            </div>
+                        <div class="stats-card text-center d-flex flex-column justify-content-center" style="flex: 1 1 auto; min-width: 70px; max-width: 100px;">
+                            <div class="stat-number text-dark">{{ $inventoryStats['expired'] ?? 0 }}</div>
+                            <div class="stat-label">Expired</div>
                         </div>
                     </div>
                 </div>

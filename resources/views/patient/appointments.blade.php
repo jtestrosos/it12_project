@@ -350,15 +350,6 @@
         </div>
     </div>
 
-    <!-- Book Appointment Button -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <a href="{{ route('patient.book-appointment') }}" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i> Book New Appointment
-            </a>
-        </div>
-    </div>
-
     <!-- Appointments Table -->
     <div class="row">
         <div class="col-12">

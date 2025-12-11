@@ -15,6 +15,39 @@
     .btn-outline-secondary {
         border-color: #6c757d !important;
     }
+
+    /* Password Strength Indicator */
+    .strength-bar {
+        flex: 1;
+        height: 4px;
+        background-color: #e0e0e0;
+        border-radius: 2px;
+        transition: background-color 0.3s ease;
+    }
+
+    .strength-bar.weak {
+        background-color: #dc3545;
+    }
+
+    .strength-bar.medium {
+        background-color: #ffc107;
+    }
+
+    .strength-bar.strong {
+        background-color: #28a745;
+    }
+
+    #strength-text.weak {
+        color: #dc3545;
+    }
+
+    #strength-text.medium {
+        color: #ffc107;
+    }
+
+    #strength-text.strong {
+        color: #28a745;
+    }
 </style>
 @endpush
 
@@ -60,7 +93,14 @@
                             @enderror
                         </div>
 
-                        <x-input name="email" label="Email" type="email" required value="{{ old('email') }}" />
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-medium">Email <span class="text-danger">*</span></label>
+                            <input type="email" name="email" id="register-email" class="form-control @error('email') is-invalid @enderror" required value="{{ old('email') }}">
+                            <div id="email-feedback" class="mt-1" style="font-size: 0.875rem;"></div>
+                            @error('email')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
 
                         <x-input name="phone" label="Phone Number" placeholder="Enter your phone number (optional)"
                             value="{{ old('phone') }}" />
@@ -119,10 +159,27 @@
                         <x-input name="birth_date" label="Birth Date" type="date" required
                             value="{{ old('birth_date') }}" data-role="birth-date" max="{{ now()->toDateString() }}" />
 
-                        <x-input name="password" id="register-password" label="Password" type="password" required />
+                        <div class="mb-3">
+                            <label for="register-password" class="form-label fw-medium">Password <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="password" name="password" id="register-password" class="form-control @error('password') is-invalid @enderror" required style="border-right: 0;">
+                                <button class="btn btn-outline-secondary" type="button" id="toggle-password" style="border-left: 0; background: white; border-color: #6c757d !important;">
+                                    <i class="fas fa-eye text-muted"></i>
+                                </button>
+                            </div>
+                            @error('password')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                            <div class="password-strength-indicator mt-2">
+                                <div class="d-flex gap-1 mb-1">
+                                    <div class="strength-bar" id="strength-bar-1"></div>
+                                    <div class="strength-bar" id="strength-bar-2"></div>
+                                    <div class="strength-bar" id="strength-bar-3"></div>
+                                </div>
+                                <small id="strength-text" class="text-muted"></small>
+                            </div>
+                        </div>
 
-                        <x-input name="password_confirmation" id="register-password-confirm" label="Confirm Password"
-                            type="password" required />
 
                         <x-button type="submit" variant="primary" class="w-100 text-white">Register</x-button>
                         </form>
@@ -214,9 +271,126 @@
             // --- Validation Logic ---
             const form = document.querySelector('.registration-form');
             const passwordInput = document.getElementById('register-password');
-            const passwordConfirmInput = document.getElementById('register-password-confirm');
+            const emailInput = document.getElementById('register-email');
             const nameInput = form.querySelector('input[name="name"]');
             const phoneInput = form.querySelector('input[name="phone"]');
+
+            // Password Visibility Toggle
+            const togglePasswordBtn = document.getElementById('toggle-password');
+            if (togglePasswordBtn && passwordInput) {
+                togglePasswordBtn.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    
+                    const icon = this.querySelector('i');
+                    if (icon.classList.contains('fa-eye')) {
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                });
+            }
+
+            // Password Strength Indicator
+            const strengthBar1 = document.getElementById('strength-bar-1');
+            const strengthBar2 = document.getElementById('strength-bar-2');
+            const strengthBar3 = document.getElementById('strength-bar-3');
+            const strengthText = document.getElementById('strength-text');
+
+            const calculatePasswordStrength = (password) => {
+                if (!password) return 0;
+                
+                let strength = 0;
+                const checks = {
+                    length: password.length >= 8,
+                    lowercase: /[a-z]/.test(password),
+                    uppercase: /[A-Z]/.test(password),
+                    number: /\d/.test(password),
+                    special: /[!@#$%^&*()_+\-=[\]{}|,.<>/?]/.test(password)
+                };
+
+                // Weak: 8+ chars
+                if (checks.length) strength = 1;
+                
+                // Medium: 8+ chars + uppercase + lowercase
+                if (checks.length && checks.lowercase && checks.uppercase) strength = 2;
+                
+                // Strong: 8+ chars + uppercase + lowercase + number + special
+                if (checks.length && checks.lowercase && checks.uppercase && checks.number && checks.special) strength = 3;
+
+                return strength;
+            };
+
+            const updatePasswordStrength = () => {
+                const password = passwordInput.value;
+                const strength = calculatePasswordStrength(password);
+
+                // Reset all bars
+                [strengthBar1, strengthBar2, strengthBar3].forEach(bar => {
+                    bar.classList.remove('weak', 'medium', 'strong');
+                });
+                strengthText.className = '';
+
+                if (strength === 0) {
+                    strengthText.textContent = '';
+                } else if (strength === 1) {
+                    strengthBar1.classList.add('weak');
+                    strengthText.textContent = 'weak';
+                    strengthText.classList.add('weak');
+                } else if (strength === 2) {
+                    strengthBar1.classList.add('medium');
+                    strengthBar2.classList.add('medium');
+                    strengthText.textContent = 'medium';
+                    strengthText.classList.add('medium');
+                } else if (strength === 3) {
+                    strengthBar1.classList.add('strong');
+                    strengthBar2.classList.add('strong');
+                    strengthBar3.classList.add('strong');
+                    strengthText.textContent = 'strong';
+                    strengthText.classList.add('strong');
+                }
+            };
+
+            // Live Email Validation
+            let emailCheckTimeout;
+            const emailFeedback = document.getElementById('email-feedback');
+
+            const checkEmailAvailability = async () => {
+                const email = emailInput.value.trim();
+                
+                if (!email || !email.includes('@')) {
+                    emailFeedback.innerHTML = '';
+                    emailInput.classList.remove('is-invalid', 'is-valid');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/check-email', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ email })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.available) {
+                        emailInput.classList.remove('is-invalid');
+                        emailInput.classList.add('is-valid');
+                        emailFeedback.innerHTML = '<span class="text-success"><i class="fas fa-check-circle"></i> Email is available</span>';
+                    } else {
+                        emailInput.classList.remove('is-valid');
+                        emailInput.classList.add('is-invalid');
+                        emailFeedback.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle"></i> ' + data.message + '</span>';
+                    }
+                } catch (error) {
+                    console.error('Email check error:', error);
+                }
+            };
 
             const clearClientErrors = () => {
                 const clientErrors = form.querySelectorAll('.invalid-feedback.js-register-error');
@@ -224,7 +398,6 @@
                 if (nameInput) nameInput.classList.remove('is-invalid');
                 if (phoneInput) phoneInput.classList.remove('is-invalid');
                 if (passwordInput) passwordInput.classList.remove('is-invalid');
-                if (passwordConfirmInput) passwordConfirmInput.classList.remove('is-invalid');
             };
 
             const appendError = (input, message) => {
@@ -233,7 +406,6 @@
                 const div = document.createElement('div');
                 div.className = 'invalid-feedback js-register-error d-block';
                 div.textContent = message;
-                // Insert after the parent div (input-group) if it exists, otherwise after input
                 const parent = input.closest('.input-group') || input;
                 if (parent.nextElementSibling && parent.nextElementSibling.classList.contains('invalid-feedback')) {
                     // Already has error
@@ -268,27 +440,31 @@
 
                 if (passwordInput) {
                     const value = passwordInput.value;
-                    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{}|,.<>\/?]).{8,}$/;
                     if (!value) {
                         appendError(passwordInput, 'Password is required.');
-                        valid = false;
-                    } else if (!passwordRegex.test(value)) {
-                        appendError(passwordInput, 'Password must be at least 8 characters and include one uppercase letter, one lowercase letter, one number, and one special character.');
-                        valid = false;
-                    }
-                }
-
-                if (passwordInput && passwordConfirmInput) {
-                    const value = passwordInput.value;
-                    const confirmValue = passwordConfirmInput.value;
-                    if (confirmValue && value !== confirmValue) {
-                        appendError(passwordConfirmInput, 'Password and confirm password must match.');
                         valid = false;
                     }
                 }
 
                 return valid;
             };
+
+            // Event Listeners
+            if (passwordInput) {
+                passwordInput.addEventListener('input', () => {
+                    updatePasswordStrength();
+                    validateNameAndPhone();
+                });
+                passwordInput.addEventListener('blur', validateNameAndPhone);
+            }
+
+            if (emailInput) {
+                emailInput.addEventListener('input', () => {
+                    clearTimeout(emailCheckTimeout);
+                    emailCheckTimeout = setTimeout(checkEmailAvailability, 500);
+                });
+                emailInput.addEventListener('blur', checkEmailAvailability);
+            }
 
             if (form) {
                 if (nameInput) {
@@ -298,14 +474,6 @@
                 if (phoneInput) {
                     phoneInput.addEventListener('input', validateNameAndPhone);
                     phoneInput.addEventListener('blur', validateNameAndPhone);
-                }
-                if (passwordInput) {
-                    passwordInput.addEventListener('input', validateNameAndPhone);
-                    passwordInput.addEventListener('blur', validateNameAndPhone);
-                }
-                if (passwordConfirmInput) {
-                    passwordConfirmInput.addEventListener('input', validateNameAndPhone);
-                    passwordConfirmInput.addEventListener('blur', validateNameAndPhone);
                 }
 
                 form.addEventListener('submit', function (e) {

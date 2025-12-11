@@ -33,12 +33,6 @@
                 @endif
 
                 <a href="{{ route('services') }}" class="btn btn-outline-dark btn-lg mb-2" style="color: black; border-color: black;">View Services</a>
-
-                <div class="mt-4">
-                    <span class="me-4"><strong>609+</strong> Patients Served</span>
-                    <span class="me-4"><strong>98%</strong> Satisfaction Rate</span>
-                    <span><strong>24/7</strong> Online Support</span>
-                </div>
             </div>
         </div>
     </div>
