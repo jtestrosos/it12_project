@@ -42,7 +42,7 @@ class PatientController extends Controller
         $rules = [
             'patient_name' => 'required|string|max:255',
             'patient_phone' => 'required|string|max:20',
-            'appointment_date' => 'required|date|after:today',
+            'appointment_date' => 'required|date|after_or_equal:today',
             'appointment_time' => 'required',
             'service_id' => 'required|exists:services,id',
             'notes' => 'nullable|string|max:1000',

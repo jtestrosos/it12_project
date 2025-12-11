@@ -1465,21 +1465,23 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script>
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+    </script>
+
     @if(session('success') || session('status') || session('error') || session('warning') || session('info'))
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 1000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer)
-                        toast.addEventListener('mouseleave', Swal.resumeTimer)
-                    }
-                });
-
                 @if(session('success') || session('status'))
                     Toast.fire({ icon: 'success', title: "{{ session('success') ?? session('status') }}" });
                 @endif
@@ -1492,7 +1494,7 @@
                 @if(session('info'))
                     Toast.fire({ icon: 'info', title: "{{ session('info') }}" });
                 @endif
-                            });
+            });
         </script>
     @endif
 
