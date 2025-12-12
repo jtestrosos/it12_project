@@ -22,8 +22,9 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
+        // Additional input sanitization
         $credentials = $request->only('email', 'password');
-        $email = $request->input('email');
+        $email = strip_tags(trim($request->input('email')));
 
         // Try to find user in all three tables
         $patient = Patient::where('email', $email)->first();
