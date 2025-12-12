@@ -1,0 +1,205 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - complementary [ref=e2]:
+    - generic [ref=e3]:
+      - button "Toggle sidebar" [ref=e4] [cursor=pointer]:
+        - generic [ref=e5]: 
+      - text: 
+    - navigation [ref=e6]:
+      - link " Dashboard" [ref=e7] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000/admin/dashboard
+        - generic [ref=e8]: 
+        - generic: Dashboard
+      - link " Patient Management" [ref=e9] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000/admin/patients
+        - generic [ref=e10]: 
+        - generic: Patient Management
+      - generic [ref=e11]:
+        - link " Visits" [ref=e12] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e13]: 
+          - generic: Visits
+          - text: 
+        - text:  
+      - generic [ref=e14]:
+        - link " Services & Reports" [ref=e15] [cursor=pointer]:
+          - /url: "#"
+          - generic [ref=e16]: 
+          - generic: Services & Reports
+          - text: 
+        - text:    
+      - link " Inventory" [ref=e17] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000/admin/inventory
+        - generic [ref=e18]: 
+        - generic: Inventory
+  - generic [ref=e19]:
+    - banner [ref=e20]:
+      - generic [ref=e21]:
+        - img "Logo" [ref=e22]
+        - generic [ref=e23]:
+          - heading "Manage Appointments" [level=4] [ref=e24]
+          - paragraph [ref=e25]: View and manage all patient appointments
+      - generic [ref=e26]:
+        - button "" [ref=e27] [cursor=pointer]:
+          - generic [ref=e28]: 
+        - generic [ref=e29]:
+          - link "A Admin User" [ref=e30] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=e31]: A
+            - generic [ref=e32]: Admin User
+          - text:  
+    - main [ref=e33]:
+      - generic [ref=e34]:
+        - generic:   
+        - button "+ Add New Appointment" [ref=e36] [cursor=pointer]:
+          - generic [ref=e37]: +
+          - text: Add New Appointment
+      - generic [ref=e38]:
+        - generic [ref=e39]:
+          - generic [ref=e40]:
+            - generic [ref=e41]: Status
+            - combobox [ref=e42]:
+              - option "All" [selected]
+              - option "Pending"
+              - option "Confirmed"
+              - option "Completed"
+              - option "Cancelled"
+              - option "Rescheduled"
+          - generic [ref=e43]:
+            - generic [ref=e44]: Service
+            - combobox [ref=e45]:
+              - option "All" [selected]
+              - option "General Checkup"
+              - option "Prenatal"
+              - option "Medical Check-up"
+              - option "Immunization"
+              - option "Family Planning"
+          - generic [ref=e46]:
+            - generic [ref=e47]: Search
+            - textbox "Search by patient, email, or phone" [ref=e48]
+          - button " Clear" [ref=e50] [cursor=pointer]:
+            - generic [ref=e51]: 
+            - text: Clear
+        - generic [ref=e52]: Showing 7 of 7 appointments
+      - generic [ref=e53]:
+        - generic [ref=e54]:
+          - text:                                                                                                   
+          - table [ref=e55]:
+            - rowgroup [ref=e56]:
+              - row "Date  Patient Service Status Actions" [ref=e57]:
+                - columnheader [ref=e58]:
+                  - checkbox [ref=e59]
+                - columnheader "Date " [ref=e60]:
+                  - link "Date " [ref=e61] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8000/admin/appointments?sort=date&direction=asc
+                    - generic [ref=e62]: Date
+                    - generic [ref=e63]: 
+                - columnheader "Patient" [ref=e64]
+                - columnheader "Service" [ref=e65]
+                - columnheader "Status" [ref=e66]
+                - columnheader "Actions" [ref=e67]
+            - rowgroup [ref=e68]:
+              - row "Dec 18, 2025 01:00 PM John Doe patient@malasakit.com General Checkup Confirmed " [ref=e69]:
+                - cell [ref=e70]:
+                  - checkbox [ref=e71]
+                - cell "Dec 18, 2025 01:00 PM" [ref=e72]:
+                  - generic [ref=e73]: Dec 18, 2025
+                  - text: 01:00 PM
+                - cell "John Doe patient@malasakit.com" [ref=e74]:
+                  - generic [ref=e75]: John Doe
+                  - text: patient@malasakit.com
+                - cell "General Checkup" [ref=e76]
+                - cell "Confirmed" [ref=e77]
+                - cell "" [ref=e78]:
+                  - button "" [ref=e80] [cursor=pointer]:
+                    - generic [ref=e81]: 
+              - row "Dec 18, 2025 11:30 AM James Estrosos james@gmail.com General Checkup Pending " [ref=e82]:
+                - cell [ref=e83]:
+                  - checkbox [ref=e84]
+                - cell "Dec 18, 2025 11:30 AM" [ref=e85]:
+                  - generic [ref=e86]: Dec 18, 2025
+                  - text: 11:30 AM
+                - cell "James Estrosos james@gmail.com" [ref=e87]:
+                  - generic [ref=e88]: James Estrosos
+                  - text: james@gmail.com
+                - cell "General Checkup" [ref=e89]
+                - cell "Pending" [ref=e90]
+                - cell "" [ref=e91]:
+                  - button "" [ref=e93] [cursor=pointer]:
+                    - generic [ref=e94]: 
+              - row "Dec 18, 2025 08:30 AM John Doe patient@malasakit.com General Checkup Pending " [ref=e95]:
+                - cell [ref=e96]:
+                  - checkbox [ref=e97]
+                - cell "Dec 18, 2025 08:30 AM" [ref=e98]:
+                  - generic [ref=e99]: Dec 18, 2025
+                  - text: 08:30 AM
+                - cell "John Doe patient@malasakit.com" [ref=e100]:
+                  - generic [ref=e101]: John Doe
+                  - text: patient@malasakit.com
+                - cell "General Checkup" [ref=e102]
+                - cell "Pending" [ref=e103]
+                - cell "" [ref=e104]:
+                  - button "" [ref=e106] [cursor=pointer]:
+                    - generic [ref=e107]: 
+              - row "Dec 18, 2025 08:00 AM James Pathay lebronjamespathay@gmail.com Immunization Pending " [ref=e108]:
+                - cell [ref=e109]:
+                  - checkbox [ref=e110]
+                - cell "Dec 18, 2025 08:00 AM" [ref=e111]:
+                  - generic [ref=e112]: Dec 18, 2025
+                  - text: 08:00 AM
+                - cell "James Pathay lebronjamespathay@gmail.com" [ref=e113]:
+                  - generic [ref=e114]: James Pathay
+                  - text: lebronjamespathay@gmail.com
+                - cell "Immunization" [ref=e115]
+                - cell "Pending" [ref=e116]
+                - cell "" [ref=e117]:
+                  - button "" [ref=e119] [cursor=pointer]:
+                    - generic [ref=e120]: 
+              - row "Dec 17, 2025 08:30 AM James Estrosos james@gmail.com Medical Check-up Pending " [ref=e121]:
+                - cell [ref=e122]:
+                  - checkbox [ref=e123]
+                - cell "Dec 17, 2025 08:30 AM" [ref=e124]:
+                  - generic [ref=e125]: Dec 17, 2025
+                  - text: 08:30 AM
+                - cell "James Estrosos james@gmail.com" [ref=e126]:
+                  - generic [ref=e127]: James Estrosos
+                  - text: james@gmail.com
+                - cell "Medical Check-up" [ref=e128]
+                - cell "Pending" [ref=e129]
+                - cell "" [ref=e130]:
+                  - button "" [ref=e132] [cursor=pointer]:
+                    - generic [ref=e133]: 
+              - row "Dec 12, 2025 02:30 PM Sofia Flores sofiaflores@malasakit.com Prenatal Pending " [ref=e134]:
+                - cell [ref=e135]:
+                  - checkbox [ref=e136]
+                - cell "Dec 12, 2025 02:30 PM" [ref=e137]:
+                  - generic [ref=e138]: Dec 12, 2025
+                  - text: 02:30 PM
+                - cell "Sofia Flores sofiaflores@malasakit.com" [ref=e139]:
+                  - generic [ref=e140]: Sofia Flores
+                  - text: sofiaflores@malasakit.com
+                - cell "Prenatal" [ref=e141]
+                - cell "Pending" [ref=e142]
+                - cell "" [ref=e143]:
+                  - button "" [ref=e145] [cursor=pointer]:
+                    - generic [ref=e146]: 
+              - row "Dec 08, 2025 08:00 AM James Lebron jameslebron@gmail.com Prenatal Pending " [ref=e147]:
+                - cell [ref=e148]:
+                  - checkbox [ref=e149]
+                - cell "Dec 08, 2025 08:00 AM" [ref=e150]:
+                  - generic [ref=e151]: Dec 08, 2025
+                  - text: 08:00 AM
+                - cell "James Lebron jameslebron@gmail.com" [ref=e152]:
+                  - generic [ref=e153]: James Lebron
+                  - text: jameslebron@gmail.com
+                - cell "Prenatal" [ref=e154]
+                - cell "Pending" [ref=e155]
+                - cell "" [ref=e156]:
+                  - button "" [ref=e158] [cursor=pointer]:
+                    - generic [ref=e159]: 
+        - text:              
+      - generic [ref=e161]: Showing 1-7 of 7 items
+      - text:       
+```

@@ -77,7 +77,7 @@
         <div class="row g-3 mb-4">
             <!-- Age Distribution -->
             <div class="col-md-6">
-                <div class="card-surface p-3">
+                <div class="card-surface p-3 h-100">
                     <h5 class="mb-3">Age Distribution</h5>
                     <div class="table-responsive">
                         <table class="table table-sm mb-0">
@@ -94,7 +94,8 @@
                                         <td>{{ $group }} years</td>
                                         <td class="text-end"><strong>{{ $count }}</strong></td>
                                         <td class="text-end">
-                                            {{ $totalPatients > 0 ? round(($count / $totalPatients) * 100, 1) : 0 }}%</td>
+                                            {{ $totalPatients > 0 ? round(($count / $totalPatients) * 100, 1) : 0 }}%
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -105,7 +106,7 @@
 
             <!-- Barangay Distribution -->
             <div class="col-md-6">
-                <div class="card-surface p-3">
+                <div class="card-surface p-3 h-100">
                     <h5 class="mb-3">Barangay Distribution</h5>
                     <div class="table-responsive">
                         <table class="table table-sm mb-0">
@@ -122,7 +123,8 @@
                                         <td>{{ $item->barangay }}</td>
                                         <td class="text-end"><strong>{{ $item->count }}</strong></td>
                                         <td class="text-end">
-                                            {{ $totalPatients > 0 ? round(($item->count / $totalPatients) * 100, 1) : 0 }}%</td>
+                                            {{ $totalPatients > 0 ? round(($item->count / $totalPatients) * 100, 1) : 0 }}%
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -139,7 +141,7 @@
         <!-- Top Patients by Appointments -->
         <div class="row g-3 mb-4">
             <div class="col-md-6">
-                <div class="card-surface p-3">
+                <div class="card-surface p-3 h-100">
                     <h5 class="mb-3">Top Patients by Appointments</h5>
                     <div class="table-responsive">
                         <table class="table table-sm mb-0">
@@ -169,7 +171,7 @@
 
             <!-- Recent Registrations -->
             <div class="col-md-6">
-                <div class="card-surface p-3">
+                <div class="card-surface p-3 h-100">
                     <h5 class="mb-3">Recent Registrations</h5>
                     <div class="table-responsive">
                         <table class="table table-sm mb-0">

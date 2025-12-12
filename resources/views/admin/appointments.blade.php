@@ -477,9 +477,9 @@
         nav[role="navigation"] .text-sm {
             display: none !important;
         }
-        
+
         /* Bring showing text closer to pagination */
-        #appointmentsPaginationContainer > div:last-child {
+        #appointmentsPaginationContainer>div:last-child {
             margin-top: -0.5rem !important;
         }
 
@@ -798,9 +798,10 @@
         }
 
         /* ========== RESPONSIVE STYLES FOR MOBILE ========== */
-        
+
         /* Tablet and below (≤991px) */
         @media (max-width: 991px) {
+
             /* Ensure content doesn't get cut off */
             .container-fluid {
                 padding-left: 0.75rem;
@@ -851,6 +852,7 @@
 
         /* Mobile phones (≤768px) */
         @media (max-width: 768px) {
+
             /* More compact cards */
             .appointment-card {
                 padding: 0.75rem;
@@ -873,7 +875,8 @@
             .form-control,
             .form-select {
                 padding: 0.55rem 0.75rem;
-                font-size: 16px; /* Prevents zoom on iOS */
+                font-size: 16px;
+                /* Prevents zoom on iOS */
             }
 
             /* Buttons full width in filter section */
@@ -994,6 +997,7 @@
 
         /* Small mobile (≤576px) */
         @media (max-width: 576px) {
+
             /* Ultra compact appointments */
             .appointment-card {
                 padding: 0.6rem;
@@ -1085,67 +1089,69 @@
             }
         }
 
-            /* Modal full screen on very small devices */
-            .modal-dialog {
-                margin: 0;
-                max-width: 100%;
-                min-height: 100vh;
-            }
+        /* Modal full screen on very small devices */
+        .modal-dialog {
+            margin: 0;
+            max-width: 100%;
+            min-height: 100vh;
+        }
 
-            .modal-content {
-                min-height: 100vh;
-                border-radius: 0;
-            }
+        .modal-content {
+            min-height: 100vh;
+            border-radius: 0;
+        }
 
-            /* Offcanvas adjustments */
-            .offcanvas {
-                max-width: 100% !important;
-            }
+        /* Offcanvas adjustments */
+        .offcanvas {
+            max-width: 100% !important;
+        }
 
-            /* Form labels smaller */
-            .form-label {
-                font-size: 0.85rem;
-            }
+        /* Form labels smaller */
+        .form-label {
+            font-size: 0.85rem;
+        }
 
-            /* Calendar very compact */
-            .calendar-grid {
-                font-size: 0.65rem;
-            }
+        /* Calendar very compact */
+        .calendar-grid {
+            font-size: 0.65rem;
+        }
 
-            .calendar-day {
-                min-height: 28px;
-            }
+        .calendar-day {
+            min-height: 28px;
+        }
 
-            /* Info cards in modals */
-            .info-card {
-                margin-bottom: 0.75rem;
-                padding: 0.75rem;
-            }
+        /* Info cards in modals */
+        .info-card {
+            margin-bottom: 0.75rem;
+            padding: 0.75rem;
+        }
 
-            .info-label {
-                font-size: 0.7rem;
-            }
+        .info-label {
+            font-size: 0.7rem;
+        }
 
-            .info-value {
-                font-size: 0.85rem;
-            }
+        .info-value {
+            font-size: 0.85rem;
+        }
 
-            /* Button groups stack */
-            .modal-footer .btn-group,
-            .modal-footer .d-flex {
-                flex-direction: column-reverse;
-                width: 100%;
-            }
+        /* Button groups stack */
+        .modal-footer .btn-group,
+        .modal-footer .d-flex {
+            flex-direction: column-reverse;
+            width: 100%;
+        }
 
-            .modal-footer .btn {
-                width: 100%;
-                margin: 0.25rem 0;
-            }
+        .modal-footer .btn {
+            width: 100%;
+            margin: 0.25rem 0;
+        }
         }
 
         /* Prevent horizontal scrolling */
         @media (max-width: 991px) {
-            body, html {
+
+            body,
+            html {
                 overflow-x: hidden;
                 max-width: 100vw;
             }
@@ -1155,13 +1161,15 @@
                 margin-right: 0;
             }
 
-            .row > * {
+            .row>* {
                 padding-left: 0.5rem;
                 padding-right: 0.5rem;
             }
 
             /* Ensure all elements fit */
-            *, *::before, *::after {
+            *,
+            *::before,
+            *::after {
                 max-width: 100%;
             }
 
@@ -1174,6 +1182,7 @@
 
         /* Touch device optimizations */
         @media (hover: none) and (pointer: coarse) {
+
             /* Larger touch targets */
             .btn,
             .page-link,
@@ -1290,7 +1299,8 @@
                                 class="text-decoration-none d-inline-flex align-items-center gap-1">
                                 <span style="color: #009fb1;">Date</span>
                                 @if($currentSort === 'date')
-                                    <i class="fas fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} fa-sm ms-1" style="color: #009fb1;"></i>
+                                    <i class="fas fa-sort-{{ $currentDirection === 'asc' ? 'up' : 'down' }} fa-sm ms-1"
+                                        style="color: #009fb1;"></i>
                                 @else
                                     <i class="fas fa-sort fa-sm ms-1" style="color: #009fb1;"></i>
                                 @endif
@@ -1347,179 +1357,7 @@
                             </td>
                         </tr>
 
-                        <!-- View Modal -->
-                        <div class="modal fade" id="viewAppointmentModal{{ $appointment->id }}" tabindex="-1">
-                            <div class="modal-dialog modal-lg modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Appointment Details</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <div class="modal-body p-4">
-                                        <div class="row g-4">
-                                            <!-- Left Column: Patient Info -->
-                                            <div class="col-md-6">
-                                                <div class="info-card p-3 rounded-3 h-100">
-                                                    <h6 class="text-uppercase text-muted small fw-bold mb-3 d-flex align-items-center">
-                                                        <i class="fas fa-user-circle me-2"></i>Patient Information
-                                                    </h6>
-                                                    <div class="info-item mb-3">
-                                                        <label class="info-label">Name</label>
-                                                        <div class="info-value">{{ $appointment->patient_name }}</div>
-                                                    </div>
-                                                    <div class="info-item mb-3">
-                                                        <label class="info-label">Contact</label>
-                                                        <div class="info-value">
-                                                            <div><i class="fas fa-phone me-2 text-muted"></i>{{ $appointment->patient_phone }}</div>
-                                                            <div class="mt-1"><i class="fas fa-envelope me-2 text-muted"></i>{{ $appointment->user->email ?? 'No email linked' }}</div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="info-item">
-                                                        <label class="info-label">Address</label>
-                                                        <div class="info-value"><i class="fas fa-map-marker-alt me-2 text-muted"></i>{{ $appointment->patient_address ?? 'N/A' }}</div>
-                                                    </div>
-                                                </div>
-                                            </div>
 
-                                            <!-- Right Column: Appointment Info -->
-                                            <div class="col-md-6">
-                                                <div class="info-card p-3 rounded-3 h-100">
-                                                    <h6 class="text-uppercase text-muted small fw-bold mb-3 d-flex align-items-center">
-                                                        <i class="fas fa-calendar-check me-2"></i>Appointment Information
-                                                    </h6>
-                                                    <div class="info-item mb-3">
-                                                        <label class="info-label">Service</label>
-                                                        <div class="info-value text-primary fw-bold">
-                                                            <i class="fas fa-stethoscope me-2"></i>{{ $appointment->service_type }}
-                                                        </div>
-                                                    </div>
-                                                    <div class="info-item mb-3">
-                                                        <label class="info-label">Date & Time</label>
-                                                        <div class="info-value">
-                                                            <div class="mb-1">
-                                                                <i class="fas fa-calendar-alt me-2 text-muted"></i>
-                                                                {{ $appointment->appointment_date->format('F d, Y') }}
-                                                            </div>
-                                                            <div>
-                                                                <i class="fas fa-clock me-2 text-muted"></i>
-                                                                {{ $appointment->appointment_time }}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="info-item mb-3">
-                                                        <label class="info-label">Status</label>
-                                                        @php
-                                                            $statusDisplay = [
-                                                                'pending' => 'Pending',
-                                                                'approved' => 'Confirmed',
-                                                                'rescheduled' => 'Rescheduled',
-                                                                'cancelled' => 'Cancelled',
-                                                                'completed' => 'Completed',
-                                                                'no_show' => 'No Show'
-                                                            ][$appointment->status] ?? ucfirst($appointment->status);
-                                                        @endphp
-                                                        <div>
-                                                            <span class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
-                                                        </div>
-                                                    </div>
-                                                    @if($appointment->notes)
-                                                        <div class="info-item">
-                                                            <label class="info-label">Notes</label>
-                                                            <div class="notes-box p-2 rounded">{{ $appointment->notes }}</div>
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Timestamps -->
-                                        <div class="row g-3 mt-3 pt-3 border-top">
-                                            <div class="col-6">
-                                                <div class="timestamp-item">
-                                                    <i class="fas fa-plus-circle me-2 text-muted"></i>
-                                                    <span class="timestamp-label">Created:</span>
-                                                    <span class="timestamp-value">{{ $appointment->created_at->format('M d, Y h:i A') }}</span>
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="timestamp-item">
-                                                    <i class="fas fa-edit me-2 text-muted"></i>
-                                                    <span class="timestamp-label">Updated:</span>
-                                                    <span class="timestamp-value">{{ $appointment->updated_at->format('M d, Y h:i A') }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer d-flex justify-content-between align-items-center px-4 py-3">
-                                        <div class="d-flex gap-2 flex-wrap">
-                                            <!-- Reschedule -->
-                                            @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
-                                                <button type="button" class="btn-modern btn-modern-warning reschedule-btn"
-                                                    data-appointment-id="{{ $appointment->id }}"
-                                                    data-action-url="{{ route('admin.appointment.update', $appointment) }}"
-                                                    data-bs-dismiss="modal">
-                                                    <i class="fas fa-calendar-alt me-2"></i>Reschedule
-                                                </button>
-                                            @endif
-
-                                            <!-- Mark Completed -->
-                                            @if($appointment->status === 'approved')
-                                                <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    <input type="hidden" name="status" value="completed">
-                                                    <button type="submit" class="btn-modern btn-modern-success">
-                                                        <i class="fas fa-check-circle me-2"></i>Complete
-                                                    </button>
-                                                </form>
-                                            @endif
-
-                                            <!-- Mark No-show -->
-                                            @if($appointment->status === 'approved')
-                                                <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    <input type="hidden" name="status" value="no_show">
-                                                    <button type="submit" class="btn-modern btn-modern-secondary">
-                                                        <i class="fas fa-user-slash me-2"></i>No-show
-                                                    </button>
-                                                </form>
-                                            @endif
-                                            
-                                            <!-- Approve Button (only show if pending) -->
-                                            @if($appointment->status === 'pending')
-                                                <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    <input type="hidden" name="status" value="approved">
-                                                    <button type="submit" class="btn-modern btn-modern-success">
-                                                        <i class="fas fa-check me-2"></i>Approve
-                                                    </button>
-                                                </form>
-                                            @endif
-                                            
-                                            <!-- Cancel Button -->
-                                            @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
-                                                <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
-                                                    class="d-inline cancel-form" id="cancelForm{{ $appointment->id }}">
-                                                    @csrf
-                                                    <input type="hidden" name="status" value="cancelled">
-                                                    <button type="button" class="btn-modern btn-modern-danger"
-                                                        data-form-id="cancelForm{{ $appointment->id }}"
-                                                        onclick="confirmCancel(this)">
-                                                        <i class="fas fa-times me-2"></i>Cancel Appointment
-                                                    </button>
-                                                </form>
-                                            @endif
-                                        </div>
-                                        <button type="button" class="btn-modern btn-modern-outline"
-                                            data-bs-dismiss="modal">
-                                            <i class="fas fa-times-circle me-2"></i>Close
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                     @empty
                         <tr>
@@ -1593,8 +1431,7 @@
     </div>
 
     <!-- Pagination -->
-    <div class="d-flex flex-column align-items-center mt-4"
-        id="appointmentsPaginationContainer">
+    <div class="d-flex flex-column align-items-center mt-4" id="appointmentsPaginationContainer">
         <div>
             {{ $appointments->links('pagination::bootstrap-5') }}
         </div>
@@ -1802,6 +1639,182 @@
             </div>
         </div>
     </div>
+    <!-- View Appointment Details Modals -->
+        @foreach($appointments as $appointment)
+            <!-- View Modal -->
+            <div class="modal fade" id="viewAppointmentModal{{ $appointment->id }}" tabindex="-1">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Appointment Details</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <div class="row g-4">
+                                <!-- Left Column: Patient Info -->
+                                <div class="col-md-6">
+                                    <div class="info-card p-3 rounded-3 h-100">
+                                        <h6 class="text-uppercase text-muted small fw-bold mb-3 d-flex align-items-center">
+                                            <i class="fas fa-user-circle me-2"></i>Patient Information
+                                        </h6>
+                                        <div class="info-item mb-3">
+                                            <label class="info-label">Name</label>
+                                            <div class="info-value">{{ $appointment->patient_name }}</div>
+                                        </div>
+                                        <div class="info-item mb-3">
+                                            <label class="info-label">Contact</label>
+                                            <div class="info-value">
+                                                <div><i class="fas fa-phone me-2 text-muted"></i>{{ $appointment->patient_phone }}</div>
+                                                <div class="mt-1"><i class="fas fa-envelope me-2 text-muted"></i>{{ $appointment->user->email ?? 'No email linked' }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <label class="info-label">Address</label>
+                                            <div class="info-value"><i class="fas fa-map-marker-alt me-2 text-muted"></i>{{ $appointment->patient_address ?? 'N/A' }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column: Appointment Info -->
+                                <div class="col-md-6">
+                                    <div class="info-card p-3 rounded-3 h-100">
+                                        <h6 class="text-uppercase text-muted small fw-bold mb-3 d-flex align-items-center">
+                                            <i class="fas fa-calendar-check me-2"></i>Appointment Information
+                                        </h6>
+                                        <div class="info-item mb-3">
+                                            <label class="info-label">Service</label>
+                                            <div class="info-value text-primary fw-bold">
+                                                <i class="fas fa-stethoscope me-2"></i>{{ $appointment->service_type }}
+                                            </div>
+                                        </div>
+                                        <div class="info-item mb-3">
+                                            <label class="info-label">Date & Time</label>
+                                            <div class="info-value">
+                                                <div class="mb-1">
+                                                    <i class="fas fa-calendar-alt me-2 text-muted"></i>
+                                                    {{ $appointment->appointment_date->format('F d, Y') }}
+                                                </div>
+                                                <div>
+                                                    <i class="fas fa-clock me-2 text-muted"></i>
+                                                    {{ $appointment->appointment_time }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="info-item mb-3">
+                                            <label class="info-label">Status</label>
+                                            @php
+                                                $statusDisplay = [
+                                                    'pending' => 'Pending',
+                                                    'approved' => 'Confirmed',
+                                                    'rescheduled' => 'Rescheduled',
+                                                    'cancelled' => 'Cancelled',
+                                                    'completed' => 'Completed',
+                                                    'no_show' => 'No Show'
+                                                ][$appointment->status] ?? ucfirst($appointment->status);
+                                            @endphp
+                                            <div>
+                                                <span class="status-badge status-{{ $appointment->status }}">{{ $statusDisplay }}</span>
+                                            </div>
+                                        </div>
+                                        @if($appointment->notes)
+                                            <div class="info-item">
+                                                <label class="info-label">Notes</label>
+                                                <div class="notes-box p-2 rounded">{{ $appointment->notes }}</div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Timestamps -->
+                            <div class="row g-3 mt-3 pt-3 border-top">
+                                <div class="col-6">
+                                    <div class="timestamp-item">
+                                        <i class="fas fa-plus-circle me-2 text-muted"></i>
+                                        <span class="timestamp-label">Created:</span>
+                                        <span class="timestamp-value">{{ $appointment->created_at->format('M d, Y h:i A') }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="timestamp-item">
+                                        <i class="fas fa-edit me-2 text-muted"></i>
+                                        <span class="timestamp-label">Updated:</span>
+                                        <span class="timestamp-value">{{ $appointment->updated_at->format('M d, Y h:i A') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer d-flex justify-content-between align-items-center px-4 py-3">
+                            <div class="d-flex gap-2 flex-wrap">
+                                <!-- Reschedule -->
+                                @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
+                                    <button type="button" class="btn-modern btn-modern-warning reschedule-btn"
+                                        data-appointment-id="{{ $appointment->id }}"
+                                        data-action-url="{{ route('admin.appointment.update', $appointment) }}"
+                                        data-bs-dismiss="modal">
+                                        <i class="fas fa-calendar-alt me-2"></i>Reschedule
+                                    </button>
+                                @endif
+
+                                <!-- Mark Completed -->
+                                @if($appointment->status === 'approved')
+                                    <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
+                                        class="d-inline">
+                                        @csrf
+                                        <input type="hidden" name="status" value="completed">
+                                        <button type="submit" class="btn-modern btn-modern-success">
+                                            <i class="fas fa-check-circle me-2"></i>Complete
+                                        </button>
+                                    </form>
+                                @endif
+
+                                <!-- Mark No-show -->
+                                @if($appointment->status === 'approved')
+                                    <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
+                                        class="d-inline">
+                                        @csrf
+                                        <input type="hidden" name="status" value="no_show">
+                                        <button type="submit" class="btn-modern btn-modern-secondary">
+                                            <i class="fas fa-user-slash me-2"></i>No-show
+                                        </button>
+                                    </form>
+                                @endif
+
+                                <!-- Approve Button (only show if pending) -->
+                                @if($appointment->status === 'pending')
+                                    <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
+                                        class="d-inline">
+                                        @csrf
+                                        <input type="hidden" name="status" value="approved">
+                                        <button type="submit" class="btn-modern btn-modern-success">
+                                            <i class="fas fa-check me-2"></i>Approve
+                                        </button>
+                                    </form>
+                                @endif
+
+                                <!-- Cancel Button -->
+                                @if($appointment->status !== 'cancelled' && $appointment->status !== 'completed')
+                                    <form method="POST" action="{{ route('admin.appointment.update', $appointment) }}"
+                                        class="d-inline cancel-form" id="cancelForm{{ $appointment->id }}">
+                                        @csrf
+                                        <input type="hidden" name="status" value="cancelled">
+                                        <button type="button" class="btn-modern btn-modern-danger"
+                                            data-form-id="cancelForm{{ $appointment->id }}"
+                                            onclick="confirmCancel(this)">
+                                            <i class="fas fa-times me-2"></i>Cancel Appointment
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                            <button type="button" class="btn-modern btn-modern-outline"
+                                data-bs-dismiss="modal">
+                                <i class="fas fa-times-circle me-2"></i>Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
 @endsection
 
 @push('scripts')
@@ -1924,13 +1937,13 @@
             window.confirmCancel = function (btn) {
                 const formId = btn.getAttribute('data-form-id');
                 console.log('confirmCancel called, form ID:', formId);
-                
+
                 if (!formId) {
                     console.error('No form ID found on button');
                     alert('Error: Cannot find form identifier. Please refresh the page.');
                     return;
                 }
-                
+
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You are about to cancel this appointment. This action cannot be undone!",
@@ -1944,7 +1957,7 @@
                     if (result.isConfirmed) {
                         const form = document.getElementById(formId);
                         console.log('Form found by ID:', form);
-                        
+
                         if (form) {
                             console.log('Submitting form to:', form.action);
                             form.submit();
@@ -2460,139 +2473,139 @@
             }
 
             // Initialize Add Appointment Calendar
-                    const addAppointmentModal = document.getElementById('addAppointmentModal');
-                    let addCalendar = null;
+            const addAppointmentModal = document.getElementById('addAppointmentModal');
+            let addCalendar = null;
 
-                    if (addAppointmentModal) {
-                        addAppointmentModal.addEventListener('shown.bs.modal', function () {
-                            if (!addCalendar) {
-                                addCalendar = new AppointmentCalendar({
-                                    prevBtnId: 'prevMonth',
-                                    nextBtnId: 'nextMonth',
-                                    currentMonthId: 'currentMonth',
-                                    calendarGridId: 'calendarGrid',
-                                    selectedDateDisplayId: 'selectedDateDisplay',
-                                    timeSlotsGridId: 'timeSlotsGrid',
-                                    dateInputId: 'appointment_date',
-                                    timeInputId: 'appointment_time'
-                                });
-                            }
-                        });
-
-                        addAppointmentModal.addEventListener('hidden.bs.modal', function () {
-                            if (addCalendar) {
-                                addCalendar.selectedDate = null;
-                                addCalendar.selectedTime = null;
-                                // Reset UI
-                                document.getElementById('selectedDateDisplay').textContent = 'Select a date to view available time slots';
-                                document.getElementById('timeSlotsGrid').innerHTML = '<div class="text-center text-muted"><i class="fas fa-clock fa-2x mb-2"></i><p>Select a date to view time slots</p></div>';
-                                document.getElementById('appointment_date').value = '';
-                                document.getElementById('appointment_time').value = '';
-                                // Remove selection classes
-                                document.querySelectorAll('#calendarGrid .selected').forEach(el => el.classList.remove('selected'));
-                            }
+            if (addAppointmentModal) {
+                addAppointmentModal.addEventListener('shown.bs.modal', function () {
+                    if (!addCalendar) {
+                        addCalendar = new AppointmentCalendar({
+                            prevBtnId: 'prevMonth',
+                            nextBtnId: 'nextMonth',
+                            currentMonthId: 'currentMonth',
+                            calendarGridId: 'calendarGrid',
+                            selectedDateDisplayId: 'selectedDateDisplay',
+                            timeSlotsGridId: 'timeSlotsGrid',
+                            dateInputId: 'appointment_date',
+                            timeInputId: 'appointment_time'
                         });
                     }
-
-                    // Initialize Reschedule Appointment Calendar
-                    const rescheduleModal = document.getElementById('rescheduleAppointmentModal');
-                    let rescheduleCalendar = null;
-
-                    if (rescheduleModal) {
-                        rescheduleModal.addEventListener('shown.bs.modal', function () {
-                            if (!rescheduleCalendar) {
-                                rescheduleCalendar = new AppointmentCalendar({
-                                    prevBtnId: 'reschedPrevMonth',
-                                    nextBtnId: 'reschedNextMonth',
-                                    currentMonthId: 'reschedCurrentMonth',
-                                    calendarGridId: 'reschedCalendarGrid',
-                                    selectedDateDisplayId: 'reschedSelectedDateDisplay',
-                                    timeSlotsGridId: 'reschedTimeSlotsGrid',
-                                    dateInputId: 'resched_new_date',
-                                    timeInputId: 'resched_new_time'
-                                });
-                            }
-                        });
-
-                        rescheduleModal.addEventListener('hidden.bs.modal', function () {
-                            if (rescheduleCalendar) {
-                                rescheduleCalendar.selectedDate = null;
-                                rescheduleCalendar.selectedTime = null;
-                                // Reset UI
-                                document.getElementById('reschedSelectedDateDisplay').textContent = 'Select a date to view available time slots';
-                                document.getElementById('reschedTimeSlotsGrid').innerHTML = '<div class="text-center text-muted"><i class="fas fa-clock fa-2x mb-2"></i><p>Select a date to view time slots</p></div>';
-                                document.getElementById('resched_new_date').value = '';
-                                document.getElementById('resched_new_time').value = '';
-                                document.querySelectorAll('#reschedCalendarGrid .selected').forEach(el => el.classList.remove('selected'));
-                            }
-                        });
-                    }
-
-                    // Handle Reschedule Button Clicks
-                    document.addEventListener('click', function (e) {
-                        if (e.target && e.target.classList.contains('reschedule-btn')) {
-                            const btn = e.target;
-                            const appointmentId = btn.dataset.appointmentId;
-                            const actionUrl = btn.dataset.actionUrl;
-
-                            const form = document.getElementById('rescheduleForm');
-                            if (form) {
-                                form.action = actionUrl;
-                            }
-
-                            // Open the modal
-                            const modal = new bootstrap.Modal(document.getElementById('rescheduleAppointmentModal'));
-                            modal.show();
-                        }
-                    });
                 });
 
-                // Custom validation for Add Appointment form
-                const addAppointmentForm = document.querySelector('#addAppointmentModal form');
-                if (addAppointmentForm) {
-                    addAppointmentForm.addEventListener('submit', function(e) {
-                        e.preventDefault();
-                        
-                        const selectedPatientId = document.getElementById('selected_patient_id').value;
-                        const patientNameField = document.getElementById('patient_name');
-                        const patientName = patientNameField.value.trim();
-                        const serviceType = document.getElementById('service_type').value;
-                        const appointmentDate = document.getElementById('appointment_date').value;
-                        const appointmentTime = document.getElementById('appointment_time').value;
-                        
-                        let missingFields = [];
-                        
-                        // If no patient selected from search, check manual entry (only Patient Name is required)
-                        if (!selectedPatientId) {
-                            // Only check Patient Name if field is not disabled
-                            if (!patientNameField.disabled && !patientName) {
-                                missingFields.push('Patient Name (or search and select an existing patient)');
-                            }
-                        }
-                        
-                        if (!serviceType) missingFields.push('Service Type');
-                        if (!appointmentDate) missingFields.push('Appointment Date (select from calendar)');
-                        if (!appointmentTime) missingFields.push('Time Slot (select from available times)');
-                        
-                        if (missingFields.length > 0) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Missing Information',
-                                html: '<p class="mb-3">Please fill in the following required fields:</p><ul class="text-start ps-4">' + 
-                                      missingFields.map(field => '<li class="mb-1">' + field + '</li>').join('') + 
-                                      '</ul>',
-                                confirmButtonText: 'OK, I\'ll complete them',
-                                confirmButtonColor: '#17a2b8',
-                                customClass: {
-                                    popup: 'swal-wide'
-                                }
-                            });
-                            return false;
-                        }
-                        
-                        // If all validation passes, submit the form
-                        this.submit();
-                    });
+                addAppointmentModal.addEventListener('hidden.bs.modal', function () {
+                    if (addCalendar) {
+                        addCalendar.selectedDate = null;
+                        addCalendar.selectedTime = null;
+                        // Reset UI
+                        document.getElementById('selectedDateDisplay').textContent = 'Select a date to view available time slots';
+                        document.getElementById('timeSlotsGrid').innerHTML = '<div class="text-center text-muted"><i class="fas fa-clock fa-2x mb-2"></i><p>Select a date to view time slots</p></div>';
+                        document.getElementById('appointment_date').value = '';
+                        document.getElementById('appointment_time').value = '';
+                        // Remove selection classes
+                        document.querySelectorAll('#calendarGrid .selected').forEach(el => el.classList.remove('selected'));
+                    }
+                });
+            }
+
+            // Initialize Reschedule Appointment Calendar
+            const rescheduleModal = document.getElementById('rescheduleAppointmentModal');
+            let rescheduleCalendar = null;
+
+            if (rescheduleModal) {
+                rescheduleModal.addEventListener('shown.bs.modal', function () {
+                    if (!rescheduleCalendar) {
+                        rescheduleCalendar = new AppointmentCalendar({
+                            prevBtnId: 'reschedPrevMonth',
+                            nextBtnId: 'reschedNextMonth',
+                            currentMonthId: 'reschedCurrentMonth',
+                            calendarGridId: 'reschedCalendarGrid',
+                            selectedDateDisplayId: 'reschedSelectedDateDisplay',
+                            timeSlotsGridId: 'reschedTimeSlotsGrid',
+                            dateInputId: 'resched_new_date',
+                            timeInputId: 'resched_new_time'
+                        });
+                    }
+                });
+
+                rescheduleModal.addEventListener('hidden.bs.modal', function () {
+                    if (rescheduleCalendar) {
+                        rescheduleCalendar.selectedDate = null;
+                        rescheduleCalendar.selectedTime = null;
+                        // Reset UI
+                        document.getElementById('reschedSelectedDateDisplay').textContent = 'Select a date to view available time slots';
+                        document.getElementById('reschedTimeSlotsGrid').innerHTML = '<div class="text-center text-muted"><i class="fas fa-clock fa-2x mb-2"></i><p>Select a date to view time slots</p></div>';
+                        document.getElementById('resched_new_date').value = '';
+                        document.getElementById('resched_new_time').value = '';
+                        document.querySelectorAll('#reschedCalendarGrid .selected').forEach(el => el.classList.remove('selected'));
+                    }
+                });
+            }
+
+            // Handle Reschedule Button Clicks
+            document.addEventListener('click', function (e) {
+                if (e.target && e.target.classList.contains('reschedule-btn')) {
+                    const btn = e.target;
+                    const appointmentId = btn.dataset.appointmentId;
+                    const actionUrl = btn.dataset.actionUrl;
+
+                    const form = document.getElementById('rescheduleForm');
+                    if (form) {
+                        form.action = actionUrl;
+                    }
+
+                    // Open the modal
+                    const modal = new bootstrap.Modal(document.getElementById('rescheduleAppointmentModal'));
+                    modal.show();
                 }
-            </script>
+            });
+        });
+
+        // Custom validation for Add Appointment form
+        const addAppointmentForm = document.querySelector('#addAppointmentModal form');
+        if (addAppointmentForm) {
+            addAppointmentForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const selectedPatientId = document.getElementById('selected_patient_id').value;
+                const patientNameField = document.getElementById('patient_name');
+                const patientName = patientNameField.value.trim();
+                const serviceType = document.getElementById('service_type').value;
+                const appointmentDate = document.getElementById('appointment_date').value;
+                const appointmentTime = document.getElementById('appointment_time').value;
+
+                let missingFields = [];
+
+                // If no patient selected from search, check manual entry (only Patient Name is required)
+                if (!selectedPatientId) {
+                    // Only check Patient Name if field is not disabled
+                    if (!patientNameField.disabled && !patientName) {
+                        missingFields.push('Patient Name (or search and select an existing patient)');
+                    }
+                }
+
+                if (!serviceType) missingFields.push('Service Type');
+                if (!appointmentDate) missingFields.push('Appointment Date (select from calendar)');
+                if (!appointmentTime) missingFields.push('Time Slot (select from available times)');
+
+                if (missingFields.length > 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Missing Information',
+                        html: '<p class="mb-3">Please fill in the following required fields:</p><ul class="text-start ps-4">' +
+                            missingFields.map(field => '<li class="mb-1">' + field + '</li>').join('') +
+                            '</ul>',
+                        confirmButtonText: 'OK, I\'ll complete them',
+                        confirmButtonColor: '#17a2b8',
+                        customClass: {
+                            popup: 'swal-wide'
+                        }
+                    });
+                    return false;
+                }
+
+                // If all validation passes, submit the form
+                this.submit();
+            });
+        }
+    </script>
 @endpush
