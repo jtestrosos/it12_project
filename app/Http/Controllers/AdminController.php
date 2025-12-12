@@ -170,8 +170,8 @@ class AdminController extends Controller
     {
         $patients = Patient::query()
             ->with('appointments')
-            ->latest()
-            ->paginate(10);
+            ->orderBy('name', 'asc')
+            ->get();
 
         return view('admin.patients', compact('patients'));
     }
@@ -452,6 +452,12 @@ class AdminController extends Controller
             'notes' => 'nullable|string|max:1000'
         ]);
 
+        // Find the service by name
+        $service = Service::where('name', $request->service_type)->first();
+        if (!$service) {
+            return redirect()->back()->with('error', 'Invalid service selected.');
+        }
+
         // Enforce 9 slots per day per service (excluding cancelled)
         $existingCount = Appointment::whereDate('appointment_date', $request->appointment_date)
             ->where('service_type', $request->service_type)
@@ -465,7 +471,7 @@ class AdminController extends Controller
         $userId = $request->filled('user_id') ? $request->user_id : Auth::guard('admin')->id();
         $isWalkIn = !$request->filled('user_id'); // Only walk-in if no user_id provided
 
-        Appointment::create([
+        $appointment = Appointment::create([
             'patient_id' => $userId,
             'patient_name' => $request->patient_name,
             'patient_phone' => $request->patient_phone ?: '',
@@ -477,6 +483,15 @@ class AdminController extends Controller
             'is_walk_in' => $isWalkIn,
             'status' => 'pending'
         ]);
+
+        // Attach service to appointment_service pivot table
+        \Log::info('Admin creating appointment - attaching service', [
+            'appointment_id' => $appointment->id,
+            'service_id' => $service->id,
+            'service_name' => $service->name
+        ]);
+        
+        $appointment->services()->attach($service->id);
 
         return redirect()->back()->with('success', 'Appointment created successfully.');
     }
@@ -573,7 +588,8 @@ class AdminController extends Controller
                 }
             });
         }
-        $inventory = $query->paginate(10)->withQueryString();
+        // Load all items for global client-side search
+        $inventory = $query->get();
 
         // Stats for header cards and alerts
         $totalItems = Inventory::count();
@@ -634,6 +650,11 @@ class AdminController extends Controller
             'supplier' => 'nullable|string|max:255',
             'location' => 'nullable|string|max:255'
         ]);
+
+        // Check for duplicate item name (case-insensitive)
+        if (Inventory::whereRaw('LOWER(item_name) = ?', [strtolower($request->item_name)])->exists()) {
+            return redirect()->back()->with('error', 'Item with this name already exists.');
+        }
 
         $inventory = Inventory::create($request->all());
         $inventory->updateStatus();
@@ -843,8 +864,14 @@ class AdminController extends Controller
             ]);
 
             $patient = Patient::findOrFail($request->user_id);
+            
+            // Find the service by name
+            $service = Service::where('name', $request->service_type)->first();
+            if (!$service) {
+                return redirect()->back()->with('error', 'Invalid service selected.');
+            }
 
-            Appointment::create([
+            $appointment = Appointment::create([
                 'patient_id' => $patient->id,
                 'patient_name' => $patient->name,
                 'patient_phone' => $patient->phone ?? '',
@@ -855,9 +882,12 @@ class AdminController extends Controller
                 'notes' => $request->notes,
                 'is_walk_in' => true,
                 'status' => 'waiting',
-                'approved_by' => Auth::guard('admin')->id(),
+                'approved_by_admin_id' => Auth::guard('admin')->id(),
                 'approved_at' => now()
             ]);
+            
+            // Attach service
+            $appointment->services()->attach($service->id);
 
             return redirect()->back()->with('success', 'Walk-in patient added successfully.');
         }
@@ -870,8 +900,14 @@ class AdminController extends Controller
             'service_type' => 'required|string',
             'notes' => 'nullable|string|max:1000'
         ]);
+        
+        // Find the service by name
+        $service = Service::where('name', $request->service_type)->first();
+        if (!$service) {
+            return redirect()->back()->with('error', 'Invalid service selected.');
+        }
 
-        Appointment::create([
+        $appointment = Appointment::create([
             'patient_id' => Auth::guard('admin')->id(), // link to admin user to satisfy NOT NULL constraint
             'patient_name' => $request->patient_name,
             'patient_phone' => $request->patient_phone,
@@ -882,9 +918,12 @@ class AdminController extends Controller
             'notes' => $request->notes,
             'is_walk_in' => true,
             'status' => 'waiting',
-            'approved_by' => Auth::guard('admin')->id(),
+           'approved_by_admin_id' => Auth::guard('admin')->id(),
             'approved_at' => now()
         ]);
+        
+        // Attach service
+        $appointment->services()->attach($service->id);
 
         return redirect()->back()->with('success', 'Walk-in patient added successfully.');
     }
@@ -1276,46 +1315,70 @@ class AdminController extends Controller
     }
 
     // Patient Reports Export Methods
-    public function exportPatientsExcel()
+    public function exportPatientsExcel(Request $request)
     {
-        $patients = Patient::query()->get();
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
 
-        $export = new class ($patients) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
-            protected $patients;
+        $startDate = Carbon::parse($request->start_date)->startOfDay();
+        $endDate = Carbon::parse($request->end_date)->endOfDay();
 
-            public function __construct($patients)
-            {
-                $this->patients = $patients;
-            }
-
-            public function collection()
-            {
-                return $this->patients->map(function ($patient) {
-                    return [
-                        'Name' => $patient->name,
-                        'Email' => $patient->email,
-                        'Gender' => ucfirst($patient->gender ?? 'N/A'),
-                        'Age' => $patient->age ?? 'N/A',
-                        'Barangay' => $patient->barangay === 'Other' ? $patient->barangay_other : $patient->barangay,
-                        'Registered' => $patient->created_at->format('M d, Y'),
-                    ];
-                });
-            }
-
-            public function headings(): array
-            {
-                return ['Name', 'Email', 'Gender', 'Age', 'Barangay', 'Registered'];
-            }
-        };
-
-        return Excel::download($export, 'patient_reports_' . now()->format('Y-m-d') . '.xlsx');
+        return Excel::download(new \App\Exports\PatientReportExport($startDate, $endDate), 'patient_reports_' . $request->start_date . '_to_' . $request->end_date . '.xlsx');
     }
 
-    public function exportPatientsPdf()
+    public function exportPatientsPdf(Request $request)
     {
-        $patients = Patient::query()->get();
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
 
-        $html = view('admin.reports.patients-pdf', compact('patients'))->render();
+        $startDate = Carbon::parse($request->start_date)->startOfDay();
+        $endDate = Carbon::parse($request->end_date)->endOfDay();
+
+        // 1. Summary Stats
+        $totalPatients = Patient::count();
+        $maleCount = Patient::where('gender', 'male')->count();
+        $femaleCount = Patient::where('gender', 'female')->count();
+        $newPatients = Patient::whereBetween('created_at', [$startDate, $endDate])->count();
+
+        // 2. Distributions
+        $ageGroups = [
+            '0-17' => Patient::whereBetween('age', [0, 17])->count(),
+            '18-30' => Patient::whereBetween('age', [18, 30])->count(),
+            '31-50' => Patient::whereBetween('age', [31, 50])->count(),
+            '51-70' => Patient::whereBetween('age', [51, 70])->count(),
+            '71+' => Patient::where('age', '>', 70)->count(),
+        ];
+
+        $barangayDistribution = Patient::selectRaw('barangay, count(*) as count')
+            ->groupBy('barangay')
+            ->get();
+
+        // 3. Top Patients (Filtered by Date Range)
+        $topPatients = Patient::withCount(['appointments' => function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('appointment_date', [$startDate, $endDate]);
+            }])
+            ->whereHas('appointments', function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('appointment_date', [$startDate, $endDate]);
+            })
+            ->orderByDesc('appointments_count')
+            ->limit(20)
+            ->get();
+
+        // 4. Recent Registrations (Filtered by Date Range)
+        $recentPatients = Patient::whereBetween('created_at', [$startDate, $endDate])
+            ->latest()
+            ->get();
+
+        $html = view('admin.reports.patients-pdf', compact(
+            'startDate', 'endDate',
+            'totalPatients', 'maleCount', 'femaleCount', 'newPatients',
+            'ageGroups', 'barangayDistribution',
+            'topPatients', 'recentPatients'
+        ))->render();
 
         $options = new Options();
         $options->set('isRemoteEnabled', true);
@@ -1326,7 +1389,7 @@ class AdminController extends Controller
         $dompdf->setPaper('a4', 'portrait');
         $dompdf->render();
 
-        $filename = 'patient_reports_' . now()->format('Y-m-d') . '.pdf';
+        $filename = 'patient_reports_' . $request->start_date . '_to_' . $request->end_date . '.pdf';
         return response()->streamDownload(
             function () use ($dompdf) {
                 echo $dompdf->output();
@@ -1337,26 +1400,47 @@ class AdminController extends Controller
     }
 
     // Inventory Reports Export Methods
-    public function exportInventoryExcel()
+    public function exportInventoryExcel(Request $request)
     {
-        $inventory = Inventory::all();
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
 
-        $export = new class ($inventory) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+        $startDate = Carbon::parse($request->start_date)->startOfDay();
+        $endDate = Carbon::parse($request->end_date)->endOfDay();
+
+        $inventory = Inventory::orderBy('item_name', 'asc')->get();
+
+        $export = new class ($inventory, $startDate, $endDate) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
             protected $inventory;
+            protected $startDate;
+            protected $endDate;
 
-            public function __construct($inventory)
+            public function __construct($inventory, $startDate, $endDate)
             {
                 $this->inventory = $inventory;
+                $this->startDate = $startDate;
+                $this->endDate = $endDate;
             }
 
             public function collection()
             {
                 return $this->inventory->map(function ($item) {
+                    // Calculate Stocks Used (Usage + Deduct transactions)
+                    $stocksUsed = \App\Models\InventoryTransaction::where('inventory_id', $item->id)
+                        ->whereIn('transaction_type', ['usage', 'deduct', 'dispense']) // Assuming 'dispense' might be a type, verifying logic
+                        ->where(function($q) {
+                             $q->where('transaction_type', '!=', 'restock');
+                        })
+                        ->whereBetween('created_at', [$this->startDate, $this->endDate])
+                        ->sum('quantity');
+
                     return [
                         'Item Name' => $item->item_name,
                         'Category' => $item->category,
                         'Current Stock' => $item->current_stock . ' ' . $item->unit,
-                        'Minimum Stock' => $item->minimum_stock . ' ' . $item->unit,
+                        'Stocks Used' => $stocksUsed . ' ' . $item->unit,
                         'Status' => str_replace('_', ' ', ucfirst($item->status)),
                         'Expiry Date' => $item->expiry_date ? \Carbon\Carbon::parse($item->expiry_date)->format('M d, Y') : 'N/A',
                     ];
@@ -1365,18 +1449,26 @@ class AdminController extends Controller
 
             public function headings(): array
             {
-                return ['Item Name', 'Category', 'Current Stock', 'Minimum Stock', 'Status', 'Expiry Date'];
+                return ['Item Name', 'Category', 'Current Stock', 'Stocks Used', 'Status', 'Expiry Date'];
             }
         };
 
-        return Excel::download($export, 'inventory_reports_' . now()->format('Y-m-d') . '.xlsx');
+        return Excel::download($export, 'inventory_reports_' . $request->start_date . '_to_' . $request->end_date . '.xlsx');
     }
 
-    public function exportInventoryPdf()
+    public function exportInventoryPdf(Request $request)
     {
-        $inventory = Inventory::all();
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
 
-        $html = view('admin.reports.inventory-pdf', compact('inventory'))->render();
+        $startDate = Carbon::parse($request->start_date)->startOfDay();
+        $endDate = Carbon::parse($request->end_date)->endOfDay();
+
+        $inventory = Inventory::with('transactions')->orderBy('item_name')->get();
+
+        $html = view('admin.reports.inventory-pdf', compact('inventory', 'startDate', 'endDate'))->render();
 
         $options = new Options();
         $options->set('isRemoteEnabled', true);
@@ -1387,7 +1479,7 @@ class AdminController extends Controller
         $dompdf->setPaper('a4', 'landscape');
         $dompdf->render();
 
-        $filename = 'inventory_reports_' . now()->format('Y-m-d') . '.pdf';
+        $filename = 'inventory_reports_' . $request->start_date . '_to_' . $request->end_date . '.pdf';
         return response()->streamDownload(
             function () use ($dompdf) {
                 echo $dompdf->output();

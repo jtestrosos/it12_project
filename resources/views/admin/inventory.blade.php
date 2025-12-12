@@ -431,17 +431,9 @@
                     </table>
                 </div>
             </div>
-            <div class="d-flex flex-column align-items-center mt-4"
-                id="inventoryPaginationContainer">
-                <div>
-                    {{ $inventory->links('pagination::bootstrap-5') }}
-                </div>
-                <div class="small text-muted mb-0 mt-n2">
-                    @if($inventory->total() > 0)
-                        Showing {{ $inventory->firstItem() }}-{{ $inventory->lastItem() }} of {{ $inventory->total() }} items
-                    @else
-                        Showing 0 items
-                    @endif
+            <div class="d-flex flex-column align-items-center mt-4">
+                <div class="small text-muted mb-0">
+                    Total Items: {{ $inventory->count() }}
                 </div>
             </div>
 
@@ -688,7 +680,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="expiry_date" class="form-label">Expiry Date</label>
-                                <input type="date" class="form-control" id="expiry_date" name="expiry_date">
+                                <input type="date" class="form-control" id="expiry_date" name="expiry_date" min="{{ date('Y-m-d', strtotime('+1 day')) }}">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -726,78 +718,58 @@
         document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.getElementById('inventorySearchInput');
             const categorySelect = document.getElementById('inventoryCategorySelect');
-            const form = searchInput ? searchInput.closest('form') : null;
             const tableBody = document.getElementById('inventoryTableBody');
-            const paginationContainer = document.getElementById('inventoryPaginationContainer');
+            const rows = tableBody ? tableBody.querySelectorAll('tr') : [];
 
-            let debounceTimer;
+            function filterTable() {
+                const searchValue = searchInput.value.toLowerCase();
+                const categoryValue = categorySelect.value.toLowerCase();
 
-            const fetchResults = () => {
-                if (!form) return;
+                rows.forEach(row => {
+                    const name = row.dataset.name || '';
+                    const category = row.dataset.category || '';
+                    const location = row.dataset.location || '';
+                    const id = row.dataset.id || '';
+                    
+                    // Also search text content of the row for broader match
+                    const textContent = row.textContent.toLowerCase();
 
-                const formData = new FormData(form);
-                const params = new URLSearchParams(formData);
-                const url = `${form.action}?${params.toString()}`;
+                    let showRow = true;
 
-                // Show loading state
-                if (tableBody) tableBody.style.opacity = '0.5';
-
-                fetch(url, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
+                    // Search filter
+                    if (searchValue) {
+                        // Check if search value matches name, location, ID or any text content
+                        const matchesSearch = name.includes(searchValue) || 
+                                              location.includes(searchValue) || 
+                                              id.toString().includes(searchValue) ||
+                                              textContent.includes(searchValue);
+                        
+                        if (!matchesSearch) {
+                            showRow = false;
+                        }
                     }
-                })
-                    .then(response => response.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
 
-                        // Update Table Body
-                        const newTableBody = doc.getElementById('inventoryTableBody');
-                        if (newTableBody && tableBody) {
-                            tableBody.innerHTML = newTableBody.innerHTML;
-                            tableBody.style.opacity = '1';
+                    // Category filter
+                    if (categoryValue && categoryValue !== 'all' && categoryValue !== '') {
+                        if (category !== categoryValue) {
+                            showRow = false;
                         }
+                    }
 
-                        // Update Pagination & Summary (Bottom)
-                        const newPagination = doc.getElementById('inventoryPaginationContainer');
-                        if (newPagination && paginationContainer) {
-                            paginationContainer.innerHTML = newPagination.innerHTML;
-                        }
-
-                        // Update Filter Card Summary (Top)
-                        const newTopSummary = doc.querySelector('.filter-card .mt-2.small.text-muted');
-                        const currentTopSummary = document.querySelector('.filter-card .mt-2.small.text-muted');
-                        if (newTopSummary && currentTopSummary) {
-                            currentTopSummary.innerHTML = newTopSummary.innerHTML;
-                        }
-
-                        // Update URL
-                        window.history.pushState({}, '', url);
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        if (tableBody) tableBody.style.opacity = '1';
-                    });
-            };
-
-            if (searchInput && form) {
-                searchInput.addEventListener('input', function () {
-                    clearTimeout(debounceTimer);
-                    debounceTimer = setTimeout(fetchResults, 500);
-                });
-
-                // Prevent form submission on Enter and use AJAX
-                form.addEventListener('submit', function (e) {
-                    e.preventDefault();
-                    fetchResults();
+                    row.style.display = showRow ? '' : 'none';
                 });
             }
 
-            if (categorySelect && form) {
-                categorySelect.addEventListener('change', function () {
-                    fetchResults();
+            if (searchInput) {
+                searchInput.addEventListener('input', filterTable);
+                // Prevent form submission
+                searchInput.closest('form').addEventListener('submit', function(e) {
+                    e.preventDefault();
                 });
+            }
+
+            if (categorySelect) {
+                categorySelect.addEventListener('change', filterTable);
             }
         });
     </script>

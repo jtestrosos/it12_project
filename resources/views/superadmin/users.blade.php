@@ -307,13 +307,10 @@
             <!-- Modals for EACH user are placed here so they are refreshed with AJAX -->
             @include('superadmin.partials.user-modals')
 
-            <!-- Pagination (Inside table-container for AJAX) -->
-            <div class="d-flex flex-column align-items-center mt-4" id="usersPaginationContainer">
-                <div>
-                    {{ $users->links('pagination::bootstrap-5') }}
-                </div>
-                <div class="small text-muted mb-0 mt-n2">
-                    Showing {{ $users->firstItem() }}-{{ $users->lastItem() }} of {{ $users->total() }} users
+            <!-- Total Count -->
+            <div class="d-flex flex-column align-items-center mt-4">
+                <div class="small text-muted mb-0">
+                    Total Users: <span id="totalUsersCount">{{ $users->count() }}</span>
                 </div>
             </div>
         @else

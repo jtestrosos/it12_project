@@ -7,13 +7,29 @@
 @section('content')
     <div class="p-0 p-md-4">
         <!-- Export Buttons -->
-        <div class="d-flex justify-content-end mb-3 gap-2">
-            <a href="{{ route('admin.reports.export.patients') }}" class="btn btn-success">
-                <i class="fas fa-file-excel me-2"></i>Export Excel
-            </a>
-            <a href="{{ route('admin.reports.export.patients.pdf') }}" class="btn btn-danger">
-                <i class="fas fa-file-pdf me-2"></i>Export PDF
-            </a>
+        <!-- Export Form -->
+        <div class="card-surface p-3 mb-4">
+            <form action="{{ route('admin.reports.export.patients') }}" method="GET" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">Start Date</label>
+                    <input type="date" name="start_date" class="form-control" required
+                        value="{{ now()->startOfMonth()->format('Y-m-d') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">End Date</label>
+                    <input type="date" name="end_date" class="form-control" required
+                        value="{{ now()->endOfMonth()->format('Y-m-d') }}">
+                </div>
+                <div class="col-md-6 d-flex gap-2">
+                    <button type="submit" class="btn btn-success flex-grow-1">
+                        <i class="fas fa-file-excel me-2"></i>Export Excel (Report)
+                    </button>
+                    <button type="submit" formaction="{{ route('admin.reports.export.patients.pdf') }}"
+                        class="btn btn-danger flex-grow-1">
+                        <i class="fas fa-file-pdf me-2"></i>Export PDF
+                    </button>
+                </div>
+            </form>
         </div>
 
         <!-- Overview Cards -->

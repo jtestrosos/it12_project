@@ -1868,6 +1868,11 @@
 
                         if (dayData.is_weekend) {
                             dayElement.classList.add('weekend');
+                            // Visually disable weekends
+                            dayElement.style.opacity = '0.5';
+                            dayElement.style.cursor = 'not-allowed';
+                            dayElement.style.backgroundColor = '#f8f9fa';
+                            dayElement.style.pointerEvents = 'none';
                         }
 
                         if (dayData.is_past) {
@@ -1878,13 +1883,15 @@
                             dayElement.classList.add('partially-occupied');
                         }
 
-                        // Add slot indicator at the bottom
-                        const indicator = document.createElement('span');
-                        indicator.className = 'slot-indicator';
-                        indicator.textContent = `${dayData.occupied_slots}/${dayData.total_slots}`;
-                        dayElement.appendChild(indicator);
+                        // Add slot indicator at the bottom (Only if occupied > 0)
+                        if (dayData.occupied_slots > 0) {
+                            const indicator = document.createElement('span');
+                            indicator.className = 'slot-indicator';
+                            indicator.textContent = `${dayData.occupied_slots}/${dayData.total_slots}`;
+                            dayElement.appendChild(indicator);
+                        }
 
-                        if (!dayData.is_past) {
+                        if (!dayData.is_past && !dayData.is_weekend) {
                             dayElement.addEventListener('click', () => {
                                 this.selectDate(dayData.date);
                             });
