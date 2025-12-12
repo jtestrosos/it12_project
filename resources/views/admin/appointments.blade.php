@@ -796,6 +796,412 @@
         body.bg-dark .badge.bg-secondary {
             background-color: #4b5563 !important;
         }
+
+        /* ========== RESPONSIVE STYLES FOR MOBILE ========== */
+        
+        /* Tablet and below (≤991px) */
+        @media (max-width: 991px) {
+            /* Ensure content doesn't get cut off */
+            .container-fluid {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+
+            /* Appointment cards on tablet */
+            .appointment-card {
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+            }
+
+            /* Filter panel adjustments */
+            .row.mb-4 {
+                margin-bottom: 1rem !important;
+            }
+
+            .col-md-3,
+            .col-md-6,
+            .col-md-9 {
+                flex: 0 0 100%;
+                max-width: 100%;
+                margin-bottom: 0.75rem;
+            }
+
+            /* Button spacing */
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+
+            /* Table responsive */
+            .table-responsive {
+                margin: 0 -0.75rem;
+                padding: 0 0.75rem;
+            }
+
+            /* Reduce table font size */
+            .table-modern {
+                font-size: 0.875rem;
+            }
+
+            .table-modern thead th,
+            .table-modern tbody td {
+                padding: 0.6rem 0.75rem;
+            }
+        }
+
+        /* Mobile phones (≤768px) */
+        @media (max-width: 768px) {
+            /* More compact cards */
+            .appointment-card {
+                padding: 0.75rem;
+                border-radius: 10px;
+            }
+
+            /* Status badges smaller */
+            .status-badge {
+                padding: 0.35rem 0.75rem;
+                font-size: 0.75rem;
+            }
+
+            /* Filter section */
+            .filter-card,
+            .card {
+                margin-bottom: 0.75rem;
+            }
+
+            /* Form controls */
+            .form-control,
+            .form-select {
+                padding: 0.55rem 0.75rem;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            /* Buttons full width in filter section */
+            .d-flex.gap-2 {
+                flex-direction: column;
+                gap: 0.5rem !important;
+            }
+
+            .d-flex.gap-2 .btn {
+                width: 100%;
+            }
+
+            /* Table adjustments */
+            .table-modern {
+                font-size: 0.8rem;
+            }
+
+            .table-modern thead th,
+            .table-modern tbody td {
+                padding: 0.5rem;
+            }
+
+            /* Hide some table columns on mobile */
+            .table-modern .d-md-table-cell {
+                display: none !important;
+            }
+
+            /* Action buttons smaller */
+            .btn-icon {
+                width: 28px;
+                height: 28px;
+            }
+
+            .btn-icon i {
+                font-size: 0.8rem;
+            }
+
+            /* Stack action buttons */
+            .d-flex.gap-1 {
+                gap: 0.25rem !important;
+            }
+
+            /* Pagination */
+            .pagination {
+                font-size: 0.8rem;
+            }
+
+            .page-link {
+                padding: 0.4rem 0.6rem;
+            }
+
+            /* Modal responsive adjustments */
+            .modal-dialog {
+                margin: 0.5rem;
+                max-width: calc(100vw - 1rem);
+                width: calc(100vw - 1rem);
+            }
+
+            .modal-content {
+                border-radius: 10px;
+                max-height: calc(100vh - 1rem);
+            }
+
+            .modal-header {
+                padding: 1rem;
+            }
+
+            .modal-body {
+                padding: 1rem;
+                max-height: calc(100vh - 180px);
+                overflow-y: auto;
+            }
+
+            .modal-footer {
+                padding: 1rem;
+                flex-wrap: wrap;
+            }
+
+            .modal-footer .btn {
+                flex: 1 1 auto;
+                min-width: 120px;
+            }
+
+            /* Calendar in modal */
+            .calendar-grid {
+                font-size: 0.7rem;
+                gap: 1px;
+            }
+
+            .calendar-header {
+                padding: 0.3rem;
+                font-size: 0.7rem;
+            }
+
+            .calendar-day {
+                min-height: 32px;
+                font-size: 0.7rem;
+            }
+
+            /* Time slots */
+            .time-slots-grid {
+                grid-template-columns: 1fr;
+                gap: 0.4rem;
+            }
+
+            .time-slot {
+                padding: 0.5rem;
+            }
+
+            .time-slot .time {
+                font-size: 0.85rem;
+            }
+
+            .time-slot .status {
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Small mobile (≤576px) */
+        @media (max-width: 576px) {
+            /* Ultra compact appointments */
+            .appointment-card {
+                padding: 0.6rem;
+            }
+
+            /* Very small status badges */
+            .status-badge {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.7rem;
+            }
+
+            /* Compact table */
+            .table-modern {
+                font-size: 0.75rem;
+            }
+
+            .table-modern thead th,
+            .table-modern tbody td {
+                padding: 0.4rem 0.3rem;
+            }
+
+            /* Action buttons very compact */
+            .btn-icon {
+                width: 26px;
+                height: 26px;
+            }
+
+            /* Smaller pagination */
+            .pagination {
+                font-size: 0.75rem;
+                justify-content: center;
+            }
+
+            .page-link {
+                padding: 0.35rem 0.5rem;
+            }
+
+            /* ===== MODAL RESPONSIVE FIXES ===== */
+            /* Make modals nearly full-screen on very small devices */
+            .modal-dialog {
+                margin: 0.25rem;
+                max-width: calc(100vw - 0.5rem);
+                width: calc(100vw - 0.5rem);
+            }
+
+            .modal-content {
+                border-radius: 8px;
+                max-height: calc(100vh - 0.5rem);
+            }
+
+            .modal-header {
+                padding: 0.75rem 1rem;
+            }
+
+            .modal-title {
+                font-size: 1rem;
+            }
+
+            .modal-body {
+                padding: 0.75rem;
+                max-height: calc(100vh - 200px);
+                overflow-y: auto;
+            }
+
+            .modal-footer {
+                padding: 0.75rem;
+                flex-direction: column-reverse;
+                gap: 0.5rem;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+                margin: 0;
+            }
+
+            /* Info cards in modals */
+            .info-card {
+                padding: 0.75rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .info-label {
+                font-size: 0.7rem;
+                margin-bottom: 0.35rem;
+            }
+
+            .info-value {
+                font-size: 0.875rem;
+            }
+        }
+
+            /* Modal full screen on very small devices */
+            .modal-dialog {
+                margin: 0;
+                max-width: 100%;
+                min-height: 100vh;
+            }
+
+            .modal-content {
+                min-height: 100vh;
+                border-radius: 0;
+            }
+
+            /* Offcanvas adjustments */
+            .offcanvas {
+                max-width: 100% !important;
+            }
+
+            /* Form labels smaller */
+            .form-label {
+                font-size: 0.85rem;
+            }
+
+            /* Calendar very compact */
+            .calendar-grid {
+                font-size: 0.65rem;
+            }
+
+            .calendar-day {
+                min-height: 28px;
+            }
+
+            /* Info cards in modals */
+            .info-card {
+                margin-bottom: 0.75rem;
+                padding: 0.75rem;
+            }
+
+            .info-label {
+                font-size: 0.7rem;
+            }
+
+            .info-value {
+                font-size: 0.85rem;
+            }
+
+            /* Button groups stack */
+            .modal-footer .btn-group,
+            .modal-footer .d-flex {
+                flex-direction: column-reverse;
+                width: 100%;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+                margin: 0.25rem 0;
+            }
+        }
+
+        /* Prevent horizontal scrolling */
+        @media (max-width: 991px) {
+            body, html {
+                overflow-x: hidden;
+                max-width: 100vw;
+            }
+
+            .row {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            .row > * {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+
+            /* Ensure all elements fit */
+            *, *::before, *::after {
+                max-width: 100%;
+            }
+
+            /* Table container */
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            /* Larger touch targets */
+            .btn,
+            .page-link,
+            .btn-icon,
+            .dropdown-toggle {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            /* Calendar days */
+            .calendar-day {
+                min-height: 44px !important;
+            }
+
+            /* Time slots */
+            .time-slot {
+                min-height: 44px;
+            }
+
+            /* Remove hover effects */
+            .appointment-card:hover {
+                transform: none;
+            }
+
+            .table-modern tbody tr:hover {
+                background-color: inherit;
+            }
+        }
     </style>
 @endsection
 

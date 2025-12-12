@@ -637,21 +637,356 @@
             color: #cbd3da !important;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 1199px) {
-            .col-xl-6 {
-                width: 100%;
-                margin-bottom: 1rem;
+        /* ========== RESPONSIVE STYLES ========== */
+        
+        /* Tablet and below (≤991px) */
+        @media (max-width: 991px) {
+            .col-md-10 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .booking-body {
+                padding: 1.5rem;
+            }
+
+            .form-section {
+                padding: 1rem;
             }
         }
-        
+
+        /* Tablet (≤768px) */
         @media (max-width: 768px) {
-            .time-slots-grid {
-                grid-template-columns: 1fr;
+            .booking-card {
+                border-radius: 8px;
+                margin: 0;
             }
-            
+
+            .booking-header {
+                padding: 1rem;
+                border-radius: 8px 8px 0 0;
+            }
+
+            .booking-header h4 {
+                font-size: 1.1rem;
+            }
+
+            .booking-header p {
+                font-size: 0.875rem;
+            }
+
+            .booking-body {
+                padding: 1rem;
+            }
+
+            .form-section {
+                padding: 0.75rem;
+                margin-bottom: 1rem;
+            }
+
+            /* Step indicator adjustments */
+            .step-indicator {
+                margin-bottom: 1rem;
+            }
+
+            .step-circle {
+                width: 36px;
+                height: 36px;
+                margin-bottom: 0.25rem;
+            }
+
+            .step-label {
+                font-size: 0.75rem;
+            }
+
+            /* Calendar adjustments */
             .calendar-grid {
                 font-size: 0.75rem;
+                gap: 1px;
+            }
+
+            .calendar-header {
+                padding: 0.4rem;
+                font-size: 0.75rem;
+            }
+
+            .calendar-day {
+                font-size: 0.75rem;
+                min-height: 35px;
+            }
+
+            .calendar-day .slot-indicator {
+                font-size: 0.55rem;
+                padding: 0px 2px;
+            }
+
+            /* Time slots */
+            .time-slots-grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .time-slot {
+                padding: 0.6rem;
+            }
+
+            /* Legend */
+            .calendar-legend {
+                gap: 0.5rem;
+                padding: 0.75rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .legend-item {
+                font-size: 0.8rem;
+            }
+
+            .legend-color {
+                width: 18px;
+                height: 18px;
+            }
+
+            /* Buttons */
+            .btn-primary,
+            .btn-secondary {
+                padding: 0.6rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            /* Form controls */
+            .form-control {
+                padding: 0.6rem;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .form-label {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Mobile (≤576px) */
+        @media (max-width: 576px) {
+            .booking-card {
+                border-radius: 6px;
+            }
+
+            .booking-header {
+                padding: 0.75rem;
+            }
+
+            .booking-header h4 {
+                font-size: 1rem;
+            }
+
+            .booking-header p {
+                font-size: 0.8rem;
+            }
+
+            .booking-header .d-flex {
+                gap: 0.5rem;
+            }
+
+            .booking-header .fs-3 {
+                font-size: 1.25rem !important;
+            }
+
+            .booking-body {
+                padding: 0.75rem;
+            }
+
+            .form-section {
+                padding: 0.6rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .form-section h6 {
+                font-size: 0.9rem;
+                margin-bottom: 0.75rem;
+            }
+
+            /* Step indicator - more compact */
+            .step-indicator {
+                margin-bottom: 0.75rem;
+            }
+
+            .step-circle {
+                width: 32px;
+                height: 32px;
+                font-size: 0.875rem;
+            }
+
+            .step-label {
+                font-size: 0.7rem;
+            }
+
+            /* Calendar - very compact */
+            .calendar-grid {
+                font-size: 0.7rem;
+                gap: 1px;
+            }
+
+            .calendar-header {
+                padding: 0.3rem 0.2rem;
+                font-size: 0.7rem;
+            }
+
+            .calendar-day {
+                font-size: 0.7rem;
+                min-height: 32px;
+                padding: 2px;
+            }
+
+            .calendar-day .slot-indicator {
+                font-size: 0.5rem;
+                padding: 0px 1px;
+                bottom: 1px;
+                right: 1px;
+            }
+
+            /* Calendar navigation */
+            #prevMonth,
+            #nextMonth {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.875rem;
+            }
+
+            #currentMonth {
+                font-size: 0.9rem;
+            }
+
+            /* Time slots container */
+            .time-slots-container {
+                max-height: 400px;
+            }
+
+            .time-slots-grid-wrapper {
+                max-height: 350px;
+            }
+
+            .time-slots-grid {
+                grid-template-columns: 1fr;
+                gap: 0.4rem;
+            }
+
+            .time-slot {
+                padding: 0.5rem;
+            }
+
+            .time-slot .time {
+                font-size: 0.85rem;
+            }
+
+            .time-slot .status {
+                font-size: 0.7rem;
+            }
+
+            /* Legend - stack vertically if needed */
+            .calendar-legend {
+                gap: 0.4rem;
+                padding: 0.6rem;
+            }
+
+            .legend-item {
+                font-size: 0.75rem;
+                gap: 0.4rem;
+            }
+
+            .legend-color {
+                width: 16px;
+                height: 16px;
+            }
+
+            /* Buttons - full width on mobile */
+            .btn-primary,
+            .btn-secondary {
+                padding: 0.55rem 1rem;
+                font-size: 0.875rem;
+            }
+
+            .d-flex.gap-3.justify-content-end {
+                flex-direction: column-reverse;
+                width: 100%;
+            }
+
+            .d-flex.gap-3.justify-content-end .btn {
+                width: 100%;
+            }
+
+            /* Form controls */
+            .form-control,
+            .form-select {
+                padding: 0.55rem;
+                font-size: 16px;
+            }
+
+            .form-label {
+                font-size: 0.85rem;
+            }
+
+            /* Modal adjustments */
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+
+            .modal-header {
+                padding: 1rem;
+            }
+
+            .modal-body {
+                padding: 1rem;
+            }
+
+            .confirmation-detail {
+                flex-direction: column;
+                padding: 0.5rem 0;
+                gap: 0.25rem;
+            }
+
+            .confirmation-label {
+                font-size: 0.85rem;
+            }
+
+            .confirmation-value {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Ensure no horizontal scrolling */
+        @media (max-width: 991px) {
+            .row {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            .row > * {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+
+            /* Prevent content overflow */
+            * {
+                max-width: 100%;
+            }
+
+            .container,
+            .container-fluid {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .time-slot,
+            .calendar-day,
+            .btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            /* Larger touch targets for calendar */
+            .calendar-day {
+                min-height: 44px;
             }
         }
     </style>

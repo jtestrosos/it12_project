@@ -1273,22 +1273,148 @@
         }
 
         /* ---------- Responsive ---------- */
+        
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition), visibility var(--transition);
+        }
+
+        .sidebar-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        body.bg-dark .sidebar-overlay {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Hide overlay on desktop - only show on mobile */
+        @media (min-width: 992px) {
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+
+        /* Ensure modals appear above sidebar overlay */
+        .modal {
+            z-index: 1050 !important;
+        }
+
+        .modal-backdrop {
+            z-index: 1040 !important;
+        }
+
+        /* Ensure dropdown menus appear above everything */
+        .dropdown-menu {
+            z-index: 1060 !important;
+        }
+
+        /* Mobile Header Button */
+        .mobile-menu-btn {
+            display: none;
+            width: 44px;
+            height: 44px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #495057;
+            cursor: pointer;
+            padding: 0;
+            border-radius: 10px;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+
+        .mobile-menu-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--color-primary);
+        }
+
+        body.bg-dark .mobile-menu-btn {
+            color: #cbd3da;
+        }
+
+        body.bg-dark .mobile-menu-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--color-primary-light);
+        }
+
+        /* Tablet and Below (≤991px) */
         @media (max-width: 991px) {
+            /* CRITICAL FIX: Force main content to full width */
+            html, body {
+                width: 100% !important;
+                max-width: 100vw !important;
+                overflow-x: hidden !important;
+            }
+
+            .main-content, #mainContent {
+                width: 100% !important;
+                max-width: 100vw !important;
+                margin-left: 0 !important;
+                box-sizing: border-box !important;
+            }
+
+            main, main.p-4 {
+                width: 100% !important;
+                max-width: 100vw !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Hide desktop sidebar by default, show as off-canvas */
             .sidebar {
                 transform: translateX(-100%);
                 width: var(--sidebar-width);
+                box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
             }
 
             .sidebar.show {
                 transform: translateX(0);
             }
 
+            /* CRITICAL: Remove margin from main content - it's full width on mobile */
             .main-content {
                 margin-left: 0 !important;
+                width: 100% !important;
+                max-width: 100vw !important;
             }
 
+            /* Ensure body and html don't create gray space */
+            body, html {
+                width: 100%;
+                max-width: 100vw;
+                overflow-x: hidden;
+            }
+
+            /* Show mobile menu button in header */
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            /* Show close button inside sidebar on mobile */
+            .close-sidebar-btn {
+                display: flex;
+            }
+
+            .burger-menu-btn:not(.close-sidebar-btn) {
+                display: none;
+            }
+
+            /* Adjust header padding for mobile */
             .header {
                 padding: 1rem;
+                width: 100%;
             }
 
             .header h4 {
@@ -1296,15 +1422,273 @@
             }
 
             .header .text-muted {
-                font-size: .85rem;
+                font-size: 0.85rem;
+            }
+
+            /* Make cards more compact on tablet */
+            .card-surface,
+            .metric-card,
+            .inventory-card,
+            .chart-container,
+            .filter-card,
+            .table-card {
+                padding: var(--spacing-md);
+                border-radius: var(--radius-md);
+            }
+
+            /* Adjust chart container height */
+            .chart-container {
+                min-height: 320px;
+            }
+
+            /* Make buttons slightly smaller on tablet */
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+
+            .btn-sm {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.8125rem;
+            }
+
+            /* Improve table responsiveness */
+            .table-responsive {
+                border-radius: var(--radius-md);
+                overflow-x: auto;
+                width: 100%;
+            }
+
+            /* Remove any fixed widths */
+            .container,
+            .container-fluid,
+            .row,
+            [class*="col-"] {
+                max-width: 100% !important;
+                width: 100%;
             }
         }
 
+        /* Mobile Phones (≤767px) */
+        @media (max-width: 767px) {
+            /* Further reduce header padding */
+            .header {
+                padding: 0.75rem;
+            }
+
+            .header h4 {
+                font-size: 1rem;
+            }
+
+            .header .text-muted {
+                font-size: 0.8rem;
+                display: none; /* Hide subtitle on very small screens */
+            }
+
+            /* Mobile header logo */
+            .header img {
+                width: 36px !important;
+                height: 36px !important;
+                margin-right: 10px !important;
+            }
+
+            /* Even more compact cards */
+            .card-surface,
+            .metric-card,
+            .inventory-card,
+            .filter-card {
+                padding: var(--spacing-sm);
+                margin-bottom: var(--spacing-sm);
+            }
+
+            .chart-container {
+                padding: var(--spacing-md);
+                min-height: 280px;
+            }
+
+            /* Responsive typography */
+            h1, .h1 {
+                font-size: 1.75rem;
+            }
+
+            h2, .h2 {
+                font-size: 1.5rem;
+            }
+
+            h3, .h3 {
+                font-size: 1.25rem;
+            }
+
+            h4, .h4 {
+                font-size: 1.1rem;
+            }
+
+            h5, .h5 {
+                font-size: 1rem;
+            }
+
+            h6, .h6 {
+                font-size: 0.875rem;
+            }
+
+            /* Stack elements vertically */
+            .d-flex.flex-row {
+                flex-direction: column !important;
+            }
+
+            /* Full width buttons on mobile */
+            .btn-group {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-group .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            /* Improve form controls for touch */
+            .form-control,
+            .form-select {
+                font-size: 16px; /* Prevents zoom on iOS */
+                min-height: 44px; /* Touch-friendly */
+            }
+
+            /* Modal adjustments for mobile */
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+
+            .modal-content {
+                border-radius: var(--radius-md);
+            }
+
+            /* Table improvements */
+            .table {
+                font-size: 0.875rem;
+            }
+
+            .table thead th,
+            .table tbody td {
+                padding: 0.5rem;
+            }
+
+            /* Pagination */
+            .pagination {
+                font-size: 0.875rem;
+            }
+
+            .page-link {
+                padding: 0.375rem 0.75rem;
+            }
+        }
+
+        /* Small Mobile (≤576px) */
         @media (max-width: 576px) {
             .header img {
                 width: 32px !important;
                 height: 32px !important;
                 margin-right: 8px !important;
+            }
+
+            .header h4 {
+                font-size: 0.95rem;
+            }
+
+            /* Ultra compact cards */
+            .card-surface,
+            .metric-card,
+            .inventory-card,
+            .filter-card {
+                padding: 0.75rem;
+            }
+
+            /* Dropdown menus full width on small mobile */
+            .dropdown-menu {
+                min-width: calc(100vw - 2rem);
+            }
+
+            /* User profile dropdown adjustments */
+            .header .dropdown-menu {
+                right: 0;
+                left: auto;
+                transform: translateX(0) !important;
+            }
+        }
+
+        /* Landscape mode on mobile devices */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .sidebar {
+                width: 200px; /* Narrower sidebar in landscape */
+            }
+
+            .header {
+                padding: 0.5rem 1rem;
+                min-height: 56px;
+            }
+
+            .chart-container {
+                min-height: 240px;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            /* Ensure all interactive elements are touch-friendly */
+            .btn,
+            .nav-link,
+            .dropdown-item,
+            a {
+                min-height: 44px;
+                min-width: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Remove hover effects on touch devices */
+            .card-surface:hover,
+            .metric-card:hover,
+            .inventory-card:hover {
+                transform: none;
+            }
+
+            /* Larger tap targets for nav items */
+            .sidebar .nav-link {
+                min-height: 48px;
+            }
+        }
+
+        /* High DPI screens */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            /* Ensure crisp fonts and icons */
+            body {
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .sidebar,
+            .header,
+            .sidebar-overlay,
+            .mobile-menu-btn,
+            .btn,
+            .no-print {
+                display: none !important;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+            }
+
+            .card-surface,
+            .metric-card,
+            .table-card {
+                box-shadow: none !important;
+                border: 1px solid #dee2e6 !important;
             }
         }
 
@@ -1341,6 +1725,13 @@
         <!-- Header -->
         <header class="header">
             <div class="d-flex align-items-center">
+                <!-- Mobile Menu Button (shown only on mobile) -->
+                @if(!View::hasSection('hide-sidebar'))
+                    <button class="mobile-menu-btn me-2" id="mobileMenuBtn" aria-label="Open menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                @endif
+                
                 <img src="{{ asset('images/malasakit-logo-blue.png') }}" alt="Logo"
                     style="width:40px;height:40px;margin-right:12px;">
                 <div>
@@ -1610,6 +2001,11 @@
             };
 
             toggleBtn?.addEventListener('click', toggleSidebar);
+            
+            // Mobile menu button
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            mobileMenuBtn?.addEventListener('click', toggleSidebar);
+            
             closeBtn?.addEventListener('click', () => {
                 sidebar.classList.remove('show');
                 overlay.classList.remove('show');
@@ -1617,6 +2013,26 @@
             overlay?.addEventListener('click', () => {
                 sidebar.classList.remove('show');
                 overlay.classList.remove('show');
+            });
+
+            // Handle window resize
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    // Re-initialize sidebar state based on new window size
+                    if (isDesktop()) {
+                        overlay.classList.remove('show');
+                        const collapsed = localStorage.getItem(sidebarKey) !== 'false';
+                        sidebar.classList.toggle('collapsed', collapsed);
+                        mainContent.classList.toggle('sidebar-closed', collapsed);
+                        sidebar.classList.add('show');
+                    } else {
+                        sidebar.classList.remove('collapsed', 'show');
+                        overlay.classList.remove('show');
+                        mainContent.classList.remove('sidebar-closed');
+                    }
+                }, 150);
             });
 
             let rt;
