@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 
     <!-- Loading Screen -->
-    <style nonce="{{ $cspNonce }}">
+    <style>
         /* Hide scrollbar during loading */
         body:has(#page-loader:not(.loaded)) {
             overflow: hidden !important;
@@ -69,7 +69,7 @@
             opacity: 1;
         }
     </style>
-    <script nonce="{{ $cspNonce }}">
+    <script>
         // Check if coming from dark mode logout (one-time flag)
         (function() {
             var isLogoutFromDark = sessionStorage.getItem('logout-from-dark') === 'true';
@@ -101,7 +101,7 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     </noscript>
 
-    <style nonce="{{ $cspNonce }}">
+    <style>
         :root {
             --bs-primary: #009fb1;
             --bs-primary-rgb: 0, 159, 177;
@@ -478,7 +478,8 @@
                                     <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
-                                        <a class="dropdown-item logout-link" href="{{ route('logout') }}">
+                                        <a class="dropdown-item" href="{{ route('logout') }}"
+                                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                             Logout
                                         </a>
                                     </li>
@@ -537,7 +538,7 @@
                                 @endif
                                 <li class="nav-item">
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-                                    <a class="nav-link logout-link" href="#">Logout</a>
+                                    <a class="nav-link" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
                                 </li>
                             @endif
                         </ul>
@@ -674,18 +675,6 @@
             </div>
         </div>
     </div>
-
-    <script nonce="{{ $cspNonce }}">
-        document.addEventListener('DOMContentLoaded', function() {
-            const logoutLinks = document.querySelectorAll('.logout-link');
-            logoutLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    document.getElementById('logout-form').submit();
-                });
-            });
-        });
-    </script>
 
     <!-- Register Modal -->
     <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
