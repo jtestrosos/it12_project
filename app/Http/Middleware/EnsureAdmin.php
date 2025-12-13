@@ -19,7 +19,7 @@ class EnsureAdmin
         if (!Auth::guard('admin')->check()) {
             // If user is logged in as another role, show unauthorized instead of login redirect
             if (Auth::guard('patient')->check() || Auth::guard('super_admin')->check() || Auth::check()) {
-                abort(403, 'Unauthorized access. You do not have permission to view this page.');
+                return redirect()->back();
             }
             return redirect('/login')->with('error', 'Please login as an admin to access this page.');
         }

@@ -950,47 +950,60 @@ class AdminController extends Controller
             ->groupBy('service_type')
             ->get();
 
-        // --- Multi-timeframe Trend Data ---
+        // Insights Data
+        // 1. Service Efficiency Matrix (Analytics)
+        $servicePerformance = Appointment::selectRaw("
+                service_type, 
+                count(*) as total,
+                sum(case when status = 'completed' then 1 else 0 end) as completed,
+                sum(case when status = 'cancelled' then 1 else 0 end) as cancelled,
+                sum(case when status = 'pending' then 1 else 0 end) as pending
+            ")
+            ->groupBy('service_type')
+            ->orderByDesc('total')
+            ->get();
 
+        // 2. Inventory by Category (Analytics)
+        $inventoryByCategory = Inventory::selectRaw('category, count(*) as count, sum(current_stock) as total_stock')
+            ->groupBy('category')
+            ->orderByDesc('count')
+            ->limit(5)
+            ->get();
+
+        // 3. Status Trends for Line Chart (Comparison)
         $driver = DB::getDriverName();
-
-        // 1. Weekly (Current Week: Sun-Sat)
-        $startOfWeek = now()->startOfWeek();
-        $endOfWeek = now()->endOfWeek();
-        $dayOfWeekSql = $driver === 'pgsql' ? 'EXTRACT(DOW FROM appointment_date) + 1' : 'DAYOFWEEK(appointment_date)';
-        $weeklyData = Appointment::selectRaw("$dayOfWeekSql as day, count(*) as count")
-            ->whereBetween('appointment_date', [$startOfWeek, $endOfWeek])
-            ->groupBy('day')
-            ->pluck('count', 'day')
-            ->toArray();
-
-        // 2. Monthly (Current Month: 1st-End)
-        $startOfMonth = now()->startOfMonth();
-        $endOfMonth = now()->endOfMonth();
-        $daySql = $driver === 'pgsql' ? 'EXTRACT(DAY FROM appointment_date)' : 'DAY(appointment_date)';
-        $monthlyData = Appointment::selectRaw("$daySql as day, count(*) as count")
-            ->whereBetween('appointment_date', [$startOfMonth, $endOfMonth])
-            ->groupBy('day')
-            ->pluck('count', 'day')
-            ->toArray();
-
-        // 3. Yearly (Current Year: Jan-Dec)
-        $startOfYear = now()->startOfYear();
-        $endOfYear = now()->endOfYear();
         $monthSql = $driver === 'pgsql' ? 'EXTRACT(MONTH FROM appointment_date)' : 'MONTH(appointment_date)';
-        $yearlyData = Appointment::selectRaw("$monthSql as month, count(*) as count")
-            ->whereBetween('appointment_date', [$startOfYear, $endOfYear])
-            ->groupBy('month')
-            ->pluck('count', 'month')
-            ->toArray();
-
-        $trendData = [
-            'weekly' => $weeklyData,
-            'monthly' => $monthlyData,
-            'yearly' => $yearlyData
+        
+        // Group by Month AND Status
+        $rawTrend = Appointment::selectRaw("$monthSql as month, status, count(*) as count")
+            ->whereYear('appointment_date', now()->year)
+            ->whereIn('status', ['completed', 'cancelled', 'pending'])
+            ->groupBy('month', 'status')
+            ->get();
+        
+        // Format for Chart.js (Datasets)
+        $monthlyTrend = [
+            'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            'completed' => array_fill(0, 12, 0),
+            'cancelled' => array_fill(0, 12, 0),
+            'pending' => array_fill(0, 12, 0),
         ];
 
-        return view('admin.reports', compact('appointmentStats', 'inventoryStats', 'serviceTypes', 'trendData'));
+        foreach ($rawTrend as $row) {
+            $monthIndex = $row->month - 1; // 0-indexed
+            if(isset($monthlyTrend[$row->status][$monthIndex])) {
+                $monthlyTrend[$row->status][$monthIndex] = $row->count;
+            }
+        }
+
+        return view('admin.reports', compact(
+            'appointmentStats', 
+            'inventoryStats', 
+            'serviceTypes', 
+            'servicePerformance',
+            'inventoryByCategory',
+            'monthlyTrend'
+        ));
     }
 
     public function analytics()
