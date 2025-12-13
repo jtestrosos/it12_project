@@ -37,6 +37,8 @@ class SecurityHeaders
             "img-src 'self' data: https:",
             "connect-src 'self'",
             "frame-ancestors 'self'",
+            "base-uri 'self'",
+            "object-src 'none'",
         ]);
         $response->headers->set('Content-Security-Policy', $csp);
 
