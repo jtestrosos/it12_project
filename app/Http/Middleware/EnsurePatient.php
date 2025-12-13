@@ -17,6 +17,9 @@ class EnsurePatient
     public function handle(Request $request, Closure $next): Response
     {
         if (!Auth::guard('patient')->check()) {
+             if (Auth::guard('admin')->check() || Auth::guard('super_admin')->check() || Auth::check()) {
+                abort(403, 'Unauthorized access. You do not have permission to view this page.');
+            }
             return redirect('/login')->with('error', 'Please login as a patient to access this page.');
         }
 
