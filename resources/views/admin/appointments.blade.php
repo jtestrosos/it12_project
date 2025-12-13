@@ -1025,15 +1025,7 @@
                 height: 26px;
             }
 
-            /* Smaller pagination */
-            .pagination {
-                font-size: 0.75rem;
-                justify-content: center;
-            }
 
-            .page-link {
-                padding: 0.35rem 0.5rem;
-            }
 
             /* ===== MODAL RESPONSIVE FIXES ===== */
             /* Make modals nearly full-screen on very small devices */
@@ -1430,19 +1422,9 @@
         </div>
     </div>
 
-    <!-- Pagination -->
-    <div class="d-flex flex-column align-items-center mt-4" id="appointmentsPaginationContainer">
-        <div>
-            {{ $appointments->links('pagination::bootstrap-5') }}
-        </div>
-        <div class="small text-muted mb-0 mt-n2">
-            @if($appointments->total() > 0)
-                Showing {{ $appointments->firstItem() }}-{{ $appointments->lastItem() }} of {{ $appointments->total() }} items
-            @else
-                Showing 0 items
-            @endif
-        </div>
-    </div>
+    @if($appointments->count() > 0)
+        <div id="appointmentsPaginationContainer"></div>
+    @endif
 
     <!-- Add Appointment Modal -->
     <div class="modal fade" id="addAppointmentModal" tabindex="-1">
@@ -2608,4 +2590,22 @@
             });
         }
     </script>
+    @if($appointments->count() > 0)
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize reusable pagination
+            window.paginatorInstance = new TablePaginator({
+                tableId: 'appointmentsTable', // This ID is unused in class but good for reference, ensure table has it? Actually class uses bodyId
+                tableBodyId: 'appointmentsTableBody',
+                paginationContainerId: 'appointmentsPaginationContainer',
+                searchId: 'appointmentSearch',
+                rowsPerPage: 10,
+                filterInputs: {
+                    'appointmentStatusFilter': 'data-status',
+                    'appointmentServiceFilter': 'data-service'
+                }
+            });
+        });
+    </script>
+    @endif
 @endpush

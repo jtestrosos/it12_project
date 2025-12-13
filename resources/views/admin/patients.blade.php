@@ -448,7 +448,7 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Search</label>
-                            <input type="text" class="form-control" id="barangayFilter"
+                            <input type="text" class="form-control" id="patientSearch"
                                 placeholder="Enter Patient's Name, Barangay or Purok">
                         </div>
                         <div class="col-md-2">
@@ -570,11 +570,8 @@
             </div>
         @endif
         <!-- Pagination -->
-        <div class="d-flex flex-column align-items-center mt-4" id="patientsPaginationContainer">
-            <div class="small text-muted mb-0">
-                Total Patients: {{ $patients->count() }}
-            </div>
-        </div>
+        <!-- Pagination -->
+        <div id="patientsPaginationContainer" class="mt-4"></div>
     </div>
     </div>
 @endsection
@@ -1639,6 +1636,36 @@
                 appointmentCalendar.selectedDate = null;
                 document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
             }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the TablePaginator for Patients
+            new TablePaginator({
+                tableId: 'patientsTableBody', // Using tbody ID as the main table reference
+                tableBodyId: 'patientsTableBody',
+                paginationContainerId: 'patientsPaginationContainer',
+                searchId: 'patientSearch',
+                filterInputs: {
+                    statusFilter: (row, statusToCheck) => {
+                        // Logic to find status in the row
+                        // The status is in the 3rd column (index 2)
+                        const statusCell = row.cells[2].textContent.trim().toLowerCase();
+                        if (statusToCheck === 'active') return statusCell === 'active';
+                        if (statusToCheck === 'inactive') return statusCell === 'inactive';
+                        return true;
+                    },
+                     appointmentFilter: (row, value) => {
+                        // Logic to check appointments
+                        // Appointment count is in the 5th column (index 4)
+                        const appointmentCount = parseInt(row.cells[4].textContent.trim());
+                        if (value === 'with-appointments') return appointmentCount > 0;
+                        if (value === 'no-appointments') return appointmentCount === 0;
+                        return true;
+                     }
+                },
+                rowsPerPage: 10
+            });
         });
     </script>
 @endpush

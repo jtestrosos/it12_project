@@ -175,9 +175,99 @@
             --shadow-dark-sm: 0 2px 8px rgba(0, 0, 0, .3);
             --shadow-dark-md: 0 6px 18px rgba(0, 0, 0, .4);
             --shadow-dark-lg: 0 10px 30px rgba(0, 0, 0, .5);
+
+            /* Analytics Theme Variables */
+            --chart-height: 300px;
+            --kpi-trend-up: #10b981;
+            --kpi-trend-down: #ef4444;
+            --kpi-trend-neutral: #94a3b8;
         }
 
-        body {
+        /* --- Global Analytics Components --- */
+
+        /* 1. KPI Cards */
+        .kpi-row { 
+            display: flex; gap: 1rem; margin-bottom: 2rem; overflow-x: auto; padding-bottom: 0.5rem; 
+        }
+        
+        .kpi-card {
+            flex: 1;
+            min-width: 200px;
+            background: var(--card-bg-light);
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: #cbd5e1;
+        }
+
+        .kpi-label { 
+            font-size: 0.85rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; 
+        }
+        
+        .kpi-value { 
+            font-size: 2rem; font-weight: 700; color: #1e293b; line-height: 1; 
+        }
+        
+        .kpi-sub { 
+            font-size: 0.8rem; margin-top: 0.5rem; display: flex; align-items: center; gap: 0.25rem; color: #64748b; 
+        }
+        
+        .text-trend-up { color: var(--kpi-trend-up) !important; }
+        .text-trend-down { color: var(--kpi-trend-down) !important; }
+        .text-neutral { color: var(--kpi-trend-neutral) !important; }
+
+        /* 2. Chart Sections */
+        .chart-section {
+            background: var(--card-bg-light); 
+            border: 1px solid #e2e8f0; 
+            border-radius: var(--radius-md); 
+            padding: 1.5rem; 
+            height: 100%;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .section-header { 
+            margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; 
+        }
+        
+        .header-title { 
+            font-size: 1.1rem; font-weight: 700; color: #334155; 
+        }
+
+        /* 3. Filter Buttons */
+        .btn-filter {
+            border: none; background: transparent; color: #94a3b8; font-weight: 600; font-size: 0.85rem; padding: 0.25rem 0.75rem;
+            transition: color 0.2s;
+        }
+        .btn-filter:hover { color: #64748b; }
+        .btn-filter.active { color: #0f172a; text-decoration: underline; text-underline-offset: 4px; }
+
+        /* Dark Mode Overrides for Analytics */
+        body.bg-dark .kpi-card, 
+        body.bg-dark .chart-section { 
+            background: var(--card-bg-dark); 
+            border-color: var(--border-dark); 
+        }
+        
+        body.bg-dark .kpi-value, 
+        body.bg-dark .header-title { color: #f1f5f9; }
+        
+        body.bg-dark .kpi-label,
+        body.bg-dark .kpi-sub,
+        body.bg-dark .btn-filter { color: #94a3b8; }
+        
+        body.bg-dark .btn-filter:hover { color: #cbd5e1; }
+        body.bg-dark .btn-filter.active { color: #f1f5f9; }
             background-color: var(--bg-light);
             color: var(--text-light);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -2237,6 +2327,242 @@
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        /**
+         * Reusable Client-Side Pagination & Search Class
+         */
+        /**
+         * Reusable Client-Side Pagination & Search Class
+         * Enhanced with premium styling and robust state management.
+         */
+        class TablePaginator {
+            constructor(config) {
+                this.tableId = config.tableId;
+                this.tableBodyId = config.tableBodyId;
+                this.paginationContainerId = config.paginationContainerId;
+                this.searchId = config.searchId; 
+                this.rowsPerPage = config.rowsPerPage || 10;
+                this.filterInputs = config.filterInputs || {};
+                
+                // State
+                this.rows = Array.from(document.querySelectorAll(`#${this.tableBodyId} tr`));
+                this.filteredRows = [...this.rows];
+                this.currentPage = 1;
+
+                // Register instance globally for onclick handlers
+                window.TablePaginators = window.TablePaginators || {};
+                window.TablePaginators[this.tableId] = this;
+
+                this.init();
+            }
+
+            init() {
+                // Setup Search Listener
+                if (this.searchId) {
+                    const searchInput = document.getElementById(this.searchId);
+                    if (searchInput) {
+                        searchInput.addEventListener('input', (e) => {
+                            this.currentPage = 1; // Reset to page 1 on search
+                            this.filterRows(e.target.value);
+                        });
+                    }
+                }
+
+                // Setup Custom Filter Listeners
+                for (const [inputId, attribute] of Object.entries(this.filterInputs)) {
+                     const input = document.getElementById(inputId);
+                     if(input) {
+                         input.addEventListener('change', () => {
+                             this.currentPage = 1; // Reset to page 1 on filter change
+                             this.filterRows();
+                         });
+                     }
+                }
+
+                // Initial Render
+                this.render();
+            }
+
+            filterRows(searchValue = null) {
+                // Get current search value if not provided
+                if (searchValue === null && this.searchId) {
+                    const el = document.getElementById(this.searchId);
+                    searchValue = el ? el.value : '';
+                }
+                
+                const term = (searchValue || '').toLowerCase().trim();
+
+                this.filteredRows = this.rows.filter(row => {
+                    // Text Search
+                    // We join all cell text to ensure we search the visible content
+                    const textMatch = row.innerText.toLowerCase().includes(term);
+                    
+                    // Attribute Filters
+                    let attrMatch = true;
+                    for (const [inputId, filterDef] of Object.entries(this.filterInputs)) {
+                        const input = document.getElementById(inputId);
+                        if(input && input.value) {
+                             if (typeof filterDef === 'function') {
+                                 // Custom filter function: (row, inputValue) => boolean
+                                 if (!filterDef(row, input.value)) {
+                                     attrMatch = false;
+                                 }
+                             } else {
+                                 // Simple attribute match
+                                 const attribute = filterDef;
+                                 const rowValue = row.getAttribute(attribute);
+                                 // Exact match or contains? Using exact for dropdowns usually.
+                                 if (input.value.toLowerCase() !== (rowValue || '').toLowerCase()) {
+                                     attrMatch = false;
+                                 }
+                             }
+                        }
+                    }
+
+                    return textMatch && attrMatch;
+                });
+
+                this.render();
+            }
+
+            render() {
+                const totalRows = this.filteredRows.length;
+                const totalPages = Math.ceil(totalRows / this.rowsPerPage);
+                
+                // Ensure current page is valid
+                if (this.currentPage > totalPages) this.currentPage = totalPages || 1;
+                if (this.currentPage < 1) this.currentPage = 1;
+
+                const start = (this.currentPage - 1) * this.rowsPerPage;
+                const end = start + this.rowsPerPage;
+                const pageRows = this.filteredRows.slice(start, end);
+
+                // Batch DOM updates for rows
+                this.rows.forEach(row => {
+                    if (row.style.display !== 'none') row.style.display = 'none';
+                });
+
+                pageRows.forEach(row => {
+                    if (row.style.display !== '') row.style.display = '';
+                });
+
+                this.renderPaginationControls(totalRows, totalPages, start, end);
+            }
+
+            renderPaginationControls(totalRows, totalPages, start, end) {
+                const container = document.getElementById(this.paginationContainerId);
+                if (!container) return;
+
+                if (totalRows === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="fas fa-search text-muted fa-2x mb-2 opacity-50"></i>
+                            <p class="text-muted small mb-0">No records found matching your query.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const showingStart = start + 1;
+                const showingEnd = Math.min(end, totalRows);
+
+                // Premium Pagination Styling
+                let paginationHtml = `
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mt-4 gap-3">
+                        <div class="small text-muted order-2 order-sm-1">
+                            Showing <span class="fw-bold text-dark">${showingStart}</span> to <span class="fw-bold text-dark">${showingEnd}</span> of <span class="fw-bold text-dark">${totalRows}</span> entries
+                        </div>
+                        
+                        <nav aria-label="Page navigation" class="order-1 order-sm-2">
+                            <ul class="pagination pagination-sm mb-0 shadow-sm rounded-pill overflow-hidden">
+                                <li class="page-item ${this.currentPage === 1 ? 'disabled' : ''}">
+                                    <button class="page-link border-0 px-3 h-100 d-flex align-items-center" 
+                                            onclick="window.TablePaginators['${this.tableId}'].goToPage(${this.currentPage - 1})"
+                                            ${this.currentPage === 1 ? 'disabled' : ''}>
+                                        <i class="fas fa-chevron-left x-small"></i>
+                                    </button>
+                                </li>`;
+
+                // Smart Pagination Logic (1 ... 4 5 6 ... 10)
+                const maxPagesToShow = 5;
+                let startPage, endPage;
+
+                if (totalPages <= maxPagesToShow) {
+                    startPage = 1;
+                    endPage = totalPages;
+                } else {
+                    const maxPagesBeforeCurrentPage = Math.floor(maxPagesToShow / 2);
+                    const maxPagesAfterCurrentPage = Math.ceil(maxPagesToShow / 2) - 1;
+                    
+                    if (this.currentPage <= maxPagesBeforeCurrentPage) {
+                        startPage = 1;
+                        endPage = maxPagesToShow;
+                    } else if (this.currentPage + maxPagesAfterCurrentPage >= totalPages) {
+                        startPage = totalPages - maxPagesToShow + 1;
+                        endPage = totalPages;
+                    } else {
+                        startPage = this.currentPage - maxPagesBeforeCurrentPage;
+                        endPage = this.currentPage + maxPagesAfterCurrentPage;
+                    }
+                }
+
+                // First Page + Ellipsis
+                if (startPage > 1) {
+                    paginationHtml += `
+                        <li class="page-item">
+                            <button class="page-link border-0" onclick="window.TablePaginators['${this.tableId}'].goToPage(1)">1</button>
+                        </li>
+                        ${startPage > 2 ? '<li class="page-item disabled"><span class="page-link border-0">...</span></li>' : ''}
+                    `;
+                }
+
+                // Page Numbers
+                for (let i = startPage; i <= endPage; i++) {
+                     const activeClass = i === this.currentPage ? 'active bg-primary text-white fw-bold' : 'text-muted';
+                     paginationHtml += `
+                        <li class="page-item">
+                            <button class="page-link border-0 ${activeClass}" 
+                                    style="${i === this.currentPage ? 'pointer-events: none;' : ''}"
+                                    onclick="window.TablePaginators['${this.tableId}'].goToPage(${i})">
+                                ${i}
+                            </button>
+                        </li>
+                     `;
+                }
+
+                // Last Page + Ellipsis
+                if (endPage < totalPages) {
+                    paginationHtml += `
+                        ${endPage < totalPages - 1 ? '<li class="page-item disabled"><span class="page-link border-0">...</span></li>' : ''}
+                        <li class="page-item">
+                            <button class="page-link border-0" onclick="window.TablePaginators['${this.tableId}'].goToPage(${totalPages})">${totalPages}</button>
+                        </li>
+                    `;
+                }
+
+                paginationHtml += `
+                                <li class="page-item ${this.currentPage === totalPages ? 'disabled' : ''}">
+                                    <button class="page-link border-0 px-3 h-100 d-flex align-items-center" 
+                                            onclick="window.TablePaginators['${this.tableId}'].goToPage(${this.currentPage + 1})"
+                                            ${this.currentPage === totalPages ? 'disabled' : ''}>
+                                        <i class="fas fa-chevron-right x-small"></i>
+                                    </button>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                `;
+
+                container.innerHTML = paginationHtml;
+            }
+
+            goToPage(page) {
+                this.currentPage = page;
+                this.render();
+            }
+        }
+    </script>
 
     @stack('scripts')
 </body>

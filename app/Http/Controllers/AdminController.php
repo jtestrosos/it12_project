@@ -413,7 +413,7 @@ class AdminController extends Controller
             $query->whereDate('appointment_date', '<=', $request->to);
         }
 
-        $appointments = $query->paginate(10)->withQueryString();
+        $appointments = $query->get();
 
         // Populate services for filters and booking drawer
         $services = [
@@ -437,7 +437,21 @@ class AdminController extends Controller
             ->count();
         $todayCapacity = $todaySlots > 0 ? (int) min(100, round(($todayBooked / $todaySlots) * 100)) : 0;
 
-        return view('admin.appointments', compact('appointments', 'services', 'todaySlots', 'todayBooked', 'todayCapacity'));
+        // Additional Stats for KPI Cards
+        $pendingCount = Appointment::where('status', 'pending')->count();
+        $todayCount = Appointment::whereDate('appointment_date', today())->count();
+        $completedToday = Appointment::whereDate('appointment_date', today())->where('status', 'completed')->count();
+
+        return view('admin.appointments', compact(
+            'appointments', 
+            'services', 
+            'todaySlots', 
+            'todayBooked', 
+            'todayCapacity',
+            'pendingCount',
+            'todayCount',
+            'completedToday'
+        ));
     }
 
     public function createAppointment(Request $request)
@@ -812,8 +826,7 @@ class AdminController extends Controller
         // Sort by most recent first
         $walkIns = $query->orderByDesc('appointment_date')
             ->orderByDesc('appointment_time')
-            ->paginate(15)
-            ->withQueryString();
+            ->get();
 
         // Get services for filter dropdown
         $services = [

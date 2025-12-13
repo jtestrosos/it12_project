@@ -431,11 +431,7 @@
                     </table>
                 </div>
             </div>
-            <div class="d-flex flex-column align-items-center mt-4">
-                <div class="small text-muted mb-0">
-                    Total Items: {{ $inventory->count() }}
-                </div>
-            </div>
+            <div id="inventoryPagination"></div>
 
             <!-- Per-item View Modals -->
             @foreach($inventory as $item)
@@ -715,62 +711,19 @@
 
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const searchInput = document.getElementById('inventorySearchInput');
-            const categorySelect = document.getElementById('inventoryCategorySelect');
-            const tableBody = document.getElementById('inventoryTableBody');
-            const rows = tableBody ? tableBody.querySelectorAll('tr') : [];
-
-            function filterTable() {
-                const searchValue = searchInput.value.toLowerCase();
-                const categoryValue = categorySelect.value.toLowerCase();
-
-                rows.forEach(row => {
-                    const name = row.dataset.name || '';
-                    const category = row.dataset.category || '';
-                    const location = row.dataset.location || '';
-                    const id = row.dataset.id || '';
-                    
-                    // Also search text content of the row for broader match
-                    const textContent = row.textContent.toLowerCase();
-
-                    let showRow = true;
-
-                    // Search filter
-                    if (searchValue) {
-                        // Check if search value matches name, location, ID or any text content
-                        const matchesSearch = name.includes(searchValue) || 
-                                              location.includes(searchValue) || 
-                                              id.toString().includes(searchValue) ||
-                                              textContent.includes(searchValue);
-                        
-                        if (!matchesSearch) {
-                            showRow = false;
-                        }
-                    }
-
-                    // Category filter
-                    if (categoryValue && categoryValue !== 'all' && categoryValue !== '') {
-                        if (category !== categoryValue) {
-                            showRow = false;
-                        }
-                    }
-
-                    row.style.display = showRow ? '' : 'none';
-                });
-            }
-
-            if (searchInput) {
-                searchInput.addEventListener('input', filterTable);
-                // Prevent form submission
-                searchInput.closest('form').addEventListener('submit', function(e) {
-                    e.preventDefault();
-                });
-            }
-
-            if (categorySelect) {
-                categorySelect.addEventListener('change', filterTable);
-            }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize reusable pagination
+            // Note: window.paginatorInstance assignment is optional now but kept for legacy external access if needed
+            window.paginatorInstance = new TablePaginator({
+                tableId: 'inventoryTable',
+                tableBodyId: 'inventoryTableBody',
+                paginationContainerId: 'inventoryPagination',
+                searchId: 'inventorySearchInput',
+                rowsPerPage: 10,
+                filterInputs: {
+                    'inventoryCategorySelect': 'data-category'
+                }
+            });
         });
     </script>
 @endpush

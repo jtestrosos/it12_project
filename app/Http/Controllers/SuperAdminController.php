@@ -523,7 +523,7 @@ class SuperAdminController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
-        $logs = $query->latest()->paginate(10)->withQueryString();
+        $logs = $query->latest()->get();
 
         // Get unique actions and tables for filter dropdowns
         $actions = SystemLog::distinct()->pluck('action')->filter();
