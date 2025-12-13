@@ -34,10 +34,6 @@ class SecurityHeadersTest extends TestCase
         
         // Assert unsafe-inline is NOT present in script-src
         // We removed it from script-src
-        // String format: script-src 'self' 'nonce-...'
-        // It should NOT match "script-src ... 'unsafe-inline'"
-        // But we allow it for style-src.
-        
         $this->assertStringNotContainsString("script-src 'self' 'unsafe-inline'", $csp);
     }
 
@@ -54,16 +50,20 @@ class SecurityHeadersTest extends TestCase
     
     public function test_robots_txt_exists_and_is_secure(): void
     {
-        $response = $this->get('/robots.txt');
-        $response->assertSuccessful();
-        $response->assertSee('Disallow: /admin');
+        $path = public_path('robots.txt');
+        $this->assertFileExists($path);
+        
+        $content = file_get_contents($path);
+        $this->assertStringContainsString('Disallow: /admin', $content);
     }
 
     public function test_security_txt_exists(): void
     {
-        $response = $this->get('/.well-known/security.txt');
-        $response->assertSuccessful();
-        $response->assertSee('Contact: mailto:security@malasakit.dpdns.org');
+        $path = public_path('.well-known/security.txt');
+        $this->assertFileExists($path);
+        
+        $content = file_get_contents($path);
+        $this->assertStringContainsString('Contact: mailto:security@malasakit.dpdns.org', $content);
     }
 
     /**
