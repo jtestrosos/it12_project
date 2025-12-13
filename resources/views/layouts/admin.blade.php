@@ -71,7 +71,7 @@
             pointer-events: all;
         }
     </style>
-    <script>
+    <script nonce="{{ $cspNonce }}">
         // Check theme and apply to loader
         (function() {
             var isDark = localStorage.getItem('app-theme') === 'dark';
@@ -1927,8 +1927,7 @@
                             <a class="dropdown-item rounded py-2 mb-1" href="{{ route('profile.edit') }}">
                                 <i class="fas fa-user-circle me-2 text-muted"></i> My Profile
                             </a>
-                            <a class="dropdown-item rounded py-2 text-danger" href="{{ route('logout') }}"
-                                onclick="event.preventDefault(); handleLogout();">
+                            <a class="dropdown-item logout-link" href="{{ route('logout') }}">
                                 <i class="fas fa-sign-out-alt me-2"></i> Logout
                             </a>
                         </li>
@@ -1944,9 +1943,9 @@
     </div>
 
     <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" nonce="{{ $cspNonce }}"></script>
 
-    <script>
+    <script nonce="{{ $cspNonce }}">
         const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
@@ -1961,7 +1960,7 @@
     </script>
 
     @if(session('success') || session('status') || session('error') || session('warning') || session('info'))
-        <script>
+        <script nonce="{{ $cspNonce }}">
             document.addEventListener('DOMContentLoaded', function () {
                 @if(session('success') || session('status'))
                     Toast.fire({ icon: 'success', title: "{{ session('success') ?? session('status') }}" });
@@ -1979,11 +1978,23 @@
         </script>
     @endif
 
+    <!-- Logout Form -->
     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
 
+    <script nonce="{{ $cspNonce }}">
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutLinks = document.querySelectorAll('.logout-link');
+            logoutLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById('logout-form').submit();
+                });
+            });
+        });
+    </script>
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" nonce="{{ $cspNonce }}"></script>
+    <script nonce="{{ $cspNonce }}">
         // Global function for logout with fade transition
         function handleLogout() {
             const overlay = document.getElementById('theme-transition-overlay');

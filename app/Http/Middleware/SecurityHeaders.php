@@ -15,6 +15,18 @@ class SecurityHeaders
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Disable OPTIONS method
+        if ($request->isMethod('OPTIONS')) {
+            return response('Method Not Allowed', 405);
+        }
+
+        $nonce = base64_encode(random_bytes(16));
+        
+        // Share nonce with all views
+        if (class_exists(\Illuminate\Support\Facades\View::class)) {
+             \Illuminate\Support\Facades\View::share('cspNonce', $nonce);
+        }
+
         $response = $next($request);
 
         // Prevent clickjacking attacks
@@ -31,7 +43,7 @@ class SecurityHeaders
         // Content Security Policy - Balanced policy for Laravel apps
         $csp = implode('; ', [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
+            "script-src 'self' 'nonce-{$nonce}' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
             "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com",
             "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
             "img-src 'self' data: https:",
